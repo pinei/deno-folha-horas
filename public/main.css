@@ -1,0 +1,64 @@
+body {
+    background-color: #FFFFFF;
+  }
+  .ui.menu .item img.logo {
+    margin-right: 1.5em;
+  }
+  .main.container {
+    margin-top: 7em;
+}
+
+#timesheet-panel table {
+    margin-top: 0.8em;
+    margin-bottom: 1.4em;
+}
+
+#timesheet-panel {
+    padding-bottom: 0.8em;
+}
+
+#search-panel .field {
+    max-width: 100%;
+}
+
+.ui.active.progress .bar::after {
+  -webkit-animation: progress-active 2s ease 1;
+  animation: progress-active 2s ease 1;
+}
+
+.ui.progress .bar {
+  overflow: visible;
+}
+
+.ui.progress .bar > .progress {
+  color: rgba(0,0,0);
+  overflow: visible;
+  right: auto;
+  left: .5em;
+}
+
+.ui.progress>.label {
+  position: absolute;
+  width: 100%;
+  font-size: 1em;
+  top: auto;
+  color: black;
+  margin-top: .2em;
+  margin-left: auto;
+  text-align: center;
+  /* background-color: white; */
+  z-index: 1;
+  mix-blend-mode: color-burn;
+}
+
+.ui.progress {
+  margin: 1em 0 1em;
+}
+
+.ui.progress:first-child {
+  margin: 0 0 1em;
+}
+
+.ui.progress:last-child {
+  margin: 0 0 1em;
+}

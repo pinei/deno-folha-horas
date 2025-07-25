@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board - Semantic UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .kanban-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .kanban-header {
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+        .kanban-column {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 15px;
+        }
+        .kanban-column-header {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .todo-header {
+            background-color: #ffb8b8;
+        }
+        .doing-header {
+            background-color: #b8e1ff;
+        }
+        .review-header {
+            background-color: #ffeeb8;
+        }
+        .done-header {
+            background-color: #b8ffc9;
+        }
+        .kanban-card {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #6e8efb;
+            cursor: move;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kanban-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .kanban-card h4 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        .kanban-card p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .add-card-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .ui.modal {
+            border-radius: 12px;
+        }
+        .ui.modal .header {
+            border-radius: 12px 12px 0 0;
+        }
+        .priority-high {
+            border-left: 4px solid #db2828;
+        }
+        .priority-medium {
+            border-left: 4px solid #f2711c;
+        }
+        .priority-low {
+            border-left: 4px solid #21ba45;
+        }
+        .ui.label {
+            margin-top: 5px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+        @media (max-width: 768px) {
+            .kanban-board {
+                flex-direction: column;
+            }
+            .kanban-column {
+                min-width: 100%;
+            }
+        }
+        .empty-column {
+            text-align: center;
+            padding: 30px 0;
+            color: #aaa;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="kanban-container">
+        <div class="kanban-header">
+            <h1><i class="tasks icon"></i> Kanban Board</h1>
+            <p>Gerenciador de tarefas com Semantic UI</p>
+        </div>
+        
+        <div class="kanban-board">
+            <!-- Coluna "A Fazer" -->
+            <div class="kanban-column">
+                <div class="kanban-column-header todo-header">
+                    <i class="plus circle icon"></i> A Fazer
+                </div>
+                <div id="todo-column" class="kanban-cards">
+                    <div class="kanban-card priority-high" draggable="true">
+                        <h4>Implementar autenticação</h4>
+                        <p>Criar sistema de login com JWT</p>
+                        <div class="card-footer">
+                            <span><i class="user icon"></i> João Silva</span>
+                            <span><i class="calendar icon"></i> 15/07</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="ui red label">Alta</div>
+                            <div>
+                                <button class="ui icon button mini" onclick="editTask(this)">
+                                    <i class="edit icon"></i>
+                                </button>
+                                <button class="ui icon button mini" onclick="deleteTask(this)">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-card priority-medium" draggable="true">
+                        <h4>Atualizar documentação</h4>
+                        <p>Revisar e atualizar documentação da API</p>
+                        <div class="card-footer">
+                            <span><i class="user icon"></i> Maria Souza</span>
+                            <span><i class="calendar icon"></i> 20/07</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="ui orange label">Média</div>
+                            <div>
+                                <button class="ui icon button mini" onclick="editTask(this)">
+                                    <i class="edit icon"></i>
+                                </button>
+                                <button class="ui icon button mini" onclick="deleteTask(this)">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="ui primary button add-card-btn" onclick="openAddModal('todo')">
+                    <i class="plus icon"></i> Adicionar Tarefa
+                </button>
+            </div>
+            
+            <!-- Coluna "Fazendo" -->
+            <div class="kanban-column">
+                <div class="kanban-column-header doing-header">
+                    <i class="spinner icon"></i> Fazendo
+                </div>
+                <div id="doing-column" class="kanban-cards">
+                    <div class="kanban-card priority-high" draggable="true">
+                        <h4>Desenvolver dashboard</h4>
+                        <p>Criar painel com métricas principais</p>
+                        <div class="card-footer">
+                            <span><i class="user icon"></i> Carlos Oliveira</span>
+                            <span><i class="calendar icon"></i> 10/07</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="ui red label">Alta</div>
+                            <div>
+                                <button class="ui icon button mini" onclick="editTask(this)">
+                                    <i class="edit icon"></i>
+                                </button>
+                                <button class="ui icon button mini" onclick="deleteTask(this)">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="ui primary button add-card-btn" onclick="openAddModal('doing')">
+                    <i class="plus icon"></i> Adicionar Tarefa
+                </button>
+            </div>
+            
+            <!-- Coluna "Revisão" -->
+            <div class="kanban-column">
+                <div class="kanban-column-header review-header">
+                    <i class="search icon"></i> Revisão
+                </div>
+                <div id="review-column" class="kanban-cards">
+                    <div class="kanban-card priority-low" draggable="true">
+                        <h4>Testes de integração</h4>
+                        <p>Executar testes entre módulos principais</p>
+                        <div class="card-footer">
+                            <span><i class="user icon"></i> Ana Costa</span>
+                            <span><i class="calendar icon"></i> 08/07</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="ui green label">Baixa</div>
+                            <div>
+                                <button class="ui icon button mini" onclick="editTask(this)">
+                                    <i class="edit icon"></i>
+                                </button>
+                                <button class="ui icon button mini" onclick="deleteTask(this)">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="ui primary button add-card-btn" onclick="openAddModal('review')">
+                    <i class="plus icon"></i> Adicionar Tarefa
+                </button>
+            </div>
+            
+            <!-- Coluna "Concluído" -->
+            <div class="kanban-column">
+                <div class="kanban-column-header done-header">
+                    <i class="check circle icon"></i> Concluído
+                </div>
+                <div id="done-column" class="kanban-cards">
+                    <div class="kanban-card priority-medium" draggable="true">
+                        <h4>Configurar ambiente</h4>
+                        <p>Preparar ambiente de desenvolvimento</p>
+                        <div class="card-footer">
+                            <span><i class="user icon"></i> Pedro Almeida</span>
+                            <span><i class="calendar icon"></i> 05/07</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="ui orange label">Média</div>
+                            <div>
+                                <button class="ui icon button mini" onclick="editTask(this)">
+                                    <i class="edit icon"></i>
+                                </button>
+                                <button class="ui icon button mini" onclick="deleteTask(this)">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="ui primary button add-card-btn" onclick="openAddModal('done')">
+                    <i class="plus icon"></i> Adicionar Tarefa
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para adicionar/editar tarefas -->
+    <div class="ui modal" id="task-modal">
+        <i class="close icon"></i>
+        <div class="header" id="modal-header">Adicionar Nova Tarefa</div>
+        <div class="content">
+            <form class="ui form" id="task-form">
+                <input type="hidden" id="edit-id">
+                <input type="hidden" id="edit-column">
+                
+                <div class="field">
+                    <label>Título</label>
+                    <input type="text" id="task-title" placeholder="Título da tarefa" required>
+                </div>
+                <div class="field">
+                    <label>Descrição</label>
+                    <textarea id="task-description" placeholder="Descrição detalhada" rows="3"></textarea>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Responsável</label>
+                        <select class="ui dropdown" id="task-assignee">
+                            <option value="">Selecione...</option>
+                            <option value="João Silva">João Silva</option>
+                            <option value="Maria Souza">Maria Souza</option>
+                            <option value="Carlos Oliveira">Carlos Oliveira</option>
+                            <option value="Ana Costa">Ana Costa</option>
+                            <option value="Pedro Almeida">Pedro Almeida</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Prazo</label>
+                        <input type="date" id="task-due-date">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Prioridade</label>
+                    <div class="ui selection dropdown" id="priority-dropdown">
+                        <input type="hidden" id="task-priority">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Selecione a prioridade</div>
+                        <div class="menu">
+                            <div class="item" data-value="high">Alta</div>
+                            <div class="item" data-value="medium">Média</div>
+                            <div class="item" data-value="low">Baixa</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">Cancelar</div>
+            <button class="ui positive right labeled icon button" onclick="saveTask()">
+                Salvar
+                <i class="checkmark icon"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script>
+        // Inicializar dropdowns do Semantic UI
+        $('.ui.dropdown').dropdown();
+        
+        // Variáveis globais
+        let draggedCard = null;
+        let currentEditCard = null;
+        let currentEditColumn = null;
+        
+        // Funções para Drag and Drop
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.classList.contains('kanban-card')) {
+                draggedCard = e.target;
+                e.target.style.opacity = '0.4';
+                setTimeout(() => e.target.classList.add('dragging'), 0);
+            }
+        });
+        
+        document.addEventListener('dragend', function(e) {
+            if (draggedCard) {
+                draggedCard.style.opacity = '1';
+                draggedCard.classList.remove('dragging');
+                draggedCard = null;
+            }
+        });
+        
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('dragenter', function(e) {
+            if (draggedCard && e.target.classList.contains('kanban-cards')) {
+                e.target.style.backgroundColor = '#f0f8ff';
+            }
+        });
+        
+        document.addEventListener('dragleave', function(e) {
+            if (e.target.classList.contains('kanban-cards')) {
+                e.target.style.backgroundColor = '';
+            }
+        });
+        
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            if (draggedCard && e.target.classList.contains('kanban-cards')) {
+                e.target.appendChild(draggedCard);
+                e.target.style.backgroundColor = '';
+            } else if (draggedCard && e.target.closest('.kanban-cards')) {
+                const column = e.target.closest('.kanban-cards');
+                column.appendChild(draggedCard);
+                column.style.backgroundColor = '';
+            }
+        });
+        
+        // Funções para manipulação de tarefas
+        function openAddModal(column) {
+            document.getElementById('modal-header').textContent = 'Adicionar Nova Tarefa';
+            document.getElementById('task-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('edit-column').value = column;
+            $('#priority-dropdown').dropdown('clear');
+            $('.ui.modal').modal('show');
+        }
+        
+        function editTask(button) {
+            const card = button.closest('.kanban-card');
+            currentEditCard = card;
+            
+            const title = card.querySelector('h4').textContent;
+            const description = card.querySelector('p').textContent;
+            const assignee = card.querySelector('.card-footer span:first-child').textContent.replace(' ', '').split(' ')[1];
+            const dueDate = card.querySelector('.card-footer span:last-child').textContent.replace(' ', '').split(' ')[1];
+            const priorityClass = Array.from(card.classList).find(c => c.startsWith('priority-'));
+            const priority = priorityClass ? priorityClass.split('-')[1] : 'medium';
+            
+            document.getElementById('modal-header').textContent = 'Editar Tarefa';
+            document.getElementById('task-title').value = title;
+            document.getElementById('task-description').value = description;
+            document.getElementById('task-assignee').value = assignee;
+            document.getElementById('task-due-date').value = dueDate.split('/').reverse().join('-');
+            $('#priority-dropdown').dropdown('set selected', priority);
+            
+            document.getElementById('edit-id').value = card.id || 'card-' + Date.now();
+            currentEditColumn = card.parentNode.id;
+            
+            $('.ui.modal').modal('show');
+        }
+        
+        function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const assignee = document.getElementById('task-assignee').value;
+            const dueDate = document.getElementById('task-due-date').value;
+            const priority = document.getElementById('task-priority').value;
+            const column = document.getElementById('edit-column').value;
+            const taskId = document.getElementById('edit-id').value;
+            
+            if (!title) {
+                alert('Por favor, insira um título para a tarefa');
+                return;
+            }
+            
+            const formattedDate = dueDate ? new Date(dueDate).toLocaleDateString('pt-BR') : '';
+            
+            let priorityClass = '';
+            let priorityLabel = '';
+            let labelColor = '';
+            
+            switch(priority) {
+                case 'high':
+                    priorityClass = 'priority-high';
+                    priorityLabel = 'Alta';
+                    labelColor = 'red';
+                    break;
+                case 'medium':
+                    priorityClass = 'priority-medium';
+                    priorityLabel = 'Média';
+                    labelColor = 'orange';
+                    break;
+                case 'low':
+                    priorityClass = 'priority-low';
+                    priorityLabel = 'Baixa';
+                    labelColor = 'green';
+                    break;
+            }
+            
+            const cardHtml = `
+                <div class="kanban-card ${priorityClass}" draggable="true" id="${taskId}">
+                    <h4>${title}</h4>
+                    <p>${description || 'Sem descrição'}</p>
+                    <div class="card-footer">
+                        <span><i class="user icon"></i> ${assignee || 'Não atribuído'}</span>
+                        <span><i class="calendar icon"></i> ${formattedDate || 'Sem prazo'}</span>
+                    </div>
+                    <div class="card-actions">
+                        <div class="ui ${labelColor} label">${priorityLabel}</div>
+                        <div>
+                            <button class="ui icon button mini" onclick="editTask(this)">
+                                <i class="edit icon"></i>
+                            </button>
+                            <button class="ui icon button mini" onclick="deleteTask(this)">
+                                <i class="trash icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (currentEditCard) {
+                // Substituir o cartão existente
+                currentEditCard.outerHTML = cardHtml;
+                currentEditCard = null;
+            } else {
+                // Adicionar novo cartão
+                const columnElement = document.getElementById(`${column}-column`);
+                columnElement.insertAdjacentHTML('beforeend', cardHtml);
+            }
+            
+            $('.ui.modal').modal('hide');
+        }
+        
+        function deleteTask(button) {
+            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                const card = button.closest('.kanban-card');
+                card.parentNode.removeChild(card);
+            }
+        }
+        
+        // Inicializar modais
+        $('.ui.modal').modal();
+    </script>
+</body>
+</html>
