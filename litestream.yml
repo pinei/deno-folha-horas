@@ -1,0 +1,5 @@
+dbs:
+  - path: "data/sqlite3.db"
+    replicas:
+      - url: "file:///Users/czl2/ONEDRI~1/Dados/Pessoal/deno-folha-horas"
+ 
