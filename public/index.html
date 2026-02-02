@@ -1,7 +1,7 @@
 <html>
   <head>
     <title>Folha de Horas</title>
-    <link rel="stylesheet" type="text/css" href="/css/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/fomantic-ui@2.9.0/dist/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="/css/main.css">
   </head>
 
@@ -21,7 +21,7 @@
     "@vue/devtools-api":
       "https://unpkg.com/@vue/devtools-api@6.6.4/lib/esm/index.js"
       - References other JS scripts
-    "pinia": "https://unpkg.com/pinia@2.3/dist/pinia.esm-browser.js"
+    "pinia": 
     "vue3-sfc-loader":
       "https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9/dist/vue3-sfc-loader.esm.js"
       "https://unpkg.com/vue3-sfc-loader@0.9.5/dist/vue3-sfc-loader.esm.js"
@@ -29,19 +29,19 @@
   <script type="importmap">
     {
       "imports": {
-        "axios": "/js/axios.js",
-        "vue": "/js/vue.esm-browser.js",
-        "vue-router": "/js/vue-router.esm-browser.js",
-        "vue-demi": "/js/vue-demi.mjs",
+        "axios": "https://unpkg.com/axios@1.7/dist/esm/axios.js",
+        "vue": "https://unpkg.com/vue@3.5/dist/vue.esm-browser.js",
+        "vue-router": "https://unpkg.com/vue-router@4.5/dist/vue-router.esm-browser.js",
+        "vue-demi": "https://unpkg.com/vue-demi@0.14.10/lib/index.mjs",
         "@vue/devtools-api": "https://unpkg.com/@vue/devtools-api@6.6.4/lib/esm/index.js",
-        "pinia": "/js/pinia.esm-browser.js",
-        "vue3-sfc-loader": "/js/vue3-sfc-loader.esm.js"
+        "pinia": "https://unpkg.com/pinia@2.3/dist/pinia.esm-browser.js",
+        "vue3-sfc-loader": "https://unpkg.com/vue3-sfc-loader@0.9.5/dist/vue3-sfc-loader.esm.js"
       }
     }
   </script>
 
-  <script src="./js/jquery.min.js"></script>
-  <script src="./js/semantic.min.js"></script>
+  <script src="https://unpkg.com/jquery@3.6.1/dist/jquery.min.js"></script>
+  <script src="https://unpkg.com/fomantic-ui@2.9.0/dist/semantic.min.js"></script>
 
   <script type="module">
     import * as Vue from 'vue'
