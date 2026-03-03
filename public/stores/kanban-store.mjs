@@ -112,6 +112,59 @@ export const useKanbanStore = defineStore('kanban', {
         ]
     }),
     actions: {
-        // Actions for manipulating cards can be added here
+        moveCard(cardId, toLaneId) {
+            let foundCard = null;
+            let fromGroup = null;
+            let fromLane = null;
+
+            // Find and remove the card
+            for (const lane of this.lanes) {
+                for (const group of lane.dateGroups) {
+                    const cardIndex = group.cards.findIndex(c => c.id === cardId);
+                    if (cardIndex !== -1) {
+                        foundCard = group.cards.splice(cardIndex, 1)[0];
+                        fromGroup = group;
+                        fromLane = lane;
+                        break;
+                    }
+                }
+                if (foundCard) break;
+            }
+
+            if (!foundCard) return;
+
+            // If same lane, put it back
+            if (fromLane.id === toLaneId) {
+                fromGroup.cards.push(foundCard);
+                return;
+            }
+
+            // Find destination lane
+            const toLane = this.lanes.find(l => l.id === toLaneId);
+            if (!toLane) {
+                // If lane not found, put it back
+                fromGroup.cards.push(foundCard);
+                return;
+            }
+
+            // Find or create dateGroup in destination lane
+            let targetGroup = toLane.dateGroups.find(g => g.date === fromGroup.date);
+            if (!targetGroup) {
+                targetGroup = {
+                    date: fromGroup.date,
+                    label: fromGroup.label,
+                    cards: []
+                };
+                // Keep dateGroups sorted or just push
+                toLane.dateGroups.push(targetGroup);
+                toLane.dateGroups.sort((a, b) => a.date.localeCompare(b.date));
+            }
+
+            // Add the card to target group
+            targetGroup.cards.push(foundCard);
+
+            // Cleanup empty groups in source lane
+            fromLane.dateGroups = fromLane.dateGroups.filter(g => g.cards.length > 0);
+        }
     }
 })
