@@ -62,6 +62,13 @@ export default {
 .ui.cards>.card.kanban-card {
     width: 100%;
     box-shadow: 0 1px 3px 0 #d4d4d5;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.ui.cards>.card.kanban-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px 0 rgba(34, 36, 38, .12), 0 2px 4px 0 rgba(34, 36, 38, .08);
 }
 
 .ui.header.kanban-group-header {
