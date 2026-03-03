@@ -1,2 +1,2 @@
-$env:DENO_CERT = "./ca.petrobras.goskope.crt"
-deno run -A --unstable main.ts
+$env:NODE_EXTRA_CA_CERTS = "./ca.petrobras.goskope.crt"
+npx tsx main.ts

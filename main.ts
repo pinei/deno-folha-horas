@@ -1,12 +1,11 @@
-// @deno-types="npm:@types/express@4.17.15"
-import express from "npm:express";
+import express from "express";
 import { statSync } from "node:fs";
 
 const app = express();
 
-const HTTP_PORT = 1024;
+const HTTP_PORT = 1025;
 
-import api from './core/api.ts';
+import api from './core/api';
 
 // Middleware to serve static files
 const options = {
@@ -14,7 +13,7 @@ const options = {
     etag: true,
     extensions: ['html', 'htm', 'js', 'png'],
     index: 'index.html',
-    maxAge: '1d',
+    maxAge: '0',
     redirect: false,
     setHeaders: function (res, path, _stat) {
         const stats = statSync(path);
@@ -28,6 +27,12 @@ app.use(express.static('public', options));
 
 // API
 app.use('/api', api);
+
+// History API Fallback for Vue Router
+import path from "node:path";
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve('public/index.html'));
+});
 
 app.listen(HTTP_PORT, () => {
     console.log(`Example app listening on port ${HTTP_PORT}`)

@@ -1,8 +1,8 @@
-import express from "npm:express";
+import express from "express";
 const router = express.Router();
 
-import { TimesheetReport } from '../store/timesheet-report.ts'
-import { assert } from "https://deno.land/std@0.176.0/_util/asserts.ts";
+import { TimesheetReport } from '../store/timesheet-report'
+import assert from "node:assert";
 
 const report = new TimesheetReport()
 
@@ -13,7 +13,7 @@ router.get('/month-timesheet/:year/:month', (req, res, next) => {
 
         assert(year.match(/^\d{4}$/), 'Invalid year')
         assert(month.match(/^\d{2}$/), 'Invalid month')
-        
+
         console.log(`> GET /month-timesheet/${year}/${month}`)
 
         const data = report.monthTimeReport(year, month)

@@ -1,8 +1,8 @@
-import express from "npm:express";
+import express from "express";
 const router = express.Router();
 
-import { TimesheetStore, TimesheetRecord } from '../store/timesheet.ts'
-import { assert } from "https://deno.land/std@0.176.0/_util/asserts.ts";
+import { TimesheetStore, TimesheetRecord } from '../store/timesheet'
+import assert from "node:assert";
 
 const store = new TimesheetStore()
 
@@ -50,7 +50,7 @@ router.post('/:id', (req, res, next) => {
         console.log(`> POST /timesheet/${id}: ` + JSON.stringify(data))
 
         if (data.id != id) {
-            throw('ID mismatch')
+            throw ('ID mismatch')
         }
 
         let record = store.parseRecord(data)

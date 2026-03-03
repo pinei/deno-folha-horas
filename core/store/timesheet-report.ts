@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import database from '../database.ts';
+import database from '../database';
 
 class TimesheetReport {
     monthTimeReport(yearStr: string, monthStr: string) {
@@ -20,7 +20,7 @@ class TimesheetReport {
             'CENTRO',
             "REPLACE(SUM(TIME_SPENT), '.', ',') AS TOTAL"
         ];
-        
+
         for (let day = 1; day <= daysInMonth; day++) {
             let strDay = day.toString().padStart(2, '0')
             columns.push(

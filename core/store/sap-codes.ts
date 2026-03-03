@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import database from '../database.ts';
+import database from '../database';
 
 /*
  * Interação com a base de dados.
@@ -55,7 +55,7 @@ class Category {
 }
 
 type SAPCodeProperties = keyof Pick<SAPCode, { [K in keyof SAPCode]: SAPCode[K] extends Function ? never : K }[keyof SAPCode]>
-type SAPCodeFields = Exclude<SAPCodeProperties, 'id'>; 
+type SAPCodeFields = Exclude<SAPCodeProperties, 'id'>;
 
 class SAPCodeStore {
     // Todos os campos exceto o id
@@ -73,12 +73,12 @@ class SAPCodeStore {
         'active': 'ACTIVE'
     }
 
-    _insertObject(object: SAPCode) : SAPCode {
+    _insertObject(object: SAPCode): SAPCode {
         object.validated()
 
 
-        const fields = Object.keys(this.mapping).map((key : string) : string => this.mapping[key as SAPCodeFields]);
-        const values = Object.keys(this.mapping).map((key : string) : any => object[key as SAPCodeFields]);
+        const fields = Object.keys(this.mapping).map((key: string): string => this.mapping[key as SAPCodeFields]);
+        const values = Object.keys(this.mapping).map((key: string): any => object[key as SAPCodeFields]);
 
         const index = fields.indexOf('ACTIVE')
         values[index] = values[index] ? 1 : 0
@@ -92,11 +92,11 @@ class SAPCodeStore {
         return object
     }
 
-    _updateObject(object: SAPCode) : SAPCode {
+    _updateObject(object: SAPCode): SAPCode {
         object.validated()
 
-        const fields = Object.keys(this.mapping).map((key : string) : string => this.mapping[key as SAPCodeFields]);
-        const values = Object.keys(this.mapping).map((key : string) : any => object[key as SAPCodeFields]);
+        const fields = Object.keys(this.mapping).map((key: string): string => this.mapping[key as SAPCodeFields]);
+        const values = Object.keys(this.mapping).map((key: string): any => object[key as SAPCodeFields]);
 
         const index = fields.indexOf('ACTIVE')
         values[index] = values[index] ? 1 : 0
@@ -116,17 +116,17 @@ class SAPCodeStore {
         }
     }
 
-    deleteObject(id : number) {
+    deleteObject(id: number) {
         const changes = database.delete('SAP_CAT2_OBJECT', `ID = ${id}`);
 
         assert(changes > 0, 'Changes should be greater than zero');
         return changes > 0
     }
 
-    listObjects() : SAPCode[] {
+    listObjects(): SAPCode[] {
         const results = database.select('SAP_CAT2_OBJECT', '*', '1 = 1', 'CATEGORY');
 
-        const objects : SAPCode[] = results.map((result : any) => {
+        const objects: SAPCode[] = results.map((result: any) => {
             return new SAPCode({
                 id: result.ID,
                 active: result.ACTIVE > 0 ? true : false,
@@ -143,13 +143,13 @@ class SAPCodeStore {
             })
         })
 
-        return objects        
+        return objects
     }
 
-    listCategories() : Category[] {
+    listCategories(): Category[] {
         const results = database.select('SAP_CAT2_OBJECT', 'CATEGORY, CATEGORY_COLOR', 'ACTIVE = 1')
-        
-        return results.map((result : any) => {
+
+        return results.map((result: any) => {
             return new Category(result.CATEGORY, result.CATEGORY_COLOR)
         })
     }

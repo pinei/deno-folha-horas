@@ -1,8 +1,8 @@
-import express from "npm:express";
+import express from "express";
 const router = express.Router();
 
-import { SAPCodeStore, SAPCode } from '../store/sap-codes.ts'
-import { assert } from "https://deno.land/std@0.176.0/_util/asserts.ts";
+import { SAPCodeStore, SAPCode } from '../store/sap-codes'
+import assert from "node:assert";
 
 const store = new SAPCodeStore()
 
@@ -31,12 +31,12 @@ router.get('/categories', (_, res, next) => {
 router.post('/:id', (req, res, next) => {
     try {
         const data = req.body
-        const id = req.params.id 
+        const id = req.params.id
         console.log(`> POST /sap-codes/${id}: ` + JSON.stringify(data))
 
         let sapCode = new SAPCode(data).validated()
         if (data.id != id) {
-            throw('ID mismatch')
+            throw ('ID mismatch')
         }
         sapCode = store.mergeObject(sapCode)
 
@@ -53,7 +53,7 @@ router.post('/', (req, res, next) => {
         const data = req.body
         console.log('> POST /sap-codes: ' + JSON.stringify(data))
 
-        delete(data.id)
+        delete (data.id)
 
         let sapCode = new SAPCode(data).validated()
         sapCode = store.mergeObject(sapCode)
@@ -68,7 +68,7 @@ router.post('/', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     try {
-        const id = req.params.id 
+        const id = req.params.id
         console.log(`> DELETE /sap-codes/${id}`)
 
         const result = store.deleteObject(id)

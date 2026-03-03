@@ -1,6 +1,5 @@
-// deno-lint-ignore-file no-explicit-any
 import assert from 'node:assert'
-import { Database, Statement } from "https://deno.land/x/sqlite3/mod.ts";
+import { DatabaseSync } from 'node:sqlite';
 
 const DB_PATH = './data/sqlite3.db'
 
@@ -66,17 +65,12 @@ const SQL_MIGRATE = [
 ]
 
 
-interface SQLStatement extends Statement {
-  run: (...args: any) => number;
-  all: (...args: any) => any[];
-}
-
 class SQLDatabase {
-  _conn: Database;
+  _conn: DatabaseSync;
+  _lastInsertRowId: number = 0;
 
   constructor(path: string) {
-    this._conn = new Database(path);
-    assert(this._conn.open == true)
+    this._conn = new DatabaseSync(path);
   }
 
   migrate() {
@@ -94,52 +88,57 @@ class SQLDatabase {
     }
   }
 
-  prepare(sql: string) : SQLStatement {
+  prepare(sql: string) {
     return this._conn.prepare(sql);
   }
 
-  insert(table: string, fields: string[], values: any[]) : number {
+  insert(table: string, fields: string[], values: any[]): number {
     const stmt = this.prepare(`insert into ${table} (${fields.join(', ')}) values (${fields.map(() => '?').join(', ')})`);
-    return stmt.run(...values);
+    const info = stmt.run(...values);
+    this._lastInsertRowId = Number(info.lastInsertRowid);
+    return info.changes;
   }
 
-  update(table: string, fields: string[], values: any[], where: string) : number {
+  update(table: string, fields: string[], values: any[], where: string): number {
     const stmt = this.prepare(`update ${table} set ${fields.map((field) => `${field} = ?`).join(', ')} where ${where}`);
-    return stmt.run(...values);
+    const info = stmt.run(...values);
+    return info.changes;
   }
 
-  delete(table: string, where: string) : number {
+  delete(table: string, where: string): number {
     const stmt = this.prepare(`delete from ${table} where ${where}`);
-    return stmt.run();
+    const info = stmt.run();
+    return info.changes;
   }
 
-  select(table: string, fields = '*', where = '1 = 1', orderBy = '1') : any[] {
+  select(table: string, fields = '*', where = '1 = 1', orderBy = '1'): any[] {
     const stmt = this.prepare(`select ${fields} from ${table} where ${where} order by ${orderBy}`);
     return stmt.all();
   }
 
-  exec(sql: string) : number {
-    return this._conn.exec(sql);
+  exec(sql: string): number {
+    this._conn.exec(sql);
+    return 1;
   }
 
-  query(sql: string) : any[] {
+  query(sql: string): any[] {
     const stmt = this.prepare(sql);
     return stmt.all();
   }
 
-  get lastInsertRowId() : number {
-    return this._conn.lastInsertRowId;
+  get lastInsertRowId(): number {
+    return this._lastInsertRowId;
   }
 
-  formatDate(date: Date) : string {
+  formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
-  parseDate(date: string) : Date | null {
+  parseDate(date: string): Date | null {
     if (/^(\d{4}-\d{2}-\d{2})$/.test(date)) {
       // Parsing as local time
       // https://codeofmatt.com/javascript-date-parsing-changes-in-es6
-      date = date.replace(/-/g, '/'); 
+      date = date.replace(/-/g, '/');
       return new Date(date);
     }
     return null;
