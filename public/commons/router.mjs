@@ -1,4 +1,4 @@
-import {createWebHistory, createRouter} from "vue-router";
+import { createWebHistory, createRouter } from "vue-router";
 import { ref, load } from './vue-loader.mjs'
 
 console.log('Setting up router...')
@@ -10,6 +10,7 @@ const Timesheet = ref('../pages/Timesheet.vue')
 const SAPCodes = ref('../pages/SAPCodes.vue')
 const MonthTimeReport = ref('../pages/TimesheetMonthTimeReport.vue')
 const FactsAndDeliveriesReport = ref('../pages/FactsAndDeliveriesReport.vue')
+const Kanban = ref('../pages/Kanban.vue')
 
 // const Export = ref('../pages/Export.vue')
 // const Import = ref('../pages/Import.vue')
@@ -26,6 +27,11 @@ export const routes = [
         name: 'sap-codes',
         path: '/sap-codes',
         component: SAPCodes
+    },
+    {
+        name: 'kanban',
+        path: '/kanban',
+        component: Kanban
     },
     {
         name: 'import',

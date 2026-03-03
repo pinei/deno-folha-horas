@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import database from '../database.ts';
+import database from '../database';
 
 class TimesheetRecord {
     id = 0
@@ -51,7 +51,7 @@ class TimesheetRecord {
 }
 
 type TimesheetRecordProperties = keyof Pick<TimesheetRecord, { [K in keyof TimesheetRecord]: TimesheetRecord[K] extends Function ? never : K }[keyof TimesheetRecord]>
-type TimesheetRecordFields = Exclude<TimesheetRecordProperties, 'id'>; 
+type TimesheetRecordFields = Exclude<TimesheetRecordProperties, 'id'>;
 
 class TimesheetStore {
     _queryForListRecords(filter) {
@@ -88,7 +88,7 @@ class TimesheetStore {
         }
     }
 
-    listRecords(filter: any) : TimesheetRecord[] {
+    listRecords(filter: any): TimesheetRecord[] {
         filter = filter || {}
 
         const query = this._queryForListRecords(filter)
@@ -96,8 +96,8 @@ class TimesheetStore {
         const stmt = database.prepare(query.sql);
         const results = stmt.all(query.params);
 
-        const records : TimesheetRecord[] = results.map((result : any) => {
-            const record : TimesheetRecord = new TimesheetRecord({
+        const records: TimesheetRecord[] = results.map((result: any) => {
+            const record: TimesheetRecord = new TimesheetRecord({
                 id: result.ID,
                 date: result.DATE,
                 category: result.CATEGORY,
@@ -110,10 +110,10 @@ class TimesheetStore {
             return record;
         })
 
-        return records;        
+        return records;
     }
 
-    _insertRecord(record : TimesheetRecord) : TimesheetRecord {
+    _insertRecord(record: TimesheetRecord): TimesheetRecord {
         record = record.validated()
 
         // Todos os campos exceto o id
@@ -127,8 +127,8 @@ class TimesheetStore {
             'context': 'CONTEXT'
         }
 
-        const fields = Object.keys(mapping).map((key : string) : string => mapping[key as TimesheetRecordFields]);
-        const values = Object.keys(mapping).map((key : string) : any => record[key as TimesheetRecordFields]);
+        const fields = Object.keys(mapping).map((key: string): string => mapping[key as TimesheetRecordFields]);
+        const values = Object.keys(mapping).map((key: string): any => record[key as TimesheetRecordFields]);
 
         const changes = database.insert('TIMESHEET', fields, values);
 
@@ -139,7 +139,7 @@ class TimesheetStore {
         return record
     }
 
-    _updateRecord(record : TimesheetRecord) : TimesheetRecord {
+    _updateRecord(record: TimesheetRecord): TimesheetRecord {
         record = record.validated()
 
         // Todos os campos exceto o id
@@ -153,8 +153,8 @@ class TimesheetStore {
             'context': 'CONTEXT'
         }
 
-        const fields = Object.keys(mapping).map((key : string) : string => mapping[key as TimesheetRecordFields]);
-        const values = Object.keys(mapping).map((key : string) : any => record[key as TimesheetRecordFields]);
+        const fields = Object.keys(mapping).map((key: string): string => mapping[key as TimesheetRecordFields]);
+        const values = Object.keys(mapping).map((key: string): any => record[key as TimesheetRecordFields]);
 
         const changes = database.update('TIMESHEET', fields, values, `ID = ${record.id}`);
 
@@ -162,7 +162,7 @@ class TimesheetStore {
         return record
     }
 
-    mergeRecord(record : TimesheetRecord) : TimesheetRecord {
+    mergeRecord(record: TimesheetRecord): TimesheetRecord {
         if (record.id) {
             return this._updateRecord(record)
         } else {
@@ -170,14 +170,14 @@ class TimesheetStore {
         }
     }
 
-    deleteRecord(id : number) : boolean {
+    deleteRecord(id: number): boolean {
         const changes = database.delete('TIMESHEET', `ID = ${id}`);
 
         assert(changes > 0, 'Changes should be greater than zero');
         return changes > 0
     }
 
-    parseRecord(data : any) : TimesheetRecord {
+    parseRecord(data: any): TimesheetRecord {
         const record = new TimesheetRecord(data).validated()
         return record
     }

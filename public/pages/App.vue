@@ -14,6 +14,7 @@ export default {
             Folha de Horas
             </a>
             <router-link to="/" class="item">Apontamento</router-link>
+            <router-link to="/kanban" class="item">Kanban</router-link>
 
             <div class="ui simple dropdown item">
                 Relatório <i class="dropdown icon"></i>
@@ -34,7 +35,7 @@ export default {
         </div>
     </div>
 
-    <div class="ui main container">
+    <div :class="['ui main', $route.path === '/kanban' ? '' : 'container']">
         <router-view/>
     </div>
 </template>
