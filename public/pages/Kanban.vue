@@ -8,10 +8,17 @@
                      @drop="onDrop($event, lane.id)" 
                      @dragover.prevent 
                      @dragenter.prevent>
-                    <h3 class="ui dividing header">{{ lane.title }}</h3>
+                    <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
+                        {{ lane.title }}
+                        <div class="ui custom-add-button">
+                            <button class="ui mini primary circular icon button" data-tooltip="Adicionar">
+                                <i class="plus icon"></i>
+                            </button>
+                        </div>
+                    </h3>
                     
-                    <div class="ui cards">
-                        <template v-for="(group, gIndex) in lane.dateGroups" :key="gIndex">
+                    <transition-group name="kanban-list" tag="div" class="ui cards">
+                        <template v-for="(group, gIndex) in lane.dateGroups" :key="group.date">
                             <h4 class="ui header kanban-group-header">
                                 {{ group.date }} <div class="ui basic olive label">{{ group.label }}</div>
                             </h4>
@@ -38,7 +45,7 @@
                                 </div>
                             </div>
                         </template>
-                    </div>
+                    </transition-group>
                 </div>
             </div>
         </div>
@@ -163,4 +170,18 @@ export default {
     margin-top: 1em;
     margin-left: 0.6em;
 }
+
+/* Vue List Transitions */
+.kanban-list-move, 
+.kanban-list-enter-active, 
+.kanban-list-leave-active {
+    transition: all 0.3s ease;
+}
+
+.kanban-list-enter-from, 
+.kanban-list-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
 </style>
