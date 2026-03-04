@@ -62,6 +62,20 @@ const SQL_MIGRATE = [
       ALTER TABLE SAP_CAT2_OBJECT ADD COLUMN CATEGORY_COLOR text;
     `
   },
+  {
+    version: '1.4.0',
+    description: 'Kanban Card Table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS KANBAN_CARD (
+        ID integer primary key autoincrement,
+        TIMESHEET_ID integer,
+        ISSUE text,
+        STATUS text,
+        ARCHIVED integer,
+        FOREIGN KEY (TIMESHEET_ID) REFERENCES TIMESHEET(ID)
+      );
+    `
+  },
 ]
 
 

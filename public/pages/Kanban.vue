@@ -3,13 +3,13 @@
         <h1 class="ui header">Kanban</h1>
         
         <div class="ui four column stackable grid">
-            <div class="column" v-for="lane in kanbanStore.lanes" :key="lane.id">
+            <div class="column" v-for="lane in kanbanStore.buckets.getBuckets()" :key="lane">
                 <div class="ui segment" :style="{ backgroundColor: lane.color }" 
-                     @drop="onDrop($event, lane.id)" 
+                     @drop="onDrop($event, lane.name)" 
                      @dragover.prevent 
                      @dragenter.prevent>
                     <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
-                        {{ lane.title }}
+                        {{ lane.description }}
                         <div class="ui custom-add-button">
                             <button class="ui mini primary circular icon button" data-tooltip="Adicionar">
                                 <i class="plus icon"></i>
@@ -18,13 +18,13 @@
                     </h3>
                     
                     <transition-group name="kanban-list" tag="div" class="ui cards">
-                        <template v-for="(group, gIndex) in lane.dateGroups" :key="group.date">
+                        <template v-for="cluster in lane.clusters.getClusters()" :key="key">
                             <h4 class="ui header kanban-group-header">
-                                {{ group.date }} <div class="ui basic olive label">{{ group.label }}</div>
+                                {{ cluster.key }} <div class="ui basic olive label">{{ dayOfWeek(cluster.key) }}</div>
                             </h4>
                             
                             <div class="card kanban-card"
-                                 v-for="card in group.cards" :key="card.id"
+                                 v-for="card in cluster.items" :key="card.id"
                                  draggable="true"
                                  @dragstart="startDrag($event, card.id)"
                                  @drag="onDrag($event)"
@@ -32,16 +32,14 @@
                                  :class="{ 'is-dragging': draggedCardId === card.id }">
                                 <div class="content">
                                     <h5>
-                                        {{ card.title }}
+                                        {{ card.timesheet.content }}
                                     </h5>
-                                    <div class="meta">{{ card.meta }}</div>
+                                    <div class="meta">{{ card.timesheet.content }}</div>
                                     <div class="description" style="margin-bottom: 1em;">
                                         {{ card.description }}
                                     </div>
-                                    <template v-for="(cat, cIndex) in card.categories" :key="cIndex">
-                                        <span :class="['ui label', cat.color]">{{ cat.label }}</span>
-                                    </template>
-                                    <span class="ui circular olive label inverted large right floated">{{ card.hours }}</span>
+                                    <span class="ui label" :class="categoryClass(card.timesheet.category)">{{ card.timesheet.category }}</span>
+                                    <span class="ui circular olive label inverted large right floated">{{ card.timesheet.timeSpent }}</span>
                                 </div>
                             </div>
                         </template>
@@ -54,12 +52,14 @@
 
 <script>
 import { useKanbanStore } from '../stores/kanban-store.mjs'
+import { useCategoryStore } from '../stores/category-store.mjs'
 
 export default {
     name: 'Kanban',
     data() {
         return {
             kanbanStore: useKanbanStore(),
+            categoryStore = useCategoryStore(),
             draggedCardId: null,
             dragClone: null,
             dragOffset: { x: 0, y: 0 }
@@ -127,6 +127,17 @@ export default {
             if (cardId) {
                 this.kanbanStore.moveCard(cardId, laneId);
             }
+        },
+        dayOfWeek(key) {
+            if (key instanceof Date) {
+                const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                const day = key.getUTCDay();
+                return days[day];
+            }
+            return key;
+        },
+        categoryClass(value) {
+            return categoryStore.getCategoryColor(value)
         }
     },
     mounted() {

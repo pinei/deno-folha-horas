@@ -50,9 +50,6 @@ class TimesheetRecord {
     }
 }
 
-type TimesheetRecordProperties = keyof Pick<TimesheetRecord, { [K in keyof TimesheetRecord]: TimesheetRecord[K] extends Function ? never : K }[keyof TimesheetRecord]>
-type TimesheetRecordFields = Exclude<TimesheetRecordProperties, 'id'>;
-
 class TimesheetStore {
     _queryForListRecords(filter) {
         const LIMIT = 500;
@@ -116,19 +113,8 @@ class TimesheetStore {
     _insertRecord(record: TimesheetRecord): TimesheetRecord {
         record = record.validated()
 
-        // Todos os campos exceto o id
-        const mapping: Record<TimesheetRecordFields, string> = {
-            'date': 'DATE',
-            'category': 'CATEGORY',
-            'timeSpent': 'TIME_SPENT',
-            'description': 'DESCRIPTION',
-            'relevantFacts': 'RELEVANT_FACTS',
-            'deliveries': 'DELIVERIES',
-            'context': 'CONTEXT'
-        }
-
-        const fields = Object.keys(mapping).map((key: string): string => mapping[key as TimesheetRecordFields]);
-        const values = Object.keys(mapping).map((key: string): any => record[key as TimesheetRecordFields]);
+        const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'RELEVANT_FACTS', 'DELIVERIES', 'CONTEXT']
+        const values = [record.date, record.category, record.timeSpent, record.description, record.relevantFacts, record.deliveries, record.context]
 
         const changes = database.insert('TIMESHEET', fields, values);
 
@@ -142,19 +128,8 @@ class TimesheetStore {
     _updateRecord(record: TimesheetRecord): TimesheetRecord {
         record = record.validated()
 
-        // Todos os campos exceto o id
-        const mapping: Record<TimesheetRecordFields, string> = {
-            'date': 'DATE',
-            'category': 'CATEGORY',
-            'timeSpent': 'TIME_SPENT',
-            'description': 'DESCRIPTION',
-            'relevantFacts': 'RELEVANT_FACTS',
-            'deliveries': 'DELIVERIES',
-            'context': 'CONTEXT'
-        }
-
-        const fields = Object.keys(mapping).map((key: string): string => mapping[key as TimesheetRecordFields]);
-        const values = Object.keys(mapping).map((key: string): any => record[key as TimesheetRecordFields]);
+        const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'RELEVANT_FACTS', 'DELIVERIES', 'CONTEXT']
+        const values = [record.date, record.category, record.timeSpent, record.description, record.relevantFacts, record.deliveries, record.context]
 
         const changes = database.update('TIMESHEET', fields, values, `ID = ${record.id}`);
 

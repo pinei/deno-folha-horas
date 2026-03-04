@@ -77,11 +77,8 @@ class SAPCodeStore {
         object.validated()
 
 
-        const fields = Object.keys(this.mapping).map((key: string): string => this.mapping[key as SAPCodeFields]);
-        const values = Object.keys(this.mapping).map((key: string): any => object[key as SAPCodeFields]);
-
-        const index = fields.indexOf('ACTIVE')
-        values[index] = values[index] ? 1 : 0
+        const fields = ['CATEGORY', 'CATEGORY_COLOR', 'TIPO_ATIVIDADE', 'CENTRO_TRABALHO', 'CENTRO', 'ELEMENTO_PEP', 'DIAGRAMA_REDE', 'OPERACAO', 'SUBOPERACAO', 'PARTICAO', 'ACTIVE']
+        const values = [object.category, object.categoryColor, object.tipoAtividade, object.centroTrabalho, object.centro, object.elementoPep, object.diagramaRede, object.operacao, object.subOperacao, object.particao, object.active ? 1 : 0]
 
         const changes = database.insert('SAP_CAT2_OBJECT', fields, values);
 
@@ -95,11 +92,8 @@ class SAPCodeStore {
     _updateObject(object: SAPCode): SAPCode {
         object.validated()
 
-        const fields = Object.keys(this.mapping).map((key: string): string => this.mapping[key as SAPCodeFields]);
-        const values = Object.keys(this.mapping).map((key: string): any => object[key as SAPCodeFields]);
-
-        const index = fields.indexOf('ACTIVE')
-        values[index] = values[index] ? 1 : 0
+        const fields = ['CATEGORY', 'CATEGORY_COLOR', 'TIPO_ATIVIDADE', 'CENTRO_TRABALHO', 'CENTRO', 'ELEMENTO_PEP', 'DIAGRAMA_REDE', 'OPERACAO', 'SUBOPERACAO', 'PARTICAO', 'ACTIVE']
+        const values = [object.category, object.categoryColor, object.tipoAtividade, object.centroTrabalho, object.centro, object.elementoPep, object.diagramaRede, object.operacao, object.subOperacao, object.particao, object.active ? 1 : 0]
 
         const changes = database.update('SAP_CAT2_OBJECT', fields, values, `ID = ${object.id}`);
 
