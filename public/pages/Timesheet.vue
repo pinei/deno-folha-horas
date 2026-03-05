@@ -8,19 +8,19 @@
         @close="closeModal" @save="saveRecord" @remove="removeRecord" @clone="cloneRecord"/>
 
     <div id="timesheet-panel">
-        <div v-if="!(timesheetStore.groupsOfRecords.length > 0)">
+        <div v-if="!(timesheetStore.clusters.length > 0)">
             <h3 class="ui header">Nenhum registro encontrado</h3>
             <button class="ui small primary icon button" @click="addRecord(null)" data-tooltip="Novo registro">
                 <i class="plus icon"></i>
             </button>
         </div>
 
-        <!-- <div v-for="group in timesheetStore.groupsOfRecords" :key="group.date" style="position: relative"> -->
-        <div v-for="group in timesheetStore.groupsOfRecords" :key="group.date" class="ui form">
+        <!-- <div v-for="cluster in timesheetStore.clusters" :key="cluster.key" style="position: relative"> -->
+        <div v-for="cluster in timesheetStore.clusters" :key="cluster.key" class="ui form">
 
-            <h4 class="ui header">{{ group.date }}
+            <h4 class="ui header">{{ cluster.key }}
                 <div class="ui basic olive label">
-                    {{ dayOfWeek(group.date) }}
+                    {{ dayOfWeek(cluster.key) }}
                 </div>
             </h4>
 
@@ -34,11 +34,11 @@
             </thead>
 
             <tbody>
-            <tr v-if="!(group.records?.length > 0)">
+            <tr v-if="!(cluster.items?.length > 0)">
                 <td colspan="4">Sem registros</td>
             </tr>
 
-            <tr v-for="record in group.records" :key="record.id">
+            <tr v-for="record in cluster.items" :key="record.id">
                 <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
                 <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
                 <td @click="editRecord(record)">
@@ -46,19 +46,13 @@
                     <p v-for="line in parseDescription(record.description)">
                         <span v-html="line"></span>
                     </p>
-                    <p v-for="line in parseRelevantFacts(record.relevantFacts)" data-tooltip="Fato Relevante" data-position="top left" class="ui blue">
-                        <i class="circle exclamation icon"></i>{{ line }}
-                    </p>
-                    <p v-for="line in parseDeliveries(record.deliveries)" data-tooltip="Entrega" data-position="top left" class="ui green">
-                        <i class="cube icon"></i>{{ line }}
-                    </p>
                 </td>
             </tr>
             </tbody>
 
             <tfoot class="full-width">
             <tr>
-                <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(group))">= <b>{{ timesheetStore.totalTimeSpent(group) }}</b></span></th>
+                <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(cluster.items))">= <b>{{ timesheetStore.totalTimeSpent(cluster.items) }}</b></span></th>
                 <th colspan="2">
                     <!-- Reservado -->
                 </th>
@@ -67,7 +61,7 @@
 
             </table>
             <div class="ui custom-add-button">
-                <button class="ui mini primary circular icon button" @click="addRecord(group)" data-tooltip="Adicionar">
+                <button class="ui mini primary circular icon button" @click="addRecord(cluster)" data-tooltip="Adicionar">
                     <i class="plus icon"></i> 
                 </button>
             </div>
@@ -76,14 +70,6 @@
     </div>
 </template>
 
-<!-- @ TODO
-	Refactoring do uso de componentes de edição (clone de objeto) com sugestão do Gemini
-	https://g.co/gemini/share/2aded8b07748
-
-    Nomenclatura para eventos de componentes
-    https://www.perplexity.ai/search/no-vu3-tem-padrao-de-nomenclat-Y8eYUd3eSHGhr20R0jL4WQ
-
--->
 <script setup>
 import { reactive, watch, onMounted, computed } from 'vue';
 import { useTimesheetStore } from '../stores/timesheet-store.mjs';
@@ -190,17 +176,7 @@ const parseDescription = (description) => {
     return lines
 }
 
-const parseRelevantFacts = (relevantFacts) => {
-    if (relevantFacts == null || relevantFacts == '')
-        return []
-    return relevantFacts.split('\n')
-}
 
-const parseDeliveries = (deliveries) => {
-    if (deliveries == null || deliveries == '')
-        return []
-    return deliveries.split('\n')
-}
 
 const dayOfWeek = (date) => {
     const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -274,14 +250,6 @@ onMounted(() => {
 span.ui.tag.label {
     padding-left: 1em;
     padding-right: 1em;
-}
-
-#timesheet-panel p.ui.blue {
-    color: rgb(0, 0, 128);
-}
-
-#timesheet-panel p.ui.green {
-    color: rgb(0, 64, 0);
 }
 
 #timesheet-panel div.ui.custom-add-button {

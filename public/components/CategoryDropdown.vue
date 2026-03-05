@@ -1,5 +1,5 @@
 <template>
-    <div id="dropdown-category" class="ui fluid selection dropdown">
+    <div :id="dropdownId" class="ui fluid selection dropdown">
         <input type="hidden" name="category">
         <i class="dropdown icon"></i>
         <div class="default text">Select Category</div>
@@ -13,6 +13,8 @@
 
 <script setup>
 import { onMounted, watch, defineModel } from 'vue'
+
+let _instanceCounter = 0
 
 const log = (message, object) => {
     if (object)
@@ -34,27 +36,35 @@ const props = defineProps({
     }
 });
 
+const dropdownId = `dropdown-category-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
+
+const initDropdown = () => {
+    if (category.value)
+        $(`#${dropdownId}`).dropdown('set selected', category.value, true)
+    else
+        $(`#${dropdownId}`).dropdown('clear', true)
+
+    $(`#${dropdownId}`).dropdown({
+        onChange: (value) => {
+            log(`Selected: ${value}`)
+            category.value = value
+        }
+    });
+}
+
 watch(() => props.enabled, (newValue, oldValue) => {
-    log(`Dropdown enabled: ${newValue}`)
+    log(`Dropdown enabled: ${newValue} (id: ${dropdownId})`)
 
-    // O v-model não funciona com o componente `dropdown` do Fomantic
-    // É necessário fazer o controle manual do binding
     if (newValue) {
-        if (category.value)
-            $('#dropdown-category').dropdown('set selected', category.value, true)
-        else
-            $('#dropdown-category').dropdown('clear', true)
-
-        $('#dropdown-category').dropdown({
-            onChange: (value) => {
-                log(`Selected: ${value}`)
-                category.value = value
-            }
-        });
+        initDropdown()
     }
 })
 
 onMounted(() => {
-    log('Mounted')
+    log(`Mounted (id: ${dropdownId})`)
+    // Initialize immediately if already enabled (e.g. added while modal is open)
+    if (props.enabled) {
+        setTimeout(() => initDropdown(), 50)
+    }
 })
 </script>

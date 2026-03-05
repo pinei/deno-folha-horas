@@ -31,15 +31,6 @@
 		<div class="field" :class="isValidDescription || 'error'">
 			<label>Descrição</label>
 			<textarea name="description" rows="2" v-model="state.record.description"></textarea>
-		</div>
-		<div class="field">
-			<label>Fatos Relevantes</label>
-			<textarea name="relevantFacts" rows="2" v-model="state.record.relevantFacts"></textarea>
-		</div>
-		<div class="field">
-			<label>Entregas</label>
-			<textarea name="deliveries" rows="2" v-model="state.record.deliveries"></textarea>
-		</div>
 		</form>
 	  </div>
 
@@ -50,10 +41,6 @@
 
 </template>
 
-<!-- @ TODO
-	Refactoring com sugestão do Gemini
-	https://g.co/gemini/share/2aded8b07748
--->
 <script setup>
 import { defineEmits, computed, watch, onMounted, onUnmounted, ref, reactive } from 'vue';
 import { useCategoryStore } from '../stores/category-store.mjs';
@@ -115,9 +102,9 @@ watch(() => props.item, (newValue) => {
 	log(`Record changed:`, newValue)
 	state.record = {...newValue};
 
-	if (newValue?.date)
-		setCalendar(newValue.date);
-}, { deep: true });
+	if (state.record.date)
+		setCalendar(state.record.date);
+});
 
 watch(() => props.visible, (newValue) => {
 	log(`Modal visible changed: ${newValue} and isModalVisible = ${state.isModalVisible}`)

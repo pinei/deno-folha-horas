@@ -2,15 +2,14 @@ import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 import timesheetService from '../services/timesheet-api.mjs'
 
-import { GroupsOfRecords } from '../domain/clusters.ts'
+import { Clusters } from '../domain/clusters.ts'
 
 export const useTimesheetStore = defineStore('timesheet', () => {
     console.log('Setting up Timesheet Store...')
 
     const currentDate = ref(new Date())
 
-    // Records grouped by date
-    const groupsOfRecords = reactive(new GroupsOfRecords())
+    const clusters = reactive(new Clusters((item) => item.date, 'DESC'))
 
     const summary = ref({
         categories: [],
@@ -54,8 +53,10 @@ export const useTimesheetStore = defineStore('timesheet', () => {
         }
     }
 
-    function totalTimeSpent(group) {
-        const total = group.records.reduce((total, record) => {
+    function totalTimeSpent(items) {
+        if (!items) return 0.0
+
+        const total = items.reduce((total, record) => {
             let timeSpent = parseFloat(record.timeSpent)
             if (isNaN(timeSpent)) timeSpent = 0
             return total + timeSpent
@@ -64,7 +65,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
     }
 
     function setRecords(records) {
-        groupsOfRecords.setRecords(records)
+        clusters.setItems(records)
         _updateSummary(records)
     }
 
@@ -97,15 +98,15 @@ export const useTimesheetStore = defineStore('timesheet', () => {
     }
 
     async function updateRecord(editedRecord) {
-        const originalRecord = groupsOfRecords.findRecordById(editedRecord.id)
+        const originalRecord = clusters.findItemById(editedRecord.id)
 
         if (originalRecord) {
-            groupsOfRecords.removeRecord(originalRecord)
+            clusters.removeItem(originalRecord)
 
             Object.assign(originalRecord, editedRecord)
 
             const saved = await timesheetService.saveRecord(editedRecord)
-            groupsOfRecords.addRecord(saved)
+            clusters.addItem(saved)
         }
         else {
             throw new Error('Registro não selecionado')
@@ -114,7 +115,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
 
     async function addRecord(record) {
         const saved = await timesheetService.saveRecord(record)
-        groupsOfRecords.addRecord(saved)
+        clusters.addItem(saved)
     }
 
     async function mergeRecord(record) {
@@ -128,7 +129,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
                 await addRecord(record)
             }
 
-            _updateSummary(groupsOfRecords.getRecords())
+            _updateSummary(clusters.getItems())
         }
         finally {
             loading.value = false
@@ -140,8 +141,8 @@ export const useTimesheetStore = defineStore('timesheet', () => {
             loading.value = true
             const deleted = await timesheetService.deleteRecord(record)
             if (deleted) {
-                groupsOfRecords.removeRecord(record)
-                _updateSummary(groupsOfRecords.getRecords())
+                clusters.removeItem(record)
+                _updateSummary(clusters.getItems())
             }
 
         } catch (err) {
@@ -153,7 +154,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
 
     return {
         totalTimeSpent,
-        groupsOfRecords: groupsOfRecords.getGroups(),
+        clusters: clusters.getClusters(),
         removeRecord,
         mergeRecord,
         loadRecordsForTerms,

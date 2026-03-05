@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { Clusters, Cluster } from '../domain/clusters.ts'
 import { Buckets, Bucket } from '../domain/buckets.ts'
@@ -21,31 +22,32 @@ export const useKanbanStore = defineStore('kanban', () => {
         { name: 'DONE', description: 'Done', color: '#eef7ee' }
     ]
 
+    const useDateAsGroupKey = (item) => {
+        // Menor data entre os timesheets
+        const ts = item.timesheets || []
+        if (ts.length === 0) return 'EMPTY'
+        return ts.reduce((min, t) => t.date < min ? t.date : min, ts[0].date)
+    }
+
     for (const lane of lanes) {
-        buckets.value.add(
+        buckets.value.addBucket(
             new Bucket(
                 lane.name,
                 lane.description,
                 lane.color,
-                new Clusters((item) => item.timesheet.date, 'DESC')
+                new Clusters(useDateAsGroupKey, 'DESC')
             ))
     }
 
-    const loadKanbanCards = () => {
+    const reloadKanbanCards = () => {
         loading.value = true
         error.value = null
 
         kanbanApi.getHotKanbanCards()
             .then(items => {
+                buckets.value.clear()
                 for (const item of items) {
-                    const bucket = buckets.value.getBucket(item.status)
-
-                    if (!bucket) {
-                        console.error(`Bucket ${item.status} not found`)
-                        continue
-                    }
-
-                    bucket.addCluster(new Cluster(item))
+                    buckets.value.addItem(item, item.status)
                 }
             })
             .catch(error => {
@@ -63,31 +65,34 @@ export const useKanbanStore = defineStore('kanban', () => {
             return
         }
 
-        fromBucket.clusters.remove(card)
-        toBucket.clusters.add(card)
+        fromBucket.clusters.removeItem(card)
+        toBucket.clusters.addItem(card)
 
         card.status = toBucket.name
-        kanbanApi.updateCardStatus(card)
+        kanbanApi.updateKanbanCardStatus(card)
     }
 
-    const saveKanbanCard = (fromBucket, card) => {
-        kanbanApi.saveKanbanCard(card)
-
+    const saveKanbanCard = async (fromBucket, card) => {
+        // Remove from old cluster BEFORE updating data (cluster key may change)
         if (fromBucket != null) {
-            if (fromBucket.name !== card.status) {
-                fromBucket.clusters.remove(card)
-            }
-            else {
-                return
-            }
+            fromBucket.clusters.removeItem(card)
         }
 
-        buckets.value.getBucket(card.status).clusters.add(card)
+        const savedData = await kanbanApi.saveKanbanCard(card)
+
+        // Update card with saved data (new IDs, updated timesheets, etc.)
+        Object.assign(card, savedData)
+
+        const toBucket = buckets.value.getBucket(card.status)
+
+        if (toBucket != null && !card.archived) {
+            toBucket.clusters.addItem(card)
+        }
     }
 
     const deleteKanbanCard = (fromBucket, card) => {
         kanbanApi.deleteKanbanCard(card)
-        fromBucket.clusters.remove(card)
+        fromBucket.clusters.removeItem(card)
     }
 
     return {
@@ -95,7 +100,7 @@ export const useKanbanStore = defineStore('kanban', () => {
         loading,
         error,
         buckets,
-        loadKanbanCards,
+        reloadKanbanCards,
         moveCard,
         saveKanbanCard,
         deleteKanbanCard

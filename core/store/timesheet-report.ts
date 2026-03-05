@@ -47,23 +47,41 @@ class TimesheetReport {
         return database.query(sql);
     }
 
-    factsAndDeliveriesReport() {
-        const sql = `
+    factsAndDeliveriesReport(startMonthStr?: string, endMonthStr?: string) {
+        let sql = `
             SELECT
                 PRINTF(
                     '%04d-W%02d',
-                    STRFTIME('%Y', DATE),
-                    STRFTIME('%V', DATE)
+                    STRFTIME('%Y', MAX(t.DATE)),
+                    STRFTIME('%V', MAX(t.DATE))
                 ) AS WEEK,
-                CATEGORY,
-                CONTEXT,
-                RELEVANT_FACTS,
-                DELIVERIES
+                MAX(t.CATEGORY) AS CATEGORY,
+                k.ISSUE AS CONTEXT,
+                k.RELEVANT_FACTS,
+                k.DELIVERIES
             FROM
-                TIMESHEET t
+                KANBAN_CARD k
+            INNER JOIN TIMESHEET t ON t.KANBAN_CARD_ID = k.ID
             WHERE
-                COALESCE(RELEVANT_FACTS, DELIVERIES) IS NOT NULL
-            ORDER BY DATE
+                (
+                    (k.RELEVANT_FACTS IS NOT NULL AND k.RELEVANT_FACTS != '') OR 
+                    (k.DELIVERIES IS NOT NULL AND k.DELIVERIES != '')
+                )
+        `
+
+        if (startMonthStr) {
+            sql += `\n                AND strftime('%Y-%m', t.DATE) >= '${startMonthStr}'`
+        }
+
+        if (endMonthStr) {
+            sql += `\n                AND strftime('%Y-%m', t.DATE) <= '${endMonthStr}'`
+        }
+
+        sql += `
+            GROUP BY 
+                k.ID
+            ORDER BY 
+                MAX(t.DATE)
         `
 
         return database.query(sql);

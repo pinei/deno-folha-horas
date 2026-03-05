@@ -5,11 +5,11 @@
         <form class="ui form">
             <div class="fields">
                 <div class="field">
-                    <label>Mës início (@todo)</label>
+                    <label>Mës início</label>
                     <Calendar v-model="state.calendarDateStart"/>
                 </div>
                 <div class="field">
-                    <label>Mës final (@todo)</label>
+                    <label>Mës final</label>
                     <Calendar v-model="state.calendarDateEnd"/>
                 </div>
             </div>
@@ -33,26 +33,13 @@
                 </form>
             </div>
         </div>
-        <div v-for="(categories, week) in filteredAndGroupedByWeek" class="ui vertical segment container">
-            <h2 class="ui header">Semana {{ week }}</h2>
-            <div v-for="(records, category) in categories">
-                <h3 class="ui header">{{ category }}</h3>
-                <ul class="ui no-bullets">
-                    <template v-for="record in records">
-                        <li v-for="line in parseRelevantFacts(record.RELEVANT_FACTS)" >
-                            <i class="circle exclamation icon"></i>{{ record.CONTEXT }} ➜ {{ line }}
-                        </li>
-                        <li v-for="line in parseDeliveries(record.DELIVERIES)">
-                            <i class="cube icon"></i>{{ record.CONTEXT }} ➜ {{ line }}
-                        </li>
-                    </template>
-                </ul>
+
+        <div class="ui form" style="margin-top: 2em;" v-show="Object.keys(filteredAndGroupedByWeek).length > 0">
+            <div class="field">
+                <label>Markdown Gerado</label>
+                <textarea rows="20" readonly style="font-family: monospace; line-height: 1.5;">{{ generateMarkdown() }}</textarea>
             </div>
-            <div class="ui custom-copy-button">
-                <button class="ui mini primary circular icon button" @click="copyMarkdown(week, categories)" data-tooltip="Copy Markdown">
-                    <i class="copy icon"></i> 
-                </button>
-            </div>
+            <div class="ui primary button" @click="copyMarkdown()" data-tooltip="Copiar Markdown para a área de transferência">Copiar Tudo</div>
         </div>
     </div>
 </template>
@@ -122,7 +109,7 @@ const parseDeliveries = (deliveries) => {
 }
 
 const generate = async () => {
-    const data = await timesheetReportApi.getFactsAndDeliveries()
+    const data = await timesheetReportApi.getFactsAndDeliveries(state.calendarDateStart, state.calendarDateEnd)
 
     const groupedByWeek = data.reduce((acc, record) => {
         const week = record['WEEK'];
@@ -153,26 +140,45 @@ const generate = async () => {
     log('Available categories:', state.availableCategories)
 }
 
-const copyMarkdown = async (week, categories) => {
-    const text = `## Semana ${week}` + 
-        Object.entries(categories).map(([category, records]) => {
+const generateMarkdown = () => {
+    return Object.entries(filteredAndGroupedByWeek.value).map(([week, categories]) => {
+        const weekHeader = `## Semana ${week}`;
+        
+        const categoriesText = Object.entries(categories).map(([category, records]) => {
             const categoryHeader = `\n\n### ${category}\n`;
 
-            const recordsText = records.map(record => {
-                const relevantFactsText = parseRelevantFacts(record.RELEVANT_FACTS)
-                    .map(line => `\n- ${record.CONTEXT} ➜ ${line}`)
-                    .join('');
+            const allFacts = [];
+            const allDeliveries = [];
 
-                const deliveriesText = parseDeliveries(record.DELIVERIES)
-                    .map(line => `\n- ${record.CONTEXT} ➜ ${line}`)
-                    .join('');
+            records.forEach(record => {
+                parseRelevantFacts(record.RELEVANT_FACTS).forEach(line => {
+                    allFacts.push(`- ${record.CONTEXT} ➜ ${line}`);
+                });
 
-                return relevantFactsText + deliveriesText;
-            }).join('');
+                parseDeliveries(record.DELIVERIES).forEach(line => {
+                    allDeliveries.push(`- ${record.CONTEXT} ➜ ${line}`);
+                });
+            });
 
-            return categoryHeader + recordsText;
+            let combinedText = '';
+
+            if (allFacts.length > 0) {
+                combinedText += `\n**Fatos Relevantes**\n${allFacts.join('\n')}\n`;
+            }
+
+            if (allDeliveries.length > 0) {
+                combinedText += `\n**Entregas**\n${allDeliveries.join('\n')}\n`;
+            }
+
+            return categoryHeader + combinedText;
         }).join('');
+        
+        return weekHeader + categoriesText;
+    }).join('\n\n');
+};
 
+const copyMarkdown = async () => {
+    const text = generateMarkdown();
     try {
         await navigator.clipboard.writeText(text);
         log('Copied to clipboard');

@@ -64,16 +64,55 @@ const SQL_MIGRATE = [
   },
   {
     version: '1.4.0',
-    description: 'Kanban Card Table',
+    description: 'Kanban Card Table (standalone, no TIMESHEET_ID FK)',
     sql: `
       CREATE TABLE IF NOT EXISTS KANBAN_CARD (
         ID integer primary key autoincrement,
-        TIMESHEET_ID integer,
         ISSUE text,
+        DESCRIPTION text,
         STATUS text,
         ARCHIVED integer,
-        FOREIGN KEY (TIMESHEET_ID) REFERENCES TIMESHEET(ID)
+        RELEVANT_FACTS text,
+        DELIVERIES text
       );
+    `
+  },
+  {
+    version: '1.4.1',
+    description: 'Add KANBAN_CARD_ID FK on TIMESHEET',
+    sql: `
+      ALTER TABLE TIMESHEET ADD COLUMN KANBAN_CARD_ID integer REFERENCES KANBAN_CARD(ID) ON DELETE SET NULL;
+    `
+  },
+  {
+    version: '1.4.2',
+    description: 'Data migration: create KANBAN_CARD for TIMESHEETs with RELEVANT_FACTS or DELIVERIES',
+    sql: `
+      INSERT INTO KANBAN_CARD (ISSUE, DESCRIPTION, RELEVANT_FACTS, DELIVERIES, STATUS, ARCHIVED)
+        SELECT CONTEXT, DESCRIPTION, RELEVANT_FACTS, DELIVERIES, 'DONE', 1
+        FROM TIMESHEET
+        WHERE (RELEVANT_FACTS IS NOT NULL AND RELEVANT_FACTS != '')
+           OR (DELIVERIES IS NOT NULL AND DELIVERIES != '');
+
+      UPDATE TIMESHEET
+        SET KANBAN_CARD_ID = (
+          SELECT KC.ID FROM KANBAN_CARD KC
+          WHERE KC.ISSUE = TIMESHEET.CONTEXT
+            AND KC.DESCRIPTION = TIMESHEET.DESCRIPTION
+            AND (KC.RELEVANT_FACTS IS TIMESHEET.RELEVANT_FACTS)
+            AND (KC.DELIVERIES IS TIMESHEET.DELIVERIES)
+          LIMIT 1
+        )
+        WHERE (RELEVANT_FACTS IS NOT NULL AND RELEVANT_FACTS != '')
+           OR (DELIVERIES IS NOT NULL AND DELIVERIES != '');
+    `
+  },
+  {
+    version: '1.4.3',
+    description: 'Drop RELEVANT_FACTS and DELIVERIES from TIMESHEET',
+    sql: `
+      ALTER TABLE TIMESHEET DROP COLUMN RELEVANT_FACTS;
+      ALTER TABLE TIMESHEET DROP COLUMN DELIVERIES;
     `
   },
 ]

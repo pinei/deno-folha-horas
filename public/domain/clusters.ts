@@ -31,6 +31,10 @@ export class Clusters {
         return this.clusters.find((cluster) => cluster.key === key)
     }
 
+    clear() {
+        this.clusters = []
+    }
+
     findItemById(id: number | string) {
         for (const cluster of this.clusters) {
             const item = cluster.items.find((item: any) => item.id === id)
@@ -102,17 +106,31 @@ export class Clusters {
 
     removeItem(item: any) {
         const key = this.keyFunction(item)
-        const cluster = this.findCluster(key)
+        let cluster = this.findCluster(key)
+        let index = -1
 
+        // Try finding by key first
         if (cluster) {
-            const index = cluster.items.findIndex((i: any) => i.id === item.id)
-            if (index !== -1) {
-                cluster.items.splice(index, 1)
+            index = cluster.items.findIndex((i: any) => i.id === item.id)
+        }
 
-                if (cluster.items.length === 0) {
-                    const clusterIndex = this.clusters.findIndex((c) => c.key === key)
-                    this.clusters.splice(clusterIndex, 1)
+        // Fallback: search all clusters by id (key may have changed after editing)
+        if (index === -1) {
+            for (const c of this.clusters) {
+                index = c.items.findIndex((i: any) => i.id === item.id)
+                if (index !== -1) {
+                    cluster = c
+                    break
                 }
+            }
+        }
+
+        if (cluster && index !== -1) {
+            cluster.items.splice(index, 1)
+
+            if (cluster.items.length === 0) {
+                const clusterIndex = this.clusters.findIndex((c) => c.key === cluster.key)
+                this.clusters.splice(clusterIndex, 1)
             }
         }
 

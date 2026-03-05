@@ -1,5 +1,5 @@
 <template>
-    <div id="month-calendar" class="ui calendar">
+    <div ref="calendarEl" class="ui calendar">
         <div class="ui input left icon">
             <i class="calendar icon"></i>
             <input type="text">
@@ -27,20 +27,21 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const calendarDate = ref(props.modelValue)
+const calendarEl = ref(null)
 
 watch(() => props.enabled, (newValue, oldValue) => {
     console.log(`Calendar enabled: ${newValue}`)
     if (newValue) {
-        $('#month-calendar').removeClass('disabled')
+        $(calendarEl.value).removeClass('disabled')
     } else {
-        $('#month-calendar').addClass('disabled')
+        $(calendarEl.value).addClass('disabled')
     }
 })
 
 onMounted(() => {
     console.log('[Calendar] Mounted...')
 
-    $('#month-calendar').calendar({
+    $(calendarEl.value).calendar({
         type: 'month',
         initialDate: calendarDate.value,
         onChange: function (date, text, mode) {

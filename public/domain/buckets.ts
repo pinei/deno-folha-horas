@@ -1,4 +1,4 @@
-import { Clusters } from './clusters';
+import { Clusters } from './clusters.ts';
 
 /*
  * Bucket is a container for clusters.
@@ -28,27 +28,37 @@ export class Buckets {
         return this.buckets;
     }
 
+    clear(): void {
+        for (const bucket of this.buckets) {
+            bucket.clusters.clear();
+        }
+    }
+
+    getBucket(name: string): Bucket | undefined {
+        return this.buckets.find(b => b.name === name);
+    }
+
     addBucket(bucket: Bucket): void {
         this.buckets.push(bucket);
     }
 
     addItem(item: any, bucketName: string): void {
-        const bucket = this.buckets.find(b => b.name === bucketName);
+        const bucket = this.getBucket(bucketName);
         if (bucket) {
             bucket.clusters.addItem(item);
         }
     }
 
     removeItem(item: any, bucketName: string): void {
-        const bucket = this.buckets.find(b => b.name === bucketName);
+        const bucket = this.getBucket(bucketName);
         if (bucket) {
             bucket.clusters.removeItem(item);
         }
     }
 
     moveItem(itemId: string | number, fromBucketName: string, toBucketName: string): void {
-        const fromBucket = this.buckets.find(b => b.name === fromBucketName);
-        const toBucket = this.buckets.find(b => b.name === toBucketName);
+        const fromBucket = this.getBucket(fromBucketName);
+        const toBucket = this.getBucket(toBucketName);
 
         if (!fromBucket || !toBucket) {
             return;
@@ -59,5 +69,15 @@ export class Buckets {
             fromBucket.clusters.removeItem(item);
             toBucket.clusters.addItem(item);
         }
+    }
+
+    findItemById(itemId: string | number): any {
+        for (const bucket of this.buckets) {
+            const item = bucket.clusters.findItemById(itemId);
+            if (item) {
+                return item;
+            }
+        }
+        return undefined;
     }
 }

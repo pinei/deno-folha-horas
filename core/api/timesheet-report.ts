@@ -24,11 +24,13 @@ router.get('/month-timesheet/:year/:month', (req, res, next) => {
     }
 });
 
-router.get('/facts-and-deliveries', (_, res, next) => {
+router.get('/facts-and-deliveries', (req, res, next) => {
     try {
-        console.log('> GET /facts-and-deliveries')
+        const startMonthStr = req.query.startMonthStr as string
+        const endMonthStr = req.query.endMonthStr as string
+        console.log(`> GET /facts-and-deliveries?startMonthStr=${startMonthStr}&endMonthStr=${endMonthStr}`)
 
-        const data = report.factsAndDeliveriesReport()
+        const data = report.factsAndDeliveriesReport(startMonthStr, endMonthStr)
         res.json(data)
     }
     catch (error) {

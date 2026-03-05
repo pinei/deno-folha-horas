@@ -7,16 +7,19 @@ const api = axios.create({
 async function getHotKanbanCards() {
     console.log(`Fetching kanban cards`)
 
-    const response = await api.get('/kanban/search', {
-        params: {
-            archive: false
-        }
+    const response = await api.post('/kanban/search', {
+        archived: false
     })
     console.log('Response: ', response.data)
 
     return response.data
 }
-
+async function searchKanbanCards(query) {
+    console.log('Searching kanban cards: ', query)
+    const response = await api.post('/kanban/search', query)
+    console.log('Response: ', response.data)
+    return response.data
+}
 async function saveKanbanCard(card) {
     console.log('Saving kanban card: ', card)
 
@@ -25,16 +28,6 @@ async function saveKanbanCard(card) {
             ? api.post(`/kanban/${card.id}`, card)
             : api.post('/kanban', card)
     )
-
-    console.log('Response: ', response.data)
-    return response.data
-}
-
-async function archiveKanbanCard(card) {
-    console.log('Archiving kanban card: ', card)
-    const response = await api.put(`/kanban/${card.id}`, {
-        archived: true
-    })
 
     console.log('Response: ', response.data)
     return response.data
@@ -60,7 +53,9 @@ async function deleteKanbanCard(card) {
 
 
 export default {
-    getKanbanCards,
+    getHotKanbanCards,
+    searchKanbanCards,
     saveKanbanCard,
-    deleteKanbanCard
+    deleteKanbanCard,
+    updateKanbanCardStatus
 }

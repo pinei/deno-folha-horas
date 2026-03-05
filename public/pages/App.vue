@@ -11,16 +11,16 @@ export default {
         <div class="ui container">
             <a href="#" class="header item">
             <img class="logo" src="/images/petrobras-8-logo-svg-vector.svg">
-            Folha de Horas
+            Timesheet App
             </a>
-            <router-link to="/" class="item">Apontamento</router-link>
             <router-link to="/kanban" class="item">Kanban</router-link>
+            <router-link to="/" class="item">Timesheet</router-link>
 
             <div class="ui simple dropdown item">
-                Relatório <i class="dropdown icon"></i>
+                Reports <i class="dropdown icon"></i>
                 <div class="menu">
-                    <router-link to="/month-time-report" class="item">Apontamento de Horas</router-link>
-                    <router-link to="/facts-and-deliveries-report" class="item">Fatos Relevantes e Entregas</router-link>
+                    <router-link to="/month-time-report" class="item">Timesheet Report</router-link>
+                    <router-link to="/facts-and-deliveries-report" class="item">Relevant Facts and Deliveries</router-link>
                 </div>
             </div>
             
@@ -35,6 +35,7 @@ export default {
         </div>
     </div>
 
+    <!-- o Kanban não pode usar `container` pois precisa de todo o espaço horizontal -->
     <div :class="['ui main', $route.path === '/kanban' ? '' : 'container']">
         <router-view/>
     </div>

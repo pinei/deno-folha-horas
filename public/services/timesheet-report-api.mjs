@@ -15,9 +15,26 @@ async function getMonthTimesheet(date) {
 }
 
 async function getFactsAndDeliveries(startMonth, endMonth) {
-    console.log('Getting facts and deliveries report...')
+    let url = `/timesheet/report/facts-and-deliveries`
+    let queryParams = []
 
-    const response = await api.get(`/timesheet/report/facts-and-deliveries`)
+    if (startMonth && startMonth instanceof Date && !isNaN(startMonth.getTime())) {
+        const startStr = `${startMonth.getFullYear()}-${(startMonth.getMonth() + 1).toString().padStart(2, '0')}`
+        queryParams.push(`startMonthStr=${startStr}`)
+    }
+
+    if (endMonth && endMonth instanceof Date && !isNaN(endMonth.getTime())) {
+        const endStr = `${endMonth.getFullYear()}-${(endMonth.getMonth() + 1).toString().padStart(2, '0')}`
+        queryParams.push(`endMonthStr=${endStr}`)
+    }
+
+    if (queryParams.length > 0) {
+        url += '?' + queryParams.join('&')
+    }
+
+    console.log(`Getting facts and deliveries report... URL: ${url}`)
+
+    const response = await api.get(url)
     return response.data
 }
 

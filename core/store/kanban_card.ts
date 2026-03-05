@@ -5,9 +5,12 @@ import { TimesheetRecord } from './timesheet';
 class KanbanCardRecord {
     id = 0
     issue: string | null = null
+    description: string | null = null
     status: string | null = null
     archived = false
-    timesheet: TimesheetRecord | null = null
+    relevantFacts: string | null = null
+    deliveries: string | null = null
+    timesheets: TimesheetRecord[] = []
 
     constructor(data: Partial<KanbanCardRecord>) {
         Object.assign(this, data)
@@ -21,7 +24,6 @@ class KanbanCardRecord {
     }
 
     validated() {
-        this.checkRequired('timesheet', 'Timesheet is required')
         this.checkRequired('status', 'Status is required')
         this.checkRequired('issue', 'Issue is required')
 
@@ -31,28 +33,10 @@ class KanbanCardRecord {
 
 class KanbanCardStore {
     _queryForListRecords(filter: any) {
-        let { timesheetId, issue, status, archived } = filter
+        let { issue, status, archived, terms } = filter
 
-        let sql = `select
-            KANBAN_CARD.*,
-            TIMESHEET.DATE AS TIMESHEET_DATE,
-            TIMESHEET.CATEGORY AS TIMESHEET_CATEGORY,
-            TIMESHEET.TIME_SPENT AS TIMESHEET_TIME_SPENT,
-            TIMESHEET.DESCRIPTION AS TIMESHEET_DESCRIPTION,
-            TIMESHEET.RELEVANT_FACTS AS TIMESHEET_RELEVANT_FACTS,
-            TIMESHEET.DELIVERIES AS TIMESHEET_DELIVERIES,
-            TIMESHEET.CONTEXT AS TIMESHEET_CONTEXT
-        from
-            KANBAN_CARD JOIN
-            TIMESHEET ON KANBAN_CARD.TIMESHEET_ID = TIMESHEET.ID
-        where
-            1 = 1`
+        let sql = `select * from KANBAN_CARD where 1 = 1`
         let params: any = {}
-
-        if (timesheetId) {
-            sql += ` and TIMESHEET_ID = @timesheetId`
-            params['@timesheetId'] = timesheetId
-        }
 
         if (issue) {
             sql += ` and ISSUE = @issue`
@@ -69,9 +53,48 @@ class KanbanCardStore {
             params['@archived'] = archived ? 1 : 0
         }
 
+        if (terms) {
+            terms = `%${terms}%`
+            sql += ` and (ISSUE like @terms or DESCRIPTION like @terms or RELEVANT_FACTS like @terms or DELIVERIES like @terms)`
+            params['@terms'] = terms
+        }
+
+        if (filter.limit) {
+            sql += ` LIMIT @limit`
+            params['@limit'] = filter.limit
+        }
+
         return {
             sql,
             params
+        }
+    }
+
+    _loadTimesheets(kanbanCardId: number): TimesheetRecord[] {
+        const sql = `select * from TIMESHEET where KANBAN_CARD_ID = @kanbanCardId order by DATE desc`
+        const stmt = database.prepare(sql);
+        const results = stmt.all({ '@kanbanCardId': kanbanCardId });
+
+        return results.map((result: any) => {
+            return new TimesheetRecord({
+                id: result.ID,
+                date: result.DATE,
+                category: result.CATEGORY,
+                timeSpent: result.TIME_SPENT,
+                description: result.DESCRIPTION,
+                context: result.CONTEXT,
+                kanbanCardId: result.KANBAN_CARD_ID
+            })
+        })
+    }
+
+    unlinkRemovedTimesheets(kanbanCardId: number, keepIds: number[]) {
+        if (keepIds.length === 0) {
+            // Unlink all timesheets from this card
+            database.update('TIMESHEET', ['KANBAN_CARD_ID'], [null], `KANBAN_CARD_ID = ${kanbanCardId}`)
+        } else {
+            const idList = keepIds.join(',')
+            database.update('TIMESHEET', ['KANBAN_CARD_ID'], [null], `KANBAN_CARD_ID = ${kanbanCardId} AND ID NOT IN (${idList})`)
         }
     }
 
@@ -87,18 +110,12 @@ class KanbanCardStore {
             const record: KanbanCardRecord = new KanbanCardRecord({
                 id: result.ID,
                 issue: result.ISSUE,
+                description: result.DESCRIPTION,
                 status: result.STATUS,
                 archived: result.ARCHIVED > 0 ? true : false,
-                timesheet: new TimesheetRecord({
-                    id: result.TIMESHEET_ID,
-                    date: result.TIMESHEET_DATE,
-                    category: result.TIMESHEET_CATEGORY,
-                    timeSpent: result.TIMESHEET_TIME_SPENT,
-                    description: result.TIMESHEET_DESCRIPTION,
-                    relevantFacts: result.TIMESHEET_RELEVANT_FACTS,
-                    deliveries: result.TIMESHEET_DELIVERIES,
-                    context: result.TIMESHEET_CONTEXT
-                })
+                relevantFacts: result.RELEVANT_FACTS,
+                deliveries: result.DELIVERIES,
+                timesheets: this._loadTimesheets(result.ID)
             })
             return record;
         })
@@ -109,8 +126,8 @@ class KanbanCardStore {
     _insertRecord(record: KanbanCardRecord): KanbanCardRecord {
         record = record.validated()
 
-        const fields = ['ISSUE', 'STATUS', 'ARCHIVED', 'TIMESHEET_ID']
-        const values = [record.issue, record.status, record.archived ? 1 : 0, record.timesheet?.id]
+        const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES']
+        const values = [record.issue, record.description, record.status, record.archived ? 1 : 0, record.relevantFacts, record.deliveries]
 
         const changes = database.insert('KANBAN_CARD', fields, values);
 
@@ -124,8 +141,8 @@ class KanbanCardStore {
     _updateRecord(record: KanbanCardRecord): KanbanCardRecord {
         record = record.validated()
 
-        const fields = ['ISSUE', 'STATUS', 'ARCHIVED']
-        const values = [record.issue, record.status, record.archived ? 1 : 0]
+        const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES']
+        const values = [record.issue, record.description, record.status, record.archived ? 1 : 0, record.relevantFacts, record.deliveries]
 
         const changes = database.update('KANBAN_CARD', fields, values, `ID = ${record.id}`);
 

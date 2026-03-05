@@ -7,9 +7,8 @@ class TimesheetRecord {
     category: string | null = null
     timeSpent = 0
     description = ''
-    relevantFacts: string | null = null
-    deliveries: string | null = null
     context: string | null = null
+    kanbanCardId: number | null = null
 
     constructor(data: Partial<TimesheetRecord>) {
         Object.assign(this, data)
@@ -32,14 +31,6 @@ class TimesheetRecord {
 
         if (typeof this.timeSpent === 'string') {
             this.timeSpent = parseFloat(this.timeSpent)
-        }
-
-        if (this.relevantFacts && this.relevantFacts.trim() === '') {
-            this.relevantFacts = null
-        }
-
-        if (this.deliveries && this.deliveries.trim() === '') {
-            this.deliveries = null
         }
 
         if (this.context && this.context.trim() === '') {
@@ -75,7 +66,7 @@ class TimesheetStore {
 
         if (terms) {
             terms = `%${terms}%`
-            sql += ` and (DESCRIPTION like @terms or RELEVANT_FACTS like @terms or DELIVERIES like @terms)`
+            sql += ` and (DESCRIPTION like @terms or CONTEXT like @terms)`
             params['@terms'] = terms
         }
 
@@ -100,9 +91,8 @@ class TimesheetStore {
                 category: result.CATEGORY,
                 timeSpent: result.TIME_SPENT,
                 description: result.DESCRIPTION,
-                relevantFacts: result.RELEVANT_FACTS,
-                deliveries: result.DELIVERIES,
-                context: result.CONTEXT
+                context: result.CONTEXT,
+                kanbanCardId: result.KANBAN_CARD_ID
             })
             return record;
         })
@@ -113,8 +103,8 @@ class TimesheetStore {
     _insertRecord(record: TimesheetRecord): TimesheetRecord {
         record = record.validated()
 
-        const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'RELEVANT_FACTS', 'DELIVERIES', 'CONTEXT']
-        const values = [record.date, record.category, record.timeSpent, record.description, record.relevantFacts, record.deliveries, record.context]
+        const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'CONTEXT', 'KANBAN_CARD_ID']
+        const values = [record.date, record.category, record.timeSpent, record.description, record.context, record.kanbanCardId]
 
         const changes = database.insert('TIMESHEET', fields, values);
 
@@ -128,8 +118,8 @@ class TimesheetStore {
     _updateRecord(record: TimesheetRecord): TimesheetRecord {
         record = record.validated()
 
-        const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'RELEVANT_FACTS', 'DELIVERIES', 'CONTEXT']
-        const values = [record.date, record.category, record.timeSpent, record.description, record.relevantFacts, record.deliveries, record.context]
+        const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'CONTEXT', 'KANBAN_CARD_ID']
+        const values = [record.date, record.category, record.timeSpent, record.description, record.context, record.kanbanCardId]
 
         const changes = database.update('TIMESHEET', fields, values, `ID = ${record.id}`);
 
