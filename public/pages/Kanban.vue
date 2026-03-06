@@ -247,6 +247,32 @@ export default {
             if (this.dragClone && (evt.clientX !== 0 || evt.clientY !== 0)) {
                 this.dragClone.style.left = (evt.clientX - this.dragOffset.x) + 'px';
                 this.dragClone.style.top = (evt.clientY - this.dragOffset.y) + 'px';
+
+                this.autoScroll(evt);
+            }
+        },
+        autoScroll(evt) {
+            // Auto-scroll window when dragging near the edges
+            const scrollMargin = 60;
+            const scrollSpeed = 20;
+
+            let scrollX = 0;
+            let scrollY = 0;
+
+            if (evt.clientY < scrollMargin) {
+                scrollY = -scrollSpeed;
+            } else if (window.innerHeight - evt.clientY < scrollMargin) {
+                scrollY = scrollSpeed;
+            }
+
+            if (evt.clientX < scrollMargin) {
+                scrollX = -scrollSpeed;
+            } else if (window.innerWidth - evt.clientX < scrollMargin) {
+                scrollX = scrollSpeed;
+            }
+
+            if (scrollX !== 0 || scrollY !== 0) {
+                window.scrollBy(scrollX, scrollY);
             }
         },
         endDrag(evt) {
