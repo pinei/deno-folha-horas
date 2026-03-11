@@ -27,7 +27,7 @@ export function useParseDescription() {
         richText = richText.replace(/^(.+ > .+)$/gm, (match) => {
             const parts = match.split(' > ').map(p => p.trim());
             const last = parts.pop();
-            const sections = parts.map(p => `<a class="section">${p}</a><i class="right chevron icon divider"></i>`).join('');
+            const sections = parts.map(p => `<div class="section">${p}</div><i class="right chevron icon divider"></i>`).join('');
             return `<div class="ui breadcrumb">${sections}<div class="active section">${last}</div></div>`;
         });
 
