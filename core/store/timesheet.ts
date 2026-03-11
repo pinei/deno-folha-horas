@@ -8,7 +8,14 @@ class TimesheetRecord {
     timeSpent = 0
     description = ''
     context: string | null = null
-    kanbanCardId: number | null = null
+    kanbanCard?: {
+        id: number
+        issue?: string | null
+        description?: string | null
+        status?: string | null
+        relevantFacts?: string | null
+        deliveries?: string | null
+    } | null = null
 
     constructor(data: Partial<TimesheetRecord>) {
         Object.assign(this, data)
@@ -52,21 +59,30 @@ class TimesheetStore {
         const sqlStartDate = database.formatDate(startDate || MIN_DATE)
         const sqlEndDate = database.formatDate(endDate || MAX_DATE)
 
-        let sql = `select * from TIMESHEET where DATE >= @sqlStartDate and DATE <= @sqlEndDate`
+        let sql = `select
+                t.*,
+                k.ISSUE as KANBAN_ISSUE,
+                k.DESCRIPTION as KANBAN_DESCRIPTION,
+                k.STATUS as KANBAN_STATUS,
+                k.RELEVANT_FACTS as KANBAN_RELEVANT_FACTS,
+                k.DELIVERIES as KANBAN_DELIVERIES
+            from TIMESHEET t ` +
+            `left join KANBAN_CARD k on t.KANBAN_CARD_ID = k.ID ` +
+            `where t.DATE >= @sqlStartDate and t.DATE <= @sqlEndDate`
 
-        let params = {
+        let params: any = {
             '@sqlStartDate': sqlStartDate,
             '@sqlEndDate': sqlEndDate,
         }
 
         if (category) {
-            sql += ` and CATEGORY = @category`
+            sql += ` and t.CATEGORY = @category`
             params['@category'] = category
         }
 
         if (terms) {
             terms = `%${terms}%`
-            sql += ` and (DESCRIPTION like @terms or CONTEXT like @terms)`
+            sql += ` and (t.DESCRIPTION like @terms or t.CONTEXT like @terms)`
             params['@terms'] = terms
         }
 
@@ -92,7 +108,14 @@ class TimesheetStore {
                 timeSpent: result.TIME_SPENT,
                 description: result.DESCRIPTION,
                 context: result.CONTEXT,
-                kanbanCardId: result.KANBAN_CARD_ID
+                kanbanCard: result.KANBAN_CARD_ID ? {
+                    id: result.KANBAN_CARD_ID,
+                    issue: result.KANBAN_ISSUE,
+                    description: result.KANBAN_DESCRIPTION,
+                    status: result.KANBAN_STATUS,
+                    relevantFacts: result.KANBAN_RELEVANT_FACTS,
+                    deliveries: result.KANBAN_DELIVERIES
+                } : null
             })
             return record;
         })
@@ -104,7 +127,7 @@ class TimesheetStore {
         record = record.validated()
 
         const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'CONTEXT', 'KANBAN_CARD_ID']
-        const values = [record.date, record.category, record.timeSpent, record.description, record.context, record.kanbanCardId]
+        const values = [record.date, record.category, record.timeSpent, record.description, record.context, record.kanbanCard?.id ?? null]
 
         const changes = database.insert('TIMESHEET', fields, values);
 
@@ -119,7 +142,7 @@ class TimesheetStore {
         record = record.validated()
 
         const fields = ['DATE', 'CATEGORY', 'TIME_SPENT', 'DESCRIPTION', 'CONTEXT', 'KANBAN_CARD_ID']
-        const values = [record.date, record.category, record.timeSpent, record.description, record.context, record.kanbanCardId]
+        const values = [record.date, record.category, record.timeSpent, record.description, record.context, record.kanbanCard?.id ?? null]
 
         const changes = database.update('TIMESHEET', fields, values, `ID = ${record.id}`);
 

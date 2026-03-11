@@ -23,7 +23,7 @@
 				</div>
 				<div class="field" :class="isValidDescription || 'error'">
 					<label>Descrição</label>
-					<textarea name="description" rows="2" v-model="state.card.description"></textarea>
+					<textarea name="description" rows="2" v-model="state.card.description" @paste="handlePaste($event, state.card, 'description')"></textarea>
 				</div>
 				<div class="field">
 					<label>Fatos Relevantes</label>
@@ -78,7 +78,7 @@
 					</div>
 					<div class="field" :class="isTsValidDescription(ts) || 'error'">
 						<label>Descrição</label>
-						<textarea rows="2" v-model="ts.description"></textarea>
+						<textarea rows="2" v-model="ts.description" @paste="handlePaste($event, ts, 'description')"></textarea>
 					</div>
 					<button class="ui mini red circular icon button right floated" type="button" data-tooltip="Remover Timesheet" data-position="top right" @click="removeTimesheet(index)">
 						<i class="trash icon"></i>
@@ -104,8 +104,10 @@
 import { defineEmits, defineModel, computed, watch, onMounted, onUnmounted, ref, reactive } from 'vue';
 import { useCategoryStore } from '../stores/category-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
+import { usePaste } from '../composables/usePaste.mjs';
 
 const categoryStore = useCategoryStore();
+const { handlePaste } = usePaste();
 
 const log = (message, object) => {
 	if (object)
@@ -217,6 +219,8 @@ watch(() => props.item, (newValue) => {
 
 	if (!state.card.timesheets)
 		state.card.timesheets = []
+	else
+		state.card.timesheets.sort((a, b) => (a.date || '').localeCompare(b.date || ''))
 
 	// Sync visual state of Fomantic UI checkbox
 	if (state.card.archived) {

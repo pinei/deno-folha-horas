@@ -3,6 +3,14 @@
 	  <i class="close icon"></i>
 	  <div class="header">{{ state.record.id ? `Registro (id=${state.record.id})` : "Registro" }}</div>
 	  <div class="content">
+		<!-- Tab menu -->
+		<div class="ui top attached tabular menu">
+			<a class="item active" data-tab="timesheet">Timesheet</a>
+			<a class="item" data-tab="issue" v-if="state.record.kanbanCard">Issue</a>
+		</div>
+
+		<!-- Timesheet tab -->
+		<div class="ui bottom attached tab segment active" data-tab="timesheet">
 		<form class="ui form">
 		<div class="field" :class="isValidDate || 'error'">
 			<label>Data</label>
@@ -30,8 +38,32 @@
 		</div>
 		<div class="field" :class="isValidDescription || 'error'">
 			<label>Descrição</label>
-			<textarea name="description" rows="2" v-model="state.record.description"></textarea>
+			<textarea name="description" rows="2" v-model="state.record.description" @paste="handlePaste($event, state.record, 'description')"></textarea>
+		</div>
 		</form>
+		</div>
+
+		<!-- Issue tab -->
+		<div class="ui bottom attached tab segment" data-tab="issue" v-if="state.record.kanbanCard">
+		<form class="ui form">
+			<div class="field">
+				<label>Issue</label>
+				<input type="text" readonly :value="state.record.kanbanCard.issue">
+			</div>
+			<div class="field">
+				<label>Descrição</label>
+				<textarea rows="2" readonly :value="state.record.kanbanCard.description"></textarea>
+			</div>
+			<div class="field">
+				<label>Fatos Relevantes</label>
+				<textarea rows="2" readonly :value="state.record.kanbanCard.relevantFacts"></textarea>
+			</div>
+			<div class="field">
+				<label>Entregas</label>
+				<textarea rows="2" readonly :value="state.record.kanbanCard.deliveries"></textarea>
+			</div>
+		</form>
+		</div>
 	  </div>
 
 	  <SaveCancelRemoveActions
@@ -45,8 +77,10 @@
 import { defineEmits, computed, watch, onMounted, onUnmounted, ref, reactive } from 'vue';
 import { useCategoryStore } from '../stores/category-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
+import { usePaste } from '../composables/usePaste.mjs';
 
 const categoryStore = useCategoryStore();
+const { handlePaste } = usePaste();
 
 const log = (message, object) => {
 	if (object)
@@ -212,6 +246,8 @@ onMounted(async () => {
 	const modalOptions = {
 		onShow: () => {
 			state.isModalVisible = true;
+			// Re-initialize tabs when modal opens
+			$('#edit-timesheet .tabular.menu .item').tab();
 		},
 		onHidden: () => {
 			state.isModalVisible = false;
@@ -220,6 +256,9 @@ onMounted(async () => {
 	};
 
 	$('#edit-timesheet').modal(modalOptions);
+
+	// Initialize Fomantic UI tabs
+	$('#edit-timesheet .tabular.menu .item').tab();
 
 	const calendarOptions = {
 		type: 'date',

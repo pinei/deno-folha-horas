@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import database from '../database';
 import { TimesheetRecord } from './timesheet';
 
-class KanbanCardRecord {
+class KanbanCard {
     id = 0
     issue: string | null = null
     description: string | null = null
@@ -12,11 +12,11 @@ class KanbanCardRecord {
     deliveries: string | null = null
     timesheets: TimesheetRecord[] = []
 
-    constructor(data: Partial<KanbanCardRecord>) {
+    constructor(data: Partial<KanbanCard>) {
         Object.assign(this, data)
     }
 
-    checkRequired(field: keyof KanbanCardRecord, errorMessage: string) {
+    checkRequired(field: keyof KanbanCard, errorMessage: string) {
         const value = this[field];
         if (value === null || value === undefined || (typeof value === 'string' && value.trim() == '')) {
             throw new Error(errorMessage);
@@ -32,7 +32,7 @@ class KanbanCardRecord {
 }
 
 class KanbanCardStore {
-    _queryForListRecords(filter: any) {
+    _queryForListCards(filter: any) {
         let { issue, status, archived, terms } = filter
 
         let sql = `select * from KANBAN_CARD where 1 = 1`
@@ -82,8 +82,7 @@ class KanbanCardStore {
                 category: result.CATEGORY,
                 timeSpent: result.TIME_SPENT,
                 description: result.DESCRIPTION,
-                context: result.CONTEXT,
-                kanbanCardId: result.KANBAN_CARD_ID
+                context: result.CONTEXT
             })
         })
     }
@@ -98,16 +97,16 @@ class KanbanCardStore {
         }
     }
 
-    listRecords(filter: any): KanbanCardRecord[] {
+    listCards(filter: any): KanbanCard[] {
         filter = filter || {}
 
-        const query = this._queryForListRecords(filter)
+        const query = this._queryForListCards(filter)
 
         const stmt = database.prepare(query.sql);
         const results = stmt.all(query.params);
 
-        const records: KanbanCardRecord[] = results.map((result: any) => {
-            const record: KanbanCardRecord = new KanbanCardRecord({
+        const cards: KanbanCard[] = results.map((result: any) => {
+            const card: KanbanCard = new KanbanCard({
                 id: result.ID,
                 issue: result.ISSUE,
                 description: result.DESCRIPTION,
@@ -117,44 +116,44 @@ class KanbanCardStore {
                 deliveries: result.DELIVERIES,
                 timesheets: this._loadTimesheets(result.ID)
             })
-            return record;
+            return card;
         })
 
-        return records;
+        return cards;
     }
 
-    _insertRecord(record: KanbanCardRecord): KanbanCardRecord {
-        record = record.validated()
+    _insertCard(card: KanbanCard): KanbanCard {
+        card = card.validated()
 
         const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES']
-        const values = [record.issue, record.description, record.status, record.archived ? 1 : 0, record.relevantFacts, record.deliveries]
+        const values = [card.issue, card.description, card.status, card.archived ? 1 : 0, card.relevantFacts, card.deliveries]
 
         const changes = database.insert('KANBAN_CARD', fields, values);
 
         assert(changes > 0, 'Changes should be greater than zero');
         assert(database.lastInsertRowId > 0, 'Row ID should be greater than zero');
 
-        record.id = database.lastInsertRowId
-        return record
+        card.id = database.lastInsertRowId
+        return card
     }
 
-    _updateRecord(record: KanbanCardRecord): KanbanCardRecord {
-        record = record.validated()
+    _updateCard(card: KanbanCard): KanbanCard {
+        card = card.validated()
 
         const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES']
-        const values = [record.issue, record.description, record.status, record.archived ? 1 : 0, record.relevantFacts, record.deliveries]
+        const values = [card.issue, card.description, card.status, card.archived ? 1 : 0, card.relevantFacts, card.deliveries]
 
-        const changes = database.update('KANBAN_CARD', fields, values, `ID = ${record.id}`);
+        const changes = database.update('KANBAN_CARD', fields, values, `ID = ${card.id}`);
 
         assert(changes > 0, 'Changes should be greater than zero');
-        return record
+        return card
     }
 
-    mergeRecord(record: KanbanCardRecord): KanbanCardRecord {
-        if (record.id) {
-            return this._updateRecord(record)
+    mergeCard(card: KanbanCard): KanbanCard {
+        if (card.id) {
+            return this._updateCard(card)
         } else {
-            return this._insertRecord(record)
+            return this._insertCard(card)
         }
     }
 
@@ -168,19 +167,19 @@ class KanbanCardStore {
         return changes > 0
     }
 
-    deleteRecord(id: number): boolean {
+    deleteCard(id: number): boolean {
         const changes = database.delete('KANBAN_CARD', `ID = ${id}`);
 
         assert(changes > 0, 'Changes should be greater than zero');
         return changes > 0
     }
 
-    parseRecord(data: any): KanbanCardRecord {
-        const record = new KanbanCardRecord(data).validated()
-        return record
+    parseCard(data: any): KanbanCard {
+        const card = new KanbanCard(data).validated()
+        return card
     }
 }
 
 export {
-    KanbanCardStore, KanbanCardRecord
+    KanbanCardStore, KanbanCard
 }

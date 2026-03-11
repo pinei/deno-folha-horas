@@ -12,9 +12,9 @@ router.post('/search', (req, res, next) => {
         const filter = req.body
         console.log('> POST /kanban/search: ' + JSON.stringify(filter))
 
-        const records = store.listRecords(filter)
-        console.log('< ' + JSON.stringify(records))
-        res.json(records)
+        const cards = store.listCards(filter)
+        console.log('< ' + JSON.stringify(cards))
+        res.json(cards)
     }
     catch (error) {
         next(error)
@@ -26,25 +26,25 @@ router.post('/', (req, res, next) => {
         const data = req.body
         console.log('> POST /kanban: ' + JSON.stringify(data))
 
-        let record = store.parseRecord(data)
-        record = store.mergeRecord(record)
+        let card = store.parseCard(data)
+        card = store.mergeCard(card)
 
         // Save associated timesheets
         if (data.timesheets && Array.isArray(data.timesheets)) {
-            record.timesheets = data.timesheets.map((tsData: any) => {
+            card.timesheets = data.timesheets.map((tsData: any) => {
                 let ts = new TimesheetRecord(tsData)
-                ts.kanbanCardId = record.id
+                ts.kanbanCard = { id: card.id }
                 ts = timesheetStore.mergeRecord(ts)
                 return ts
             })
 
             // Unlink timesheets removed from the card
-            const keepIds = record.timesheets.map(ts => ts.id).filter(id => id > 0)
-            store.unlinkRemovedTimesheets(record.id, keepIds)
+            const keepIds = card.timesheets.map(ts => ts.id).filter(id => id > 0)
+            store.unlinkRemovedTimesheets(card.id, keepIds)
         }
 
-        console.log('< ' + JSON.stringify(record))
-        res.json(record)
+        console.log('< ' + JSON.stringify(card))
+        res.json(card)
     }
     catch (error) {
         next(error)
@@ -61,25 +61,25 @@ router.post('/:id', (req, res, next) => {
             throw ('ID mismatch')
         }
 
-        let record = store.parseRecord(data)
-        record = store.mergeRecord(record)
+        let card = store.parseCard(data)
+        card = store.mergeCard(card)
 
         // Save associated timesheets
         if (data.timesheets && Array.isArray(data.timesheets)) {
-            record.timesheets = data.timesheets.map((tsData: any) => {
+            card.timesheets = data.timesheets.map((tsData: any) => {
                 let ts = new TimesheetRecord(tsData)
-                ts.kanbanCardId = record.id
+                ts.kanbanCard = { id: card.id }
                 ts = timesheetStore.mergeRecord(ts)
                 return ts
             })
 
             // Unlink timesheets removed from the card
-            const keepIds = record.timesheets.map(ts => ts.id).filter(id => id > 0)
-            store.unlinkRemovedTimesheets(record.id, keepIds)
+            const keepIds = card.timesheets.map(ts => ts.id).filter(id => id > 0)
+            store.unlinkRemovedTimesheets(card.id, keepIds)
         }
 
-        console.log('< ' + JSON.stringify(record))
-        res.json(record)
+        console.log('< ' + JSON.stringify(card))
+        res.json(card)
     }
     catch (error) {
         next(error)
@@ -113,7 +113,7 @@ router.delete('/:id', (req, res, next) => {
         const id = req.params.id
         console.log('> DELETE /kanban/' + id)
 
-        const deleted = store.deleteRecord(Number(id))
+        const deleted = store.deleteCard(Number(id))
 
         // Timesheets are not deleted, their KANBAN_CARD_ID is set to NULL via FK constraint
 

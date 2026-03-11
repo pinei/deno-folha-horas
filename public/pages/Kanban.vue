@@ -120,6 +120,9 @@ import { useKanbanStore } from '../stores/kanban-store.mjs'
 import { useCategoryStore } from '../stores/category-store.mjs'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
 import kanbanApi from '../services/kanban-api.mjs'
+import { useParseDescription } from '../composables/useParseDescription.mjs'
+
+const { parseDescription } = useParseDescription();
 
 const log = (message, object) => {
 	if (object)
@@ -321,45 +324,12 @@ export default {
         categoryClass(value) {
             return this.categoryStore.getCategoryColor(value)
         },
-        tagColor(text) {
-            const colors = [
-                'red', 'orange', 'yellow', 'olive', 'green', 'teal',
-                'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black'
-            ];
-
-            let hash = 0;
-            for (let i = 0; i < text.length; i++) {
-                hash = text.charCodeAt(i) + ((hash << 5) - hash);
-            }
-
-            const index = Math.abs(hash) % colors.length;
-            return colors[index];
-        },
         parseLines(text) {
             if (!text || text.trim() === '') return []
             return text.split('\n').filter(line => line.trim() !== '')
         },
         parseDescription(description) {
-            if (!description) return [];
-
-            let richText = description
-
-            // Links (Wikilinks format [label](url))
-            const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-            richText = richText.replace(linkRegex, '<a href="$2" target="_blank" onclick="event.stopPropagation()">$1</a>')
-
-            // Tags
-            const regex = /#[\w]+/g
-            richText = richText.replace(regex, (match) => {
-                const tag = match.substring(1)
-                const color = this.tagColor(tag)
-                return `<span class="ui ${color} tag label" style="padding-left: 1em; padding-right: 1em; font-size: 0.8em; margin-right: 0.3em;">${tag}</span>`
-            })
-
-            // Múltiplas linhas
-            const lines = richText.split('\n')
-
-            return lines
+            return parseDescription(description)
         }
     },
     mounted() {

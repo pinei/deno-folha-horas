@@ -66,7 +66,7 @@ router.post('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     try {
-        const id = req.params.id
+        const id = Number(req.params.id)
         console.log('> DELETE /timesheet/' + id)
 
         const deleted = store.deleteRecord(id)

@@ -149,19 +149,19 @@ class SQLDatabase {
     const stmt = this.prepare(`insert into ${table} (${fields.join(', ')}) values (${fields.map(() => '?').join(', ')})`);
     const info = stmt.run(...values);
     this._lastInsertRowId = Number(info.lastInsertRowid);
-    return info.changes;
+    return Number(info.changes);
   }
 
   update(table: string, fields: string[], values: any[], where: string): number {
     const stmt = this.prepare(`update ${table} set ${fields.map((field) => `${field} = ?`).join(', ')} where ${where}`);
     const info = stmt.run(...values);
-    return info.changes;
+    return Number(info.changes);
   }
 
   delete(table: string, where: string): number {
     const stmt = this.prepare(`delete from ${table} where ${where}`);
     const info = stmt.run();
-    return info.changes;
+    return Number(info.changes);
   }
 
   select(table: string, fields = '*', where = '1 = 1', orderBy = '1'): any[] {

@@ -74,6 +74,9 @@
 import { reactive, watch, onMounted, computed } from 'vue';
 import { useTimesheetStore } from '../stores/timesheet-store.mjs';
 import { useCategoryStore } from '../stores/category-store.mjs';
+import { useParseDescription } from '../composables/useParseDescription.mjs';
+
+const { parseDescription } = useParseDescription();
 
 const log = (message, object) => {
 	if (object)
@@ -120,33 +123,6 @@ const search = () => {
 
 }
 
-const tagColor = (text) => {
-    const colors = [
-        'red',
-        'orange',
-        'yellow',
-        'olive',
-        'green',
-        'teal',
-        'blue',
-        'violet',
-        'purple',
-        'pink',
-        'brown',
-        'grey',
-        'black'
-    ];
-
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-        hash = text.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    const index = Math.abs(hash) % colors.length;
-
-    return colors[index];
-}
-
 const categoryClass = (value) => {
     return categoryStore.getCategoryColor(value)
 }
@@ -159,24 +135,6 @@ const timeSpentClass = (value) => {
 
     return  { 'olive': true }
 }
-
-const parseDescription = (description) => {
-    // Tags
-    const regex = /#[\w]+/g
-    const richText = description.replace(regex, (match) => {
-        const tag = match.substring(1)
-        // Cor arbitrária baseada no texto da tag
-        const color = tagColor(tag)
-        return `<span class="ui ${color} tag label">${tag}</span>`
-    })
-
-    // Múltiplas linhas
-    const lines = richText.split('\n')
-
-    return lines
-}
-
-
 
 const dayOfWeek = (date) => {
     const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
