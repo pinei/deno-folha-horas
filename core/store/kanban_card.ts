@@ -174,6 +174,28 @@ class KanbanCardStore {
         return changes > 0
     }
 
+    listAvailableCards(): KanbanCard[] {
+        const sql = `SELECT * FROM KANBAN_CARD
+            WHERE STATUS != 'DONE'
+              AND ID NOT IN (SELECT DISTINCT KANBAN_CARD_ID FROM TIMESHEET WHERE KANBAN_CARD_ID IS NOT NULL)
+            ORDER BY ISSUE`
+
+        const stmt = database.prepare(sql);
+        const results = stmt.all();
+
+        return results.map((result: any) => {
+            return new KanbanCard({
+                id: result.ID,
+                issue: result.ISSUE,
+                description: result.DESCRIPTION,
+                status: result.STATUS,
+                archived: result.ARCHIVED > 0 ? true : false,
+                relevantFacts: result.RELEVANT_FACTS,
+                deliveries: result.DELIVERIES
+            })
+        })
+    }
+
     parseCard(data: any): KanbanCard {
         const card = new KanbanCard(data).validated()
         return card

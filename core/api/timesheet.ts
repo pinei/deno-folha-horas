@@ -79,4 +79,20 @@ router.delete('/:id', (req, res, next) => {
     }
 });
 
+router.put('/:id/kanban-card', (req, res, next) => {
+    try {
+        const id = Number(req.params.id)
+        const { kanbanCardId } = req.body
+        console.log(`> PUT /timesheet/${id}/kanban-card: kanbanCardId=${kanbanCardId}`)
+
+        const record = store.linkKanbanCard(id, kanbanCardId)
+
+        console.log('< ' + JSON.stringify(record))
+        res.json(record)
+    }
+    catch (error) {
+        next(error)
+    }
+});
+
 export default router

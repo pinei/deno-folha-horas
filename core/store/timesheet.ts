@@ -165,6 +165,42 @@ class TimesheetStore {
         return changes > 0
     }
 
+    linkKanbanCard(timesheetId: number, kanbanCardId: number): TimesheetRecord {
+        const changes = database.update('TIMESHEET', ['KANBAN_CARD_ID'], [kanbanCardId], `ID = ${timesheetId}`);
+        assert(changes > 0, 'Changes should be greater than zero');
+
+        const sql = `select
+                t.*,
+                k.ISSUE as KANBAN_ISSUE,
+                k.DESCRIPTION as KANBAN_DESCRIPTION,
+                k.STATUS as KANBAN_STATUS,
+                k.RELEVANT_FACTS as KANBAN_RELEVANT_FACTS,
+                k.DELIVERIES as KANBAN_DELIVERIES
+            from TIMESHEET t
+            left join KANBAN_CARD k on t.KANBAN_CARD_ID = k.ID
+            where t.ID = @timesheetId`
+
+        const stmt = database.prepare(sql);
+        const result: any = stmt.get({ '@timesheetId': timesheetId });
+
+        return new TimesheetRecord({
+            id: result.ID,
+            date: result.DATE,
+            category: result.CATEGORY,
+            timeSpent: result.TIME_SPENT,
+            description: result.DESCRIPTION,
+            context: result.CONTEXT,
+            kanbanCard: result.KANBAN_CARD_ID ? {
+                id: result.KANBAN_CARD_ID,
+                issue: result.KANBAN_ISSUE,
+                description: result.KANBAN_DESCRIPTION,
+                status: result.KANBAN_STATUS,
+                relevantFacts: result.KANBAN_RELEVANT_FACTS,
+                deliveries: result.KANBAN_DELIVERIES
+            } : null
+        })
+    }
+
     parseRecord(data: any): TimesheetRecord {
         const record = new TimesheetRecord(data).validated()
         return record

@@ -6,7 +6,7 @@ const api = axios.create({
 
 async function getTimesheetByMonth(year, month) {
     const startDate = new Date(year, month, 1)
-    const endDate = new Date(year, month+1, 0)
+    const endDate = new Date(year, month + 1, 0)
 
     console.log(`Search from ${startDate} to ${endDate}`)
 
@@ -35,8 +35,8 @@ async function saveRecord(record) {
 
     const response = await (
         record.id
-        ? api.post(`/timesheet/${record.id}`, record)
-        : api.post('/timesheet', record)
+            ? api.post(`/timesheet/${record.id}`, record)
+            : api.post('/timesheet', record)
     )
 
     console.log('Response: ', response.data)
@@ -51,9 +51,17 @@ async function deleteRecord(record) {
     return response.data
 }
 
+async function linkKanbanCard(timesheetId, kanbanCardId) {
+    console.log(`Linking kanban card ${kanbanCardId} to timesheet ${timesheetId}`)
+    const response = await api.put(`/timesheet/${timesheetId}/kanban-card`, { kanbanCardId })
+    console.log('Response: ', response.data)
+    return response.data
+}
+
 export default {
     getTimesheetByMonth,
     getTimesheetByTerms,
     saveRecord,
     deleteRecord,
+    linkKanbanCard,
 }

@@ -52,10 +52,18 @@ async function deleteKanbanCard(card) {
 }
 
 
+async function getAvailableKanbanCards() {
+    console.log(`Fetching available kanban cards`)
+    const response = await api.get('/kanban/available')
+    console.log('Response: ', response.data)
+    return response.data
+}
+
 export default {
     getHotKanbanCards,
     searchKanbanCards,
     saveKanbanCard,
     deleteKanbanCard,
-    updateKanbanCardStatus
+    updateKanbanCardStatus,
+    getAvailableKanbanCards
 }

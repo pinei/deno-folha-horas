@@ -7,6 +7,18 @@ import { TimesheetStore, TimesheetRecord } from '../store/timesheet'
 const store = new KanbanCardStore()
 const timesheetStore = new TimesheetStore()
 
+router.get('/available', (req, res, next) => {
+    try {
+        console.log('> GET /kanban/available')
+        const cards = store.listAvailableCards()
+        console.log('< ' + JSON.stringify(cards))
+        res.json(cards)
+    }
+    catch (error) {
+        next(error)
+    }
+})
+
 router.post('/search', (req, res, next) => {
     try {
         const filter = req.body

@@ -4,8 +4,12 @@
     <TimesheetSummary :summary="timesheetStore.summary"/>
 
     <EditRecord
-        :item="state.selectedRecord" :visible="state.isModalVisible"
+        :item="state.selectedRecord" :visible="state.isEditRecordVisible"
         @close="closeModal" @save="saveRecord" @remove="removeRecord" @clone="cloneRecord"/>
+
+    <SelectKanbanCard
+        :visible="state.isSelectKanbanCardVisible"
+        @select="onKanbanCardSelected" @close="closeSelectKanbanCard"/>
 
     <div id="timesheet-panel">
         <div v-if="!(timesheetStore.clusters.length > 0)">
@@ -42,7 +46,12 @@
                 <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
                 <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
                 <td @click="editRecord(record)">
-                    <h5 v-if="record.context">{{ record.context }}</h5>
+                    <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
+                        <h5 v-if="record.context">{{ record.context }}</h5>
+                        <button class="ui mini button" @click.stop="openSelectKanbanCard(record)">No issue</button>
+                    </div>
+                    <h5 v-else-if="record.context">{{ record.context }}</h5>
+
                     <p v-for="line in parseDescription(record.description)">
                         <span v-html="line"></span>
                     </p>
@@ -75,6 +84,7 @@ import { reactive, watch, onMounted, computed } from 'vue';
 import { useTimesheetStore } from '../stores/timesheet-store.mjs';
 import { useCategoryStore } from '../stores/category-store.mjs';
 import { useParseDescription } from '../composables/useParseDescription.mjs';
+import SelectKanbanCard from '../components/SelectKanbanCard.vue';
 
 const { parseDescription } = useParseDescription();
 
@@ -97,8 +107,10 @@ const state = reactive({
         searchText: '',
         calendarDate: new Date(),
     },
-    isModalVisible: false,
-    selectedRecord: {}
+    isEditRecordVisible: false,
+    selectedRecord: {},
+    isSelectKanbanCardVisible: false,
+    selectKanbanCardRecord: null,
 });
 
 /* Methods */
@@ -147,7 +159,7 @@ const dayOfWeek = (date) => {
 const editRecord = (record) => {
     state.selectedRecord = {...record};
     log(`Edititng record:`, state.selectedRecord)
-    state.isModalVisible = true
+    state.isEditRecordVisible = true
 }
 
 const addRecord = (group) => {
@@ -157,20 +169,20 @@ const addRecord = (group) => {
     state.selectedRecord.date = date;
 
     log(`New record:`, state.selectedRecord)
-    state.isModalVisible = true;
+    state.isEditRecordVisible = true;
 }
 
 const removeRecord = (record) => {
     log(`Removing record: ${JSON.stringify(record)}`)
     timesheetStore.removeRecord(record);
-    state.isModalVisible = false;
+    state.isEditRecordVisible = false;
     state.selectedRecord = {};
 }
 
 const saveRecord = (record) => {
     log(`Saving record: ${JSON.stringify(record)}`)
     timesheetStore.mergeRecord(record);
-    state.isModalVisible = false;
+    state.isEditRecordVisible = false;
     state.selectedRecord = {};
 }
 
@@ -183,7 +195,28 @@ const cloneRecord = (record) => {
 const closeModal = (record) => {
 	log(`Modal closed`)
     state.selectedRecord = {...record}; // permite recuperar o estado após fechar a janela de edição
-	state.isModalVisible = false
+	state.isEditRecordVisible = false
+}
+
+const openSelectKanbanCard = (record) => {
+	log('Opening SelectKanbanCard for record:', record)
+	state.selectKanbanCardRecord = record
+	state.isSelectKanbanCardVisible = true
+}
+
+const onKanbanCardSelected = async (card) => {
+	log('Kanban card selected:', card)
+	if (state.selectKanbanCardRecord) {
+		await timesheetStore.linkKanbanCard(state.selectKanbanCardRecord, card.id)
+	}
+	state.isSelectKanbanCardVisible = false
+	state.selectKanbanCardRecord = null
+}
+
+const closeSelectKanbanCard = () => {
+	log('SelectKanbanCard closed')
+	state.isSelectKanbanCardVisible = false
+	state.selectKanbanCardRecord = null
 }
 
 /* Watches */

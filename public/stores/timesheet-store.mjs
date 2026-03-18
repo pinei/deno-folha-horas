@@ -152,6 +152,23 @@ export const useTimesheetStore = defineStore('timesheet', () => {
         }
     }
 
+    async function linkKanbanCard(record, kanbanCardId) {
+        try {
+            loading.value = true
+            const updated = await timesheetService.linkKanbanCard(record.id, kanbanCardId)
+
+            // Update the record in-place within clusters
+            const originalRecord = clusters.findItemById(record.id)
+            if (originalRecord) {
+                Object.assign(originalRecord, updated)
+            }
+        } catch (err) {
+            error.value = err
+        } finally {
+            loading.value = false
+        }
+    }
+
     return {
         totalTimeSpent,
         clusters: clusters.getClusters(),
@@ -159,6 +176,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
         mergeRecord,
         loadRecordsForTerms,
         loadRecordsForMonth,
+        linkKanbanCard,
         summary
     }
 })
