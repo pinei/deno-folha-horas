@@ -34,7 +34,7 @@
 	  </div>
 	  <div class="actions">
 		<div class="ui secondary left floated button" @click="close">Cancelar</div>
-		<div class="ui primary right labeled icon button" :class="{ disabled: !state.selectedCard }" @click="confirm">OK <i class="checkmark icon"></i></div>
+		<div class="ui primary right labeled icon button" :class="{ disabled: !state.selectedCard }" @click="confirm">Salvar <i class="checkmark icon"></i></div>
 	  </div>
 	</div>
 </template>
