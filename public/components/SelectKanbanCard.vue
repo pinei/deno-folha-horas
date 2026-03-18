@@ -2,22 +2,21 @@
 	<div id="select-kanban-card" class="ui modal">
 	  <i class="close icon"></i>
 	  <div class="header">Selecionar Issue</div>
-	  <div class="content">
+	  <div class="scrolling content">
 		<div v-if="state.loading" class="ui active centered inline loader"></div>
 		<div v-else-if="state.cards.length === 0">
 			<p>Nenhuma issue disponível</p>
 		</div>
-		<div v-else class="ui relaxed divided selection list">
+		<div v-else class="ui cards">
 			<div
 				v-for="card in state.cards" :key="card.id"
-				class="item"
+				class="card kanban-card"
 				:class="{ active: state.selectedCard?.id === card.id }"
-				@click="selectCard(card)"
-				style="cursor: pointer;">
+				@click="selectCard(card)">
 				<div class="content">
-					<div class="header">
+					<h5>
 						{{ card.issue }}
-					</div>
+					</h5>
 					<div class="description" style="margin-bottom: 1em; margin-top: 0.5em;">
 						<p v-for="(line, index) in parseDescription(card.description)" :key="'d'+index">
 							<span v-html="line"></span>
@@ -34,8 +33,8 @@
 		</div>
 	  </div>
 	  <div class="actions">
-		<div class="ui cancel button" @click="close">Cancelar</div>
-		<div class="ui primary ok button" :class="{ disabled: !state.selectedCard }" @click="confirm">OK</div>
+		<div class="ui secondary left floated button" @click="close">Cancelar</div>
+		<div class="ui primary right labeled icon button" :class="{ disabled: !state.selectedCard }" @click="confirm">OK <i class="checkmark icon"></i></div>
 	  </div>
 	</div>
 </template>
@@ -158,14 +157,29 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-#select-kanban-card .ui.selection.list .item.active {
-	background-color: #e8f4fd;
-	border-left: 3px solid #2185d0;
-	font-weight: bold;
+#select-kanban-card .ui.cards {
+	/* padding: 10px; */
 }
 
-#select-kanban-card .ui.selection.list .item:hover {
-	background-color: #f0f0f0;
+#select-kanban-card .card.kanban-card {
+	width: calc(50% - 2em);
+	min-width: 250px;
+	box-shadow: 0 1px 3px 0 #d4d4d5;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	cursor: pointer;
+	margin: 1em;
+	border: 2px solid transparent;
+}
+
+#select-kanban-card .card.kanban-card:hover {
+	transform: translateY(-4px);
+    box-shadow: 0 4px 8px 0 rgba(34, 36, 38, .12), 0 2px 4px 0 rgba(34, 36, 38, .08);
+}
+
+#select-kanban-card .card.kanban-card.active {
+	border: 2px solid #2185d0;
+	box-shadow: 0 0 10px rgba(33, 133, 208, 0.5);
+    background-color: #f7fbff;
 }
 
 #select-kanban-card p.ui.blue {
@@ -176,11 +190,11 @@ onUnmounted(() => {
     color: rgb(0, 64, 0);
 }
 
-#select-kanban-card .ui.selection.list .item .description p {
+#select-kanban-card .card > .content p {
     margin: 0 0 0.5em;
 }
 
-#select-kanban-card .ui.selection.list .item .description p:last-child {
+#select-kanban-card .card > .content p:last-child {
     margin-bottom: 0;
 }
 </style>

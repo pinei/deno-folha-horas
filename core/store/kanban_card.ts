@@ -175,12 +175,16 @@ class KanbanCardStore {
     }
 
     listAvailableCards(): KanbanCard[] {
-        const sql = `SELECT * FROM KANBAN_CARD
+        const sql_only_orphans = `SELECT * FROM KANBAN_CARD
             WHERE STATUS != 'DONE'
               AND ID NOT IN (SELECT DISTINCT KANBAN_CARD_ID FROM TIMESHEET WHERE KANBAN_CARD_ID IS NOT NULL)
             ORDER BY ISSUE`
 
-        const stmt = database.prepare(sql);
+        const sql_all = `SELECT * FROM KANBAN_CARD
+            WHERE STATUS != 'DONE'
+            ORDER BY ISSUE`
+
+        const stmt = database.prepare(sql_all);
         const results = stmt.all();
 
         return results.map((result: any) => {
