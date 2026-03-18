@@ -246,8 +246,10 @@ onMounted(async () => {
 	const modalOptions = {
 		onShow: () => {
 			state.isModalVisible = true;
-			// Re-initialize tabs when modal opens
-			$('#edit-timesheet .tabular.menu .item').tab();
+			// Re-initialize tabs when modal opens, waiting for Vue DOM updates
+			setTimeout(() => {
+				$('#edit-timesheet .tabular.menu .item').tab();
+			}, 50);
 		},
 		onHidden: () => {
 			state.isModalVisible = false;
