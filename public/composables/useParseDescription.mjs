@@ -23,20 +23,20 @@ export function useParseDescription() {
         const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
         richText = richText.replace(linkRegex, '<a href="$2" target="_blank" onclick="event.stopPropagation()">$1</a>');
 
+        // Tags (inicio da linha ou logo apos espaço em branco)
+        const regex = /(^|\s)(#[\w]+)/g;
+        richText = richText.replace(regex, (match, space, tagWithHash) => {
+            const tag = tagWithHash.substring(1);
+            const color = tagColor(tag);
+            return `${space}<span class="ui ${color} tag label" style="margin-right: 0.3em;">${tag}</span>`;
+        });
+
         // Breadcrumbs (lines with " > " separators)
         richText = richText.replace(/^(.+ > .+)$/gm, (match) => {
             const parts = match.split(' > ').map(p => p.trim());
             const last = parts.pop();
             const sections = parts.map(p => `<div class="section">${p}</div><i class="right chevron icon divider"></i>`).join('');
             return `<div class="ui breadcrumb">${sections}<div class="active section">${last}</div></div>`;
-        });
-
-        // Tags
-        const regex = /#[\w]+/g;
-        richText = richText.replace(regex, (match) => {
-            const tag = match.substring(1);
-            const color = tagColor(tag);
-            return `<span class="ui ${color} tag label" style="margin-right: 0.3em;">${tag}</span>`;
         });
 
         // Múltiplas linhas

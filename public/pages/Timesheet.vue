@@ -151,9 +151,7 @@ const editRecord = (record) => {
 }
 
 const addRecord = (group) => {
-    if (state.selectedRecord.id != null) {
-        state.selectedRecord = {};
-    }
+    state.selectedRecord = {};
 
     const date = group?.date || (new Date()).toISOString().substring(0, 10);
     state.selectedRecord.date = date;
