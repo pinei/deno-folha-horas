@@ -34,34 +34,16 @@
                                 {{ cluster.key }} <div class="ui basic olive label">{{ dayOfWeek(cluster.key) }}</div>
                             </h4>
                             
-                            <div class="card kanban-card"
+                            <KanbanCard
                                  v-for="card in cluster.items" :key="card.id"
+                                 :card="card"
                                  draggable="true"
                                  @dragstart="startDrag($event, card.id)"
                                  @drag="onDrag($event)"
                                  @dragend="endDrag($event)"
                                  @click="editCard(card)"
-                                 :class="{ 'is-dragging': draggedCardId !== null && draggedCardId === card.id }">
-                                <div class="content">
-                                    <h5>
-                                        {{ card.issue }}
-                                    </h5>
-                                    <div class="meta">{{ cardContext(card) }}</div>
-                                    <div class="description" style="margin-bottom: 1em;">
-                                        <p v-for="(line, index) in parseDescription(card.description)" :key="'d'+index">
-                                            <span v-html="line"></span>
-                                        </p>
-                                        <p v-for="(line, index) in parseLines(card.relevantFacts)" :key="'rf'+index" class="ui blue" data-tooltip="Fato Relevante" data-position="top left">
-                                            <i class="circle exclamation icon"></i>{{ line }}
-                                        </p>
-                                        <p v-for="(line, index) in parseLines(card.deliveries)" :key="'dl'+index" class="ui green" data-tooltip="Entrega" data-position="top left">
-                                            <i class="cube icon"></i>{{ line }}
-                                        </p>
-                                    </div>
-                                    <span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="categoryClass(cat)">{{ cat }}</span>
-                                    <span class="ui circular olive label inverted large right floated">{{ totalTimeSpent(card) }}</span>
-                                </div>
-                            </div>
+                                 :class="{ 'is-dragging': draggedCardId !== null && draggedCardId === card.id }"
+                            />
                         </template>
                     </transition-group>
                 </div>
@@ -85,28 +67,10 @@
                 <div class="ui four column stackable grid">
                     <div class="column" v-for="card in searchResults" :key="card.id">
                         <div class="ui cards" style="height: 100%;">
-                            <div class="card kanban-card" @click="editCard(card)">
-                                <div class="content">
-                                    <h5>
-                                        {{ card.issue }}
-                                    </h5>
-                                    
-                                    <div class="meta">{{ cardContext(card) }}</div>
-                                    <div class="description" style="margin-bottom: 1em;">
-                                        <p v-for="(line, index) in parseDescription(card.description)" :key="'d'+index">
-                                            <span v-html="line"></span>
-                                        </p>
-                                        <p v-for="(line, index) in parseLines(card.relevantFacts)" :key="'rf'+index" class="ui blue" data-tooltip="Fato Relevante" data-position="top left">
-                                            <i class="circle exclamation icon"></i>{{ line }}
-                                        </p>
-                                        <p v-for="(line, index) in parseLines(card.deliveries)" :key="'dl'+index" class="ui green" data-tooltip="Entrega" data-position="top left">
-                                            <i class="cube icon"></i>{{ line }}
-                                        </p>
-                                    </div>
-                                    <span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="categoryClass(cat)">{{ cat }}</span>
-                                    <span class="ui circular olive label inverted large right floated">{{ totalTimeSpent(card) }}</span>
-                                </div>
-                            </div>
+                            <KanbanCard
+                                :card="card"
+                                @click="editCard(card)"
+                            />
                         </div>
                     </div>
                 </div>
@@ -117,12 +81,9 @@
 
 <script>
 import { useKanbanStore } from '../stores/kanban-store.mjs'
-import { useCategoryStore } from '../stores/category-store.mjs'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
+import KanbanCard from '../components/KanbanCard.vue'
 import kanbanApi from '../services/kanban-api.mjs'
-import { useParseDescription } from '../composables/useParseDescription.mjs'
-
-const { parseDescription } = useParseDescription();
 
 const log = (message, object) => {
 	if (object)
@@ -136,12 +97,12 @@ log('Setting up...')
 export default {
     name: 'Kanban',
     components: {
-        EditKanbanCard
+        EditKanbanCard,
+        KanbanCard
     },
     data() {
         return {
             kanbanStore: useKanbanStore(),
-            categoryStore: useCategoryStore(),
             draggedCardId: null,
             dragClone: null,
             dragOffset: { x: 0, y: 0 },
@@ -305,31 +266,6 @@ export default {
                 return days[day];
             }
             return key;
-        },
-        totalTimeSpent(card) {
-            return (card.timesheets || []).reduce((sum, ts) => sum + (parseFloat(ts.timeSpent) || 0), 0)
-        },
-        cardCategories(card) {
-            const ts = card.timesheets || []
-            if (ts.length === 0) return ['EMPTY']
-            const categories = [...new Set(ts.map(t => t.category).filter(c => c))]
-            return categories.length > 0 ? categories : ['EMPTY']
-        },
-        cardContext(card) {
-            const ts = card.timesheets || []
-            if (ts.length === 0) return ''
-            const contexts = [...new Set(ts.map(t => t.context).filter(c => c))]
-            return contexts.join(', ')
-        },
-        categoryClass(value) {
-            return this.categoryStore.getCategoryColor(value)
-        },
-        parseLines(text) {
-            if (!text || text.trim() === '') return []
-            return text.split('\n').filter(line => line.trim() !== '')
-        },
-        parseDescription(description) {
-            return parseDescription(description)
         }
     },
     mounted() {

@@ -8,29 +8,12 @@
 			<p>Nenhuma issue disponível</p>
 		</div>
 		<div v-else class="ui cards">
-			<div
+			<KanbanCard
 				v-for="card in state.cards" :key="card.id"
-				class="card kanban-card"
+				:card="card"
+				:simple="true"
 				:class="{ active: state.selectedCard?.id === card.id }"
-				@click="selectCard(card)">
-				<div class="content">
-					<h5>
-						{{ card.issue }}
-					</h5>
-					<div class="description" style="margin-bottom: 1em; margin-top: 0.5em;">
-						<p v-for="(line, index) in parseDescription(card.description)" :key="'d'+index">
-							<span v-html="line"></span>
-						</p>
-						<p v-for="(line, index) in parseLines(card.relevantFacts)" :key="'rf'+index" class="ui blue" data-tooltip="Fato Relevante" data-position="top left">
-							<i class="circle exclamation icon"></i>{{ line }}
-						</p>
-						<p v-for="(line, index) in parseLines(card.deliveries)" :key="'dl'+index" class="ui green" data-tooltip="Entrega" data-position="top left">
-							<i class="cube icon"></i>{{ line }}
-						</p>
-					</div>
-					<span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="categoryClass(cat)">{{ cat }}</span>
-				</div>
-			</div>
+				@click="selectCard(card)" />
 		</div>
 	  </div>
 	  <div class="actions">
@@ -43,11 +26,7 @@
 <script setup>
 import { reactive, watch, onMounted, onUnmounted } from 'vue';
 import kanbanApi from '../services/kanban-api.mjs';
-import { useParseDescription } from '../composables/useParseDescription.mjs';
-import { useCategoryStore } from '../stores/category-store.mjs';
-
-const { parseDescription } = useParseDescription();
-const categoryStore = useCategoryStore();
+import KanbanCard from '../components/KanbanCard.vue';
 
 const log = (message, object) => {
 	if (object)
@@ -91,22 +70,6 @@ async function loadAvailableCards() {
 function selectCard(card) {
 	state.selectedCard = card
 	log('Selected card:', card)
-}
-
-function parseLines(text) {
-	if (!text || text.trim() === '') return []
-	return text.split('\n').filter(line => line.trim() !== '')
-}
-
-function cardCategories(card) {
-	const ts = card.timesheets || []
-	if (ts.length === 0) return ['EMPTY']
-	const categories = [...new Set(ts.map(t => t.category).filter(c => c))]
-	return categories.length > 0 ? categories : ['EMPTY']
-}
-
-function categoryClass(value) {
-	return categoryStore.getCategoryColor(value)
 }
 
 /* Events */
