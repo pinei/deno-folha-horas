@@ -195,7 +195,8 @@ class KanbanCardStore {
                 status: result.STATUS,
                 archived: result.ARCHIVED > 0 ? true : false,
                 relevantFacts: result.RELEVANT_FACTS,
-                deliveries: result.DELIVERIES
+                deliveries: result.DELIVERIES,
+                timesheets: this._loadTimesheets(result.ID)
             })
         })
     }

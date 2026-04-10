@@ -28,6 +28,7 @@
 							<i class="cube icon"></i>{{ line }}
 						</p>
 					</div>
+					<span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="categoryClass(cat)">{{ cat }}</span>
 				</div>
 			</div>
 		</div>
@@ -43,8 +44,10 @@
 import { reactive, watch, onMounted, onUnmounted } from 'vue';
 import kanbanApi from '../services/kanban-api.mjs';
 import { useParseDescription } from '../composables/useParseDescription.mjs';
+import { useCategoryStore } from '../stores/category-store.mjs';
 
 const { parseDescription } = useParseDescription();
+const categoryStore = useCategoryStore();
 
 const log = (message, object) => {
 	if (object)
@@ -93,6 +96,17 @@ function selectCard(card) {
 function parseLines(text) {
 	if (!text || text.trim() === '') return []
 	return text.split('\n').filter(line => line.trim() !== '')
+}
+
+function cardCategories(card) {
+	const ts = card.timesheets || []
+	if (ts.length === 0) return ['EMPTY']
+	const categories = [...new Set(ts.map(t => t.category).filter(c => c))]
+	return categories.length > 0 ? categories : ['EMPTY']
+}
+
+function categoryClass(value) {
+	return categoryStore.getCategoryColor(value)
 }
 
 /* Events */
