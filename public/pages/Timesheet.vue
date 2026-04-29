@@ -162,10 +162,10 @@ const editRecord = (record) => {
     state.isEditRecordVisible = true
 }
 
-const addRecord = (group) => {
+const addRecord = (cluster) => {
     state.selectedRecord = {};
 
-    const date = group?.date || (new Date()).toISOString().substring(0, 10);
+    const date = cluster.key || (new Date()).toISOString().substring(0, 10);
     state.selectedRecord.date = date;
 
     log(`New record:`, state.selectedRecord)
