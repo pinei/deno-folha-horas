@@ -30,7 +30,7 @@
                         <div class="content" style="padding-left: 0; padding-top: 0;">
                             <div class="header" style="font-size: 1.5em; margin-bottom: 0.5em;">{{ bucket.campaign.name }}</div>
                             <div class="meta" style="margin-bottom: 1em;">
-                                <span class="ui small blue label">{{ bucket.campaign.type }}</span>
+                                <span class="ui blue label">{{ bucket.campaign.type }}</span>
                             </div>
                             <div class="description">
                                 <p v-for="(line, index) in parseDescription(bucket.campaign.description)" :key="'cd'+index">
