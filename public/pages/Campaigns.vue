@@ -32,8 +32,10 @@
                             <div class="meta" style="margin-bottom: 1em;">
                                 <span class="ui small blue label">{{ bucket.campaign.type }}</span>
                             </div>
-                            <div class="description" style="white-space: pre-wrap;">
-                                {{ bucket.campaign.description }}
+                            <div class="description">
+                                <p v-for="(line, index) in parseDescription(bucket.campaign.description)" :key="'cd'+index">
+                                    <span v-html="line"></span>
+                                </p>
                             </div>
                         </div>
                         <div class="extra content" v-if="bucket.campaign.startDate || bucket.campaign.endDate" style="padding-left: 0; border-top: none;">
@@ -86,6 +88,7 @@ import { useCampaignStore } from '../stores/campaign-store.mjs'
 import EditCampaign from '../components/EditCampaign.vue'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
 import KanbanCard from '../components/KanbanCard.vue'
+import { useParseDescription } from '../composables/useParseDescription.mjs'
 
 export default {
     name: 'Campaigns',
@@ -93,6 +96,10 @@ export default {
         EditCampaign,
         EditKanbanCard,
         KanbanCard
+    },
+    setup() {
+        const { parseDescription } = useParseDescription();
+        return { parseDescription };
     },
     data() {
         return {
@@ -199,7 +206,6 @@ export default {
     background-color: #f9fafb;
     border-radius: 8px;
     margin-bottom: 2em;
-    border-top: 4px solid #2185d0;
 }
 
 .campaign-info-col {
