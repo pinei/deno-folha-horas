@@ -17,8 +17,8 @@
 
         <h1 class="ui header" style="display: flex; justify-content: space-between; align-items: center;">
             Campaigns
-            <button class="ui primary button" @click="addCampaign">
-                <i class="plus icon"></i> Nova Campanha
+            <button class="ui primary circular icon button" @click="addCampaign">
+                <i class="plus icon"></i>
             </button>
         </h1>
         
@@ -49,32 +49,32 @@
 
                 <!-- 12 wide for Kanban Cards -->
                 <div class="twelve wide column kanban-lanes-col">
-                    <div class="ui grid">
-                        <div class="sixteen wide column status-lane" 
-                             v-for="lane in [
-                                 { key: 'TO_DO', label: 'To Do' },
-                                 { key: 'IN_PROGRESS', label: 'In Progress' },
-                                 { key: 'AWAITING', label: 'Awaiting' },
-                                 { key: 'DONE', label: 'Done' }
-                             ]"
-                             :key="lane.key"
-                             @drop="onDrop($event, lane.key, bucket.name)" 
-                             @dragover.prevent 
-                             @dragenter.prevent>
-                            <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
-                                {{ lane.label }}
-                            </h3>
-                            <div class="ui cards">
-                                <KanbanCard
-                                    v-for="card in getCardsByStatus(bucket, lane.key)" :key="card.id"
-                                    :card="card"
-                                    draggable="true"
-                                    @dragstart="startDrag($event, card.id, bucket.name)"
-                                    @dragend="endDrag($event)"
-                                    @click="editCard(card)"
-                                />
-                                <div v-if="getCardsByStatus(bucket, lane.key).length === 0" class="empty-lane-placeholder"></div>
-                            </div>
+                    <div class="ui segment status-lane"
+                         v-for="lane in [
+                             { key: 'TO_DO', label: 'To Do', color: '#f4f5f7' },
+                             { key: 'IN_PROGRESS', label: 'In Progress', color: '#e5f1fb' },
+                             { key: 'AWAITING', label: 'Awaiting', color: '#fdf3f0' },
+                             { key: 'DONE', label: 'Done', color: '#eef7ee' }
+                         ]"
+                         :key="lane.key"
+                         :style="{ backgroundColor: lane.color }"
+                         @drop="onDrop($event, lane.key, bucket.name)" 
+                         @dragover.prevent 
+                         @dragenter.prevent>
+                        <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
+                            {{ lane.label }}
+                        </h3>
+
+                        <div class="ui cards">
+                            <KanbanCard
+                                v-for="card in getCardsByStatus(bucket, lane.key)" :key="card.id"
+                                :card="card"
+                                draggable="true"
+                                @dragstart="startDrag($event, card.id, bucket.name)"
+                                @dragend="endDrag($event)"
+                                @click="editCard(card)"
+                            />
+                            <div v-if="getCardsByStatus(bucket, lane.key).length === 0" class="empty-lane-placeholder"></div>
                         </div>
                     </div>
                 </div>
@@ -213,7 +213,7 @@ export default {
     border-right: 1px solid rgba(34,36,38,.1);
 }
 
-.status-lane {
+.campaigns-container .status-lane {
     padding-bottom: 1em !important;
 }
 
@@ -225,7 +225,7 @@ export default {
     margin-top: 0.5em;
 }
 
-.status-lane > .ui.cards > .card {
+.campaigns-container .status-lane > .ui.cards > .card {
 	width: calc(33% - 1.1em);
 	min-width: 250px;
 	box-shadow: 0 1px 3px 0 #d4d4d5;

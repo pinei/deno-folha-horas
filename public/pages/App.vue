@@ -13,9 +13,9 @@ export default {
             <img class="logo" src="/images/petrobras-8-logo-svg-vector.svg">
             Timesheet App
             </a>
+            <router-link to="/" class="item">Timesheet</router-link>
             <router-link to="/kanban" class="item">Kanban</router-link>
             <router-link to="/campaigns" class="item">Campaigns</router-link>
-            <router-link to="/" class="item">Timesheet</router-link>
 
             <div class="ui simple dropdown item">
                 Reports <i class="dropdown icon"></i>
