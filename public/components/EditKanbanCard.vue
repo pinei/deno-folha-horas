@@ -17,6 +17,15 @@
 		<!-- Tab 1: Issue -->
 		<div class="ui bottom attached tab segment active" data-tab="issue-tab">
 			<form class="ui form">
+				<div class="field">
+					<label>Campanha</label>
+					<select class="ui dropdown" name="campaignId" v-model="state.card.campaignId" id="card-campaign-dropdown">
+						<option :value="null">-</option>
+						<option v-for="camp in campaignStore.campaigns" :key="camp.id" :value="camp.id">
+							{{ camp.name }}
+						</option>
+					</select>
+				</div>
 				<div class="field" :class="isValidIssue || 'error'">
 					<label>Issue</label>
 					<input type="text" name="issue" v-model="state.card.issue">
@@ -32,15 +41,6 @@
 				<div class="field">
 					<label>Entregas</label>
 					<textarea name="deliveries" rows="2" v-model="state.card.deliveries"></textarea>
-				</div>
-				<div class="field">
-					<label>Campanha</label>
-					<select class="ui dropdown" name="campaignId" v-model="state.card.campaignId" id="card-campaign-dropdown">
-						<option :value="null">Sem Campanha</option>
-						<option v-for="camp in campaignStore.campaigns" :key="camp.id" :value="camp.id">
-							{{ camp.name }}
-						</option>
-					</select>
 				</div>
 				<div class="field" v-show="state.card.status === 'DONE' && !isNewCard">
 					<label>Arquivado</label>

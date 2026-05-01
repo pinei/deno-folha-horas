@@ -41,3 +41,10 @@ export default {
         <router-view/>
     </div>
 </template>
+
+<style>
+.ui.fixed.menu .item.router-link-exact-active {
+    background-color: #2185d0 !important;
+    color: #ffffff !important;
+}
+</style>

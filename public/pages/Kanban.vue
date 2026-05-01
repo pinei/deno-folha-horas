@@ -11,8 +11,8 @@
         <h1 class="ui header">Kanban</h1>
         
         <div class="ui four column stackable grid">
-            <div class="column" v-for="lane in kanbanStore.buckets.getBuckets()" :key="lane">
-                <div class="ui segment" :style="{ backgroundColor: lane.color, minHeight: '150px' }" 
+            <div class="column vertical-lane" v-for="lane in kanbanStore.buckets.getBuckets()" :key="lane">
+                <div class="ui segment" :style="{ backgroundColor: lane.color }" 
                      @drop="onDrop($event, lane.name)" 
                      @dragover.prevent 
                      @dragenter.prevent>
@@ -42,7 +42,7 @@
                                  @drag="onDrag($event)"
                                  @dragend="endDrag($event)"
                                  @click="editCard(card)"
-                                 :class="{ 'is-dragging': draggedCardId !== null && draggedCardId === card.id }"
+                                 :class="{ 'is-dragging': draggedCardId === card.id }"
                             />
                         </template>
                     </transition-group>
@@ -52,6 +52,7 @@
 
         <div class="ui divider"></div>
 
+        <!-- Search archived cards -->
         <div style="text-align: center;">
             <div class="ui search" style="display: inline-block;">
                 <div class="ui icon input" style="width: 350px;">
@@ -84,6 +85,7 @@ import { useKanbanStore } from '../stores/kanban-store.mjs'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
 import KanbanCard from '../components/KanbanCard.vue'
 import kanbanApi from '../services/kanban-api.mjs'
+import { useKanbanDragAndDrop } from '../composables/useKanbanDragAndDrop.mjs'
 
 const log = (message, object) => {
 	if (object)
@@ -100,12 +102,13 @@ export default {
         EditKanbanCard,
         KanbanCard
     },
+    setup() {
+        const dragAndDrop = useKanbanDragAndDrop();
+        return { dragAndDrop, draggedCardId: dragAndDrop.draggedCardId };
+    },
     data() {
         return {
             kanbanStore: useKanbanStore(),
-            draggedCardId: null,
-            dragClone: null,
-            dragOffset: { x: 0, y: 0 },
             isModalVisible: false,
             selectedCard: {},
             searchQuery: '',
@@ -165,86 +168,14 @@ export default {
             }
         },
         startDrag(evt, cardId) {
-            evt.dataTransfer.dropEffect = 'move';
-            evt.dataTransfer.effectAllowed = 'move';
             evt.dataTransfer.setData('cardId', cardId);
-            
-            // Hide the default semi-transparent HTML5 drag image
-            const emptyImage = new Image();
-            emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            evt.dataTransfer.setDragImage(emptyImage, 0, 0);
-
-            // Record mouse offset relative to the card's top-left corner
-            const rect = evt.target.getBoundingClientRect();
-            this.dragOffset.x = evt.clientX - rect.left;
-            this.dragOffset.y = evt.clientY - rect.top;
-
-            // Create a wrapper for the solid clone to act as the custom drag image
-            const wrapper = document.createElement('div');
-            wrapper.className = 'ui cards';
-            wrapper.style.position = 'fixed';
-            wrapper.style.top = rect.top + 'px';
-            wrapper.style.left = rect.left + 'px';
-            wrapper.style.width = rect.width + 'px';
-            wrapper.style.height = rect.height + 'px';
-            wrapper.style.pointerEvents = 'none'; // So it doesn't block drop targets
-            wrapper.style.zIndex = '9999';
-            wrapper.style.transform = 'rotate(3deg)'; // Add slight rotation for drag feel
-
-            const cardClone = evt.target.cloneNode(true);
-            cardClone.style.margin = '0';
-            cardClone.style.backgroundColor = '#fff';
-                        
-            // Remove the 'is-dragging' class if it was cloned with it
-            cardClone.classList.remove('is-dragging');
-            
-            wrapper.appendChild(cardClone);
-            this.dragClone = wrapper;
-            document.body.appendChild(this.dragClone);
-            
-            // Wait for native drag image to capture the card before turning original into placeholder
-            setTimeout(() => {
-                this.draggedCardId = cardId;
-            }, 0);
+            this.dragAndDrop.startVisualDrag(evt, cardId);
         },
         onDrag(evt) {
-            if (this.dragClone && (evt.clientX !== 0 || evt.clientY !== 0)) {
-                this.dragClone.style.left = (evt.clientX - this.dragOffset.x) + 'px';
-                this.dragClone.style.top = (evt.clientY - this.dragOffset.y) + 'px';
-
-                this.autoScroll(evt);
-            }
-        },
-        autoScroll(evt) {
-            // Auto-scroll window when dragging near the edges
-            const scrollMargin = 60;
-            const scrollSpeed = 20;
-
-            let scrollX = 0;
-            let scrollY = 0;
-
-            if (evt.clientY < scrollMargin) {
-                scrollY = -scrollSpeed;
-            } else if (window.innerHeight - evt.clientY < scrollMargin) {
-                scrollY = scrollSpeed;
-            }
-
-            if (evt.clientX < scrollMargin) {
-                scrollX = -scrollSpeed;
-            } else if (window.innerWidth - evt.clientX < scrollMargin) {
-                scrollX = scrollSpeed;
-            }
-
-            if (scrollX !== 0 || scrollY !== 0) {
-                window.scrollBy(scrollX, scrollY);
-            }
+            this.dragAndDrop.onVisualDrag(evt);
         },
         endDrag(evt) {
-            this.draggedCardId = null;
-            if (this.dragClone) {
-                document.body.removeChild(this.dragClone);
-                this.dragClone = null;
-            }
+            this.dragAndDrop.endVisualDrag(evt);
         },
         onDrop(evt, laneId) {
             const cardId = parseInt(evt.dataTransfer.getData('cardId'));
@@ -277,7 +208,7 @@ export default {
 
 <style>
 .ui.container.kanban-container {
-    margin-top: 2em;
+    margin-top: 6em; /* Fixed menu offset */
     margin-bottom: 2em;
     width: 95% !important;
 }
@@ -285,30 +216,16 @@ export default {
 .ui.cards>.card.kanban-card {
     width: 100%;
     box-shadow: 0 1px 3px 0 #d4d4d5;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-}
-
-.ui.cards>.card.kanban-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 8px 0 rgba(34, 36, 38, .12), 0 2px 4px 0 rgba(34, 36, 38, .08);
-}
-
-.ui.cards>.card.kanban-card.is-dragging {
-    background-color: rgba(0, 0, 0, 0.05) !important;
-    border: 2px dashed #a0a0a0 !important;
-    box-shadow: none !important;
-    color: transparent !important;
-}
-
-.ui.cards>.card.kanban-card.is-dragging > * {
-    visibility: hidden;
 }
 
 .ui.header.kanban-group-header {
     width: 100%;
     margin-top: 1em;
     margin-left: 0.6em;
+}
+
+.vertical-lane > .ui.segment {
+    min-height: 150px;
 }
 
 /* Vue List Transitions */
@@ -322,23 +239,6 @@ export default {
 .kanban-list-leave-to {
     opacity: 0;
     transform: translateY(10px);
-}
-
-.kanban-card p.ui.blue {
-    color: rgb(0, 0, 128);
-}
-
-.kanban-card p.ui.green {
-    color: rgb(0, 64, 0);
-}
-
-.kanban-card span.ui.tag.label {
-    padding-left: 1em;
-    padding-right: 1em;
-}
-
-.ui.card>.content p, .ui.cards>.card>.content p {
-    margin: 0 0 1em;
 }
 
 </style>

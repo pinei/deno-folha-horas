@@ -6,7 +6,7 @@
             </h5>
             
             <div v-if="!simple" class="meta">{{ cardContext(card) }}</div>
-            <div class="description" :style="simple ? 'margin-bottom: 1em; margin-top: 0.5em;' : 'margin-bottom: 1em;'">
+            <div class="description" :style="simple ? 'margin-top: 0.5em;' : ''">
                 <p v-for="(line, index) in parseDescription(card.description)" :key="'d'+index">
                     <span v-html="line"></span>
                 </p>
@@ -17,6 +17,8 @@
                     <i class="cube icon"></i>{{ line }}
                 </p>
             </div>
+        </div>
+        <div class="extra content">
             <span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="categoryClass(cat)">{{ cat }}</span>
             <span v-if="!simple" class="ui circular olive label inverted large right floated">{{ totalTimeSpent(card) }}</span>
         </div>
@@ -68,3 +70,44 @@ function totalTimeSpent(card) {
     return (card.timesheets || []).reduce((sum, ts) => sum + (parseFloat(ts.timeSpent) || 0), 0)
 }
 </script>
+
+<style>
+.card.kanban-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.card.kanban-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px 0 rgba(34, 36, 38, .12), 0 2px 4px 0 rgba(34, 36, 38, .08);
+}
+
+.card.kanban-card.is-dragging {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border: 2px dashed #a0a0a0 !important;
+    box-shadow: none !important;
+    color: transparent !important;
+}
+
+.card.kanban-card.is-dragging > * {
+    visibility: hidden;
+}
+
+.kanban-card p.ui.blue {
+    color: rgb(0, 0, 128);
+}
+
+.kanban-card p.ui.green {
+    color: rgb(0, 64, 0);
+}
+
+.kanban-card span.ui.tag.label {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.ui.card>.content p, .ui.cards>.card>.content p {
+    margin: 0 0 1em;
+}
+
+</style>

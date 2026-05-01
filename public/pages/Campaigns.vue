@@ -48,8 +48,8 @@
                 </div>
 
                 <!-- 12 wide for Kanban Cards -->
-                <div class="twelve wide column kanban-lanes-col">
-                    <div class="ui segment status-lane"
+                <div class="twelve wide column">
+                    <div class="ui segment horizontal-lane"
                          v-for="lane in [
                              { key: 'TO_DO', label: 'To Do', color: '#f4f5f7' },
                              { key: 'IN_PROGRESS', label: 'In Progress', color: '#e5f1fb' },
@@ -71,10 +71,11 @@
                                 :card="card"
                                 draggable="true"
                                 @dragstart="startDrag($event, card.id, bucket.name)"
+                                @drag="onDrag($event)"
                                 @dragend="endDrag($event)"
                                 @click="editCard(card)"
+                                :class="{ 'is-dragging': draggedCardId === card.id }"
                             />
-                            <div v-if="getCardsByStatus(bucket, lane.key).length === 0" class="empty-lane-placeholder"></div>
                         </div>
                     </div>
                 </div>
@@ -89,6 +90,7 @@ import EditCampaign from '../components/EditCampaign.vue'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
 import KanbanCard from '../components/KanbanCard.vue'
 import { useParseDescription } from '../composables/useParseDescription.mjs'
+import { useKanbanDragAndDrop } from '../composables/useKanbanDragAndDrop.mjs'
 
 export default {
     name: 'Campaigns',
@@ -99,7 +101,8 @@ export default {
     },
     setup() {
         const { parseDescription } = useParseDescription();
-        return { parseDescription };
+        const dragAndDrop = useKanbanDragAndDrop();
+        return { parseDescription, dragAndDrop, draggedCardId: dragAndDrop.draggedCardId };
     },
     data() {
         return {
@@ -108,8 +111,7 @@ export default {
             selectedCampaign: {},
             isCardModalVisible: false,
             selectedCard: {},
-            draggedCardId: null,
-            draggedFromCampaignId: null
+            draggedFromBucketName: null
         }
     },
     methods: {
@@ -161,28 +163,31 @@ export default {
             return cluster ? cluster.items : [];
         },
 
-        startDrag(evt, cardId, campaignId) {
-            evt.dataTransfer.dropEffect = 'move';
-            evt.dataTransfer.effectAllowed = 'move';
+        startDrag(evt, cardId, bucketName) {
             evt.dataTransfer.setData('cardId', cardId);
-            evt.dataTransfer.setData('campaignId', campaignId);
-            this.draggedCardId = cardId;
-            this.draggedFromCampaignId = campaignId;
+            evt.dataTransfer.setData('bucketName', bucketName);
+            this.draggedFromBucketName = bucketName;
+            
+            this.dragAndDrop.startVisualDrag(evt, cardId);
+        },
+        onDrag(evt) {
+            this.dragAndDrop.onVisualDrag(evt);
         },
         endDrag(evt) {
-            this.draggedCardId = null;
-            this.draggedFromCampaignId = null;
+            this.draggedFromBucketName = null;
+            this.dragAndDrop.endVisualDrag(evt);
         },
-        onDrop(evt, toStatus, toCampaignId) {
+        onDrop(evt, toStatus, toBucketName) {
             const cardId = parseInt(evt.dataTransfer.getData('cardId'));
-            const fromCampaignId = evt.dataTransfer.getData('campaignId');
+            const fromBucketName = evt.dataTransfer.getData('bucketName');
             
             if (cardId) {
-                const fromBucket = this.campaignStore.buckets.getBucket(fromCampaignId);
+                const fromBucket = this.campaignStore.buckets.getBucket(fromBucketName);
                 if (fromBucket) {
                     const card = fromBucket.clusters.findItemById(cardId);
                     if (card) {
-                        this.campaignStore.moveCard(card, toStatus, Number(toCampaignId));
+                        const campaignId = Number(toBucketName);
+                        this.campaignStore.moveCard(card, toStatus, campaignId);
                     }
                 }
             }
@@ -213,24 +218,15 @@ export default {
     border-right: 1px solid rgba(34,36,38,.1);
 }
 
-.campaigns-container .status-lane {
+.ui.segment.horizontal-lane {
+    min-height: 150px;
     padding-bottom: 1em !important;
 }
 
-.empty-lane-placeholder {
-    height: 60px;
-    width: 100%;
-    border: 1px dashed rgba(0,0,0,0.1);
-    border-radius: 4px;
-    margin-top: 0.5em;
-}
-
-.campaigns-container .status-lane > .ui.cards > .card {
+.campaigns-container .horizontal-lane > .ui.cards > .card {
 	width: calc(33% - 1.1em);
 	min-width: 250px;
 	box-shadow: 0 1px 3px 0 #d4d4d5;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
-	cursor: pointer;
 	margin: 0.5em;
 	border: 2px solid transparent;
 }
