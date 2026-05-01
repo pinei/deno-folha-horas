@@ -141,6 +141,7 @@ class SQLDatabase {
 
   constructor(path: string) {
     this._conn = new DatabaseSync(path);
+    this._conn.exec('PRAGMA foreign_keys = ON;');
   }
 
   migrate() {
