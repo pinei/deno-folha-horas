@@ -14,6 +14,7 @@ export default {
             Timesheet App
             </a>
             <router-link to="/kanban" class="item">Kanban</router-link>
+            <router-link to="/campaigns" class="item">Campaigns</router-link>
             <router-link to="/" class="item">Timesheet</router-link>
 
             <div class="ui simple dropdown item">
@@ -35,8 +36,8 @@ export default {
         </div>
     </div>
 
-    <!-- o Kanban não pode usar `container` pois precisa de todo o espaço horizontal -->
-    <div :class="['ui main', $route.path === '/kanban' ? '' : 'container']">
+    <!-- o Kanban e Campaigns não podem usar `container` pois precisam de todo o espaço horizontal -->
+    <div :class="['ui main', ($route.path === '/kanban' || $route.path === '/campaigns') ? '' : 'container']">
         <router-view/>
     </div>
 </template>

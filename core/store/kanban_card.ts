@@ -11,6 +11,7 @@ class KanbanCard {
     relevantFacts: string | null = null
     deliveries: string | null = null
     timesheets: TimesheetRecord[] = []
+    campaignId: number | null = null
 
     constructor(data: Partial<KanbanCard>) {
         Object.assign(this, data)
@@ -51,6 +52,15 @@ class KanbanCardStore {
         if (archived !== undefined) {
             sql += ` and ARCHIVED = @archived`
             params['@archived'] = archived ? 1 : 0
+        }
+
+        if (filter.campaignId !== undefined) {
+            if (filter.campaignId === null) {
+                sql += ` and CAMPAIGN_ID IS NULL`
+            } else {
+                sql += ` and CAMPAIGN_ID = @campaignId`
+                params['@campaignId'] = filter.campaignId
+            }
         }
 
         if (terms) {
@@ -114,7 +124,8 @@ class KanbanCardStore {
                 archived: result.ARCHIVED > 0 ? true : false,
                 relevantFacts: result.RELEVANT_FACTS,
                 deliveries: result.DELIVERIES,
-                timesheets: this._loadTimesheets(result.ID)
+                timesheets: this._loadTimesheets(result.ID),
+                campaignId: result.CAMPAIGN_ID
             })
             return card;
         })
@@ -125,8 +136,8 @@ class KanbanCardStore {
     _insertCard(card: KanbanCard): KanbanCard {
         card = card.validated()
 
-        const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES']
-        const values = [card.issue, card.description, card.status, card.archived ? 1 : 0, card.relevantFacts, card.deliveries]
+        const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES', 'CAMPAIGN_ID']
+        const values = [card.issue, card.description, card.status, card.archived ? 1 : 0, card.relevantFacts, card.deliveries, card.campaignId]
 
         const changes = database.insert('KANBAN_CARD', fields, values);
 
@@ -140,8 +151,8 @@ class KanbanCardStore {
     _updateCard(card: KanbanCard): KanbanCard {
         card = card.validated()
 
-        const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES']
-        const values = [card.issue, card.description, card.status, card.archived ? 1 : 0, card.relevantFacts, card.deliveries]
+        const fields = ['ISSUE', 'DESCRIPTION', 'STATUS', 'ARCHIVED', 'RELEVANT_FACTS', 'DELIVERIES', 'CAMPAIGN_ID']
+        const values = [card.issue, card.description, card.status, card.archived ? 1 : 0, card.relevantFacts, card.deliveries, card.campaignId]
 
         const changes = database.update('KANBAN_CARD', fields, values, `ID = ${card.id}`);
 
@@ -196,7 +207,8 @@ class KanbanCardStore {
                 archived: result.ARCHIVED > 0 ? true : false,
                 relevantFacts: result.RELEVANT_FACTS,
                 deliveries: result.DELIVERIES,
-                timesheets: this._loadTimesheets(result.ID)
+                timesheets: this._loadTimesheets(result.ID),
+                campaignId: result.CAMPAIGN_ID
             })
         })
     }

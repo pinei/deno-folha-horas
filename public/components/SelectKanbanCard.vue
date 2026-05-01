@@ -134,10 +134,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-#select-kanban-card .ui.cards {
-	/* padding: 10px; */
-}
-
 #select-kanban-card .card.kanban-card {
 	width: calc(50% - 2em);
 	min-width: 250px;

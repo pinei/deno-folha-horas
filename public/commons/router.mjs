@@ -11,6 +11,7 @@ const SAPCodes = ref('../pages/SAPCodes.vue')
 const MonthTimeReport = ref('../pages/TimesheetMonthTimeReport.vue')
 const FactsAndDeliveriesReport = ref('../pages/FactsAndDeliveriesReport.vue')
 const Kanban = ref('../pages/Kanban.vue')
+const Campaigns = ref('../pages/Campaigns.vue')
 
 // const Export = ref('../pages/Export.vue')
 // const Import = ref('../pages/Import.vue')
@@ -32,6 +33,11 @@ export const routes = [
         name: 'kanban',
         path: '/kanban',
         component: Kanban
+    },
+    {
+        name: 'campaigns',
+        path: '/campaigns',
+        component: Campaigns
     },
     {
         name: 'import',

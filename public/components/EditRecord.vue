@@ -62,6 +62,10 @@
 				<label>Entregas</label>
 				<textarea rows="2" readonly :value="state.record.kanbanCard.deliveries"></textarea>
 			</div>
+			<div class="ui divider"></div>
+			<button type="button" class="ui red basic button" @click="unlinkIssue">
+				<i class="unlink icon"></i> Desvincular
+			</button>
 		</form>
 		</div>
 	  </div>
@@ -226,6 +230,12 @@ const close = () => {
 const clone = () => {
 	log('Cloning...')
 	emits('clone', state.record);
+}
+
+const unlinkIssue = () => {
+	log('Unlinking Issue...')
+	state.record.kanbanCard = null;
+	$('#edit-timesheet .tabular.menu .item').tab('change tab', 'timesheet');
 }
 
 /* Lifecycle */

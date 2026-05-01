@@ -33,6 +33,15 @@
 					<label>Entregas</label>
 					<textarea name="deliveries" rows="2" v-model="state.card.deliveries"></textarea>
 				</div>
+				<div class="field">
+					<label>Campanha</label>
+					<select class="ui dropdown" name="campaignId" v-model="state.card.campaignId" id="card-campaign-dropdown">
+						<option :value="null">Sem Campanha</option>
+						<option v-for="camp in campaignStore.campaigns" :key="camp.id" :value="camp.id">
+							{{ camp.name }}
+						</option>
+					</select>
+				</div>
 				<div class="field" v-show="state.card.status === 'DONE' && !isNewCard">
 					<label>Arquivado</label>
 					<div class="ui toggle checkbox" id="card-archived-checkbox">
@@ -103,10 +112,12 @@
 <script setup>
 import { defineEmits, defineModel, computed, watch, onMounted, onUnmounted, ref, reactive } from 'vue';
 import { useCategoryStore } from '../stores/category-store.mjs';
+import { useCampaignStore } from '../stores/campaign-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 
 const categoryStore = useCategoryStore();
+const campaignStore = useCampaignStore();
 const { handlePaste } = usePaste();
 
 const log = (message, object) => {
@@ -229,6 +240,10 @@ watch(() => props.item, (newValue) => {
 		$('#card-archived-checkbox').checkbox('set unchecked');
 	}
 
+	setTimeout(() => {
+		$('#card-campaign-dropdown').dropdown('set selected', state.card.campaignId || null);
+	}, 100);
+
 	// Initialize timesheet calendars after DOM update
 	setTimeout(() => {
 		initAllTimesheetCalendars()
@@ -343,6 +358,9 @@ onMounted(async () => {
 	log('Mounted...')
 
 	await categoryStore.loadCategories();
+	if (campaignStore.campaigns.length === 0) {
+		await campaignStore.loadCampaignsList();
+	}
 
 	const modalOptions = {
 		onShow: () => {
@@ -360,6 +378,13 @@ onMounted(async () => {
 
 	// Initialize tabs
 	$('#edit-kanban-card .tabular.menu .item').tab();
+
+	$('#card-campaign-dropdown').dropdown({
+		onChange: function(value) {
+			// Convert string value to number if it's not null/empty
+			state.card.campaignId = value ? Number(value) : null;
+		}
+	});
 
 	// Initialize archived checkbox
 	$('#card-archived-checkbox').checkbox({

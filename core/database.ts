@@ -115,6 +115,23 @@ const SQL_MIGRATE = [
       ALTER TABLE TIMESHEET DROP COLUMN DELIVERIES;
     `
   },
+  {
+    version: '1.5.0',
+    description: 'Add CAMPAIGN table and link to KANBAN_CARD',
+    sql: `
+      CREATE TABLE IF NOT EXISTS CAMPAIGN (
+        ID integer primary key autoincrement,
+        NAME text,
+        TYPE text,
+        DESCRIPTION text,
+        START_DATE text,
+        END_DATE text,
+        ARCHIVED integer
+      );
+
+      ALTER TABLE KANBAN_CARD ADD COLUMN CAMPAIGN_ID integer REFERENCES CAMPAIGN(ID) ON DELETE SET NULL;
+    `
+  },
 ]
 
 
