@@ -48,80 +48,30 @@
                 <!-- 12 wide for Kanban Cards -->
                 <div class="twelve wide column kanban-lanes-col">
                     <div class="ui grid">
-                        <!-- Horizontal Lane: TO_DO -->
                         <div class="sixteen wide column status-lane" 
-                             @drop="onDrop($event, 'TO_DO', bucket.name)" 
+                             v-for="lane in [
+                                 { key: 'TO_DO', label: 'To Do' },
+                                 { key: 'IN_PROGRESS', label: 'In Progress' },
+                                 { key: 'AWAITING', label: 'Awaiting' },
+                                 { key: 'DONE', label: 'Done' }
+                             ]"
+                             :key="lane.key"
+                             @drop="onDrop($event, lane.key, bucket.name)" 
                              @dragover.prevent 
                              @dragenter.prevent>
-                            <h5 class="ui dividing header" style="color: #666; margin-top: 0;">To Do</h5>
-
+                            <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
+                                {{ lane.label }}
+                            </h3>
                             <div class="ui cards">
                                 <KanbanCard
-                                    v-for="card in getCardsByStatus(bucket, 'TO_DO')" :key="card.id"
+                                    v-for="card in getCardsByStatus(bucket, lane.key)" :key="card.id"
                                     :card="card"
                                     draggable="true"
                                     @dragstart="startDrag($event, card.id, bucket.name)"
                                     @dragend="endDrag($event)"
                                     @click="editCard(card)"
                                 />
-                                <div v-if="getCardsByStatus(bucket, 'TO_DO').length === 0" class="empty-lane-placeholder"></div>
-                            </div>
-                        </div>
-
-                        <!-- Horizontal Lane: IN_PROGRESS -->
-                        <div class="sixteen wide column status-lane" 
-                             @drop="onDrop($event, 'IN_PROGRESS', bucket.name)" 
-                             @dragover.prevent 
-                             @dragenter.prevent>
-                            <h5 class="ui dividing header" style="color: #666;">In Progress</h5>
-                            <div class="ui cards">
-                                <KanbanCard
-                                    v-for="card in getCardsByStatus(bucket, 'IN_PROGRESS')" :key="card.id"
-                                    :card="card"
-                                    draggable="true"
-                                    @dragstart="startDrag($event, card.id, bucket.name)"
-                                    @dragend="endDrag($event)"
-                                    @click="editCard(card)"
-                                />
-                                <div v-if="getCardsByStatus(bucket, 'IN_PROGRESS').length === 0" class="empty-lane-placeholder"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Horizontal Lane: AWAITING -->
-                        <div class="sixteen wide column status-lane" 
-                             @drop="onDrop($event, 'AWAITING', bucket.name)" 
-                             @dragover.prevent 
-                             @dragenter.prevent>
-                            <h5 class="ui dividing header" style="color: #666;">Awaiting</h5>
-                            <div class="ui cards">
-                                <KanbanCard
-                                    v-for="card in getCardsByStatus(bucket, 'AWAITING')" :key="card.id"
-                                    :card="card"
-                                    draggable="true"
-                                    @dragstart="startDrag($event, card.id, bucket.name)"
-                                    @dragend="endDrag($event)"
-                                    @click="editCard(card)"
-                                />
-                                <div v-if="getCardsByStatus(bucket, 'AWAITING').length === 0" class="empty-lane-placeholder"></div>
-                            </div>
-                        </div>
-
-                        <!-- Horizontal Lane: DONE -->
-                        <div class="sixteen wide column status-lane" 
-                             @drop="onDrop($event, 'DONE', bucket.name)" 
-                             @dragover.prevent 
-                             @dragenter.prevent>
-                            <h5 class="ui dividing header" style="color: #666;">Done</h5>
-                            <div class="ui cards">
-                                <KanbanCard
-                                    v-for="card in getCardsByStatus(bucket, 'DONE')" :key="card.id"
-                                    :card="card"
-                                    draggable="true"
-                                    @dragstart="startDrag($event, card.id, bucket.name)"
-                                    @dragend="endDrag($event)"
-                                    @click="editCard(card)"
-                                />
-                                <div v-if="getCardsByStatus(bucket, 'DONE').length === 0" class="empty-lane-placeholder"></div>
+                                <div v-if="getCardsByStatus(bucket, lane.key).length === 0" class="empty-lane-placeholder"></div>
                             </div>
                         </div>
                     </div>
@@ -269,7 +219,7 @@ export default {
     margin-top: 0.5em;
 }
 
-.ui.cards > .card {
+.status-lane > .ui.cards > .card {
 	width: calc(33% - 1.1em);
 	min-width: 250px;
 	box-shadow: 0 1px 3px 0 #d4d4d5;
@@ -279,8 +229,4 @@ export default {
 	border: 2px solid transparent;
 }
 
-.ui.cards>.card.small-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px 0 rgba(34, 36, 38, .12), 0 2px 4px 0 rgba(34, 36, 38, .08);
-}
 </style>
