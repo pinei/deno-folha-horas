@@ -1,15 +1,15 @@
 <template>
     <div id="facts-and-deliveries-report">
-        <h1 class="ui header">Relatório de Fatos Relevantes e Entregas</h1>
+        <h1 class="ui header">Facts and Deliveries Report</h1>
 
         <form class="ui form">
             <div class="fields">
                 <div class="field">
-                    <label>Mës início</label>
+                    <label>Month Start</label>
                     <Calendar v-model="state.calendarDateStart"/>
                 </div>
                 <div class="field">
-                    <label>Mës final</label>
+                    <label>Month End</label>
                     <Calendar v-model="state.calendarDateEnd"/>
                 </div>
             </div>
@@ -22,10 +22,10 @@
          -->
         <div v-show="state.availableCategories.length > 0">
             <div class="ui segment">
-                <h4 class="ui dividing header">Configurações</h4>
+                <h4 class="ui dividing header">Configurations</h4>
                 <form class="ui form">
                     <div class="field">
-                        <label>Categorias:</label>
+                        <label>Categories:</label>
                         <select class="ui search dropdown" multiple="" v-model="state.selectedCategories">
                             <option v-for="category in state.availableCategories" :key="category" :value="category">{{ category }}</option>
                         </select>

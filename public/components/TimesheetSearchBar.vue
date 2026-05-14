@@ -2,17 +2,17 @@
     <div class="ui placeholder segment">
         <div class="ui icon header">
             <i class="search icon"></i>
-            Registros por período mensal ou busca histórica por categoria e descrição
+            Records by month or historical search by category and description
         </div>
 
         <form class="ui form" id="search-panel">
         <div class="two fields">
             <div class="four wide field">
-                <label>Mês</label>
+                <label>Month</label>
                 <Calendar v-model="state.calendarDate" :enabled="calendarEnabled"/>
             </div>
             <div class="twelve wide field">
-                <label>Descrição</label>
+                <label>Description</label>
                 <div class="ui right labeled input">
                     <input type="text" name="search-text" placeholder="category:MISC reunião" v-model="state.searchText">
                     <div class="ui right attached icon button" @click="$emit('search')">

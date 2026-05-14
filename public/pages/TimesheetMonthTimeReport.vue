@@ -1,6 +1,6 @@
 <template>
     <div id="timesheet-month-time-report">
-        <h1 class="ui header">Relatório para Apontamento de Horas</h1>
+        <h1 class="ui header">Month Timesheet Report</h1>
 
         <form class="ui form">
             <div class="fields">

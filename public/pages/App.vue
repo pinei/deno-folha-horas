@@ -26,11 +26,11 @@ export default {
             </div>
             
             <div class="ui simple dropdown item">
-                Administração <i class="dropdown icon"></i>
+                Administration <i class="dropdown icon"></i>
                 <div class="menu">
-                    <router-link to="/sap-codes" class="item">Códigos do SAP</router-link>
-                    <router-link to="/export" class="item">Exportação (@todo)</router-link>
-                    <router-link to="/import" class="item">Importação (@todo)</router-link>
+                    <router-link to="/sap-codes" class="item">SAP Codes</router-link>
+                    <router-link to="/export" class="item">Export</router-link>
+                    <router-link to="/import" class="item">Import</router-link>
                 </div>
             </div>
         </div>

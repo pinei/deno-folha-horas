@@ -1,13 +1,13 @@
 <template>
     <div class="actions main" >
-        <div class="ui secondary left floated button" @click="cancel()">Cancelar</div>
-        <div v-show="!props.disableRemove" class="ui red right labeled icon button" @click="handleRemove()">Remover <i class="trash icon"></i></div>
-        <div v-show="!props.disableRemove" class="ui secondary right labeled icon button" @click="clone()">Clonar <i class="copy outline icon"></i></div>
-        <div :class="{ disabled: props.disableSave }" class="ui primary right labeled icon button" @click="save()">Salvar <i class="checkmark icon"></i></div>
+        <div class="ui secondary left floated button" @click="cancel()">Cancel</div>
+        <div v-show="!props.disableRemove" class="ui red right labeled icon button" @click="handleRemove()">Remove <i class="trash icon"></i></div>
+        <div v-show="!props.disableRemove" class="ui secondary right labeled icon button" @click="clone()">Clone <i class="copy outline icon"></i></div>
+        <div :class="{ disabled: props.disableSave }" class="ui primary right labeled icon button" @click="save()">Save <i class="checkmark icon"></i></div>
     </div>
     <div class="actions remove">
-        <div class="ui secondary left floated button" @click="cancelRemove()">Cancelar</div>
-        <div class="ui red right labeled icon button" @click="confirmRemove()">Confirmar <i class="trash icon"></i></div>
+        <div class="ui secondary left floated button" @click="cancelRemove()">Cancel</div>
+        <div class="ui red right labeled icon button" @click="confirmRemove()">Confirm <i class="trash icon"></i></div>
     </div>
 </template>
 
