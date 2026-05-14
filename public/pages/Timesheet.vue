@@ -14,7 +14,7 @@
     <div id="timesheet-panel">
         <div v-if="!(timesheetStore.clusters.length > 0)">
             <h3 class="ui header">Nenhum registro encontrado</h3>
-            <button class="ui small primary icon button" @click="addRecord(null)" data-tooltip="Novo registro">
+            <button class="ui small primary circular icon button" @click="addRecord(null)" data-tooltip="Novo registro">
                 <i class="plus icon"></i>
             </button>
         </div>
@@ -165,7 +165,7 @@ const editRecord = (record) => {
 const addRecord = (cluster) => {
     state.selectedRecord = {};
 
-    const date = cluster.key || (new Date()).toISOString().substring(0, 10);
+    const date = cluster?.key || (new Date()).toISOString().substring(0, 10);
     state.selectedRecord.date = date;
 
     log(`New record:`, state.selectedRecord)

@@ -12,7 +12,8 @@
             :item="selectedCard" 
             v-model:visible="isCardModalVisible"
             @close="closeCardModal" 
-            @save="saveCard" 
+            @save="saveCard"
+            @clone="cloneCard"
         />
 
         <h1 class="ui header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -53,7 +54,7 @@
                          v-for="lane in [
                              { key: 'TO_DO', label: 'To Do', color: '#f4f5f7' },
                              { key: 'IN_PROGRESS', label: 'In Progress', color: '#e5f1fb' },
-                             { key: 'AWAITING', label: 'Awaiting', color: '#fdf3f0' },
+                             { key: 'AWAITING', label: 'Awaiting', color: '#fdf4e6' },
                              { key: 'DONE', label: 'Done', color: '#eef7ee' }
                          ]"
                          :key="lane.key"
@@ -63,6 +64,11 @@
                          @dragenter.prevent>
                         <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
                             {{ lane.label }}
+                            <div class="ui custom-add-button">
+                                <button class="ui mini primary circular icon button" data-tooltip="Adicionar" @click="addCard(bucket.campaign.id, lane.key)">
+                                    <i class="plus icon"></i>
+                                </button>
+                            </div>
                         </h3>
 
                         <div class="ui cards">
@@ -137,6 +143,13 @@ export default {
             this.isCampaignModalVisible = false;
         },
 
+        addCard(campaignId, status) {
+            this.selectedCard = {
+                campaignId: campaignId,
+                status: status
+            };
+            this.isCardModalVisible = true;
+        },
         editCard(card) {
             this.selectedCard = { ...card };
             this.isCardModalVisible = true;
@@ -156,6 +169,10 @@ export default {
         },
         closeCardModal() {
             this.isCardModalVisible = false;
+        },
+        cloneCard(card) {
+            this.selectedCard = { ...card, id: null };
+            this.selectedCard.timesheets = [];
         },
 
         getCardsByStatus(bucket, status) {

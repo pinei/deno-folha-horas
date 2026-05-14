@@ -144,7 +144,7 @@ export default {
         },
         cloneCard(card) {
             this.selectedCard = { ...card, id: null };
-            this.selectedCard.timesheets = (card.timesheets || []).map(ts => ({ ...ts, id: null }));
+            this.selectedCard.timesheets = [];
         },
         closeModal(card) {
             log('Modal was closed');
