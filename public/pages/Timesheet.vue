@@ -39,7 +39,7 @@
 
             <tbody>
             <tr v-if="!(cluster.items?.length > 0)">
-                <td colspan="4">Sem registros</td>
+                <td colspan="4">No records</td>
             </tr>
 
             <tr v-for="record in cluster.items" :key="record.id">
@@ -149,7 +149,7 @@ const timeSpentClass = (value) => {
 }
 
 const dayOfWeek = (date) => {
-    const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const day = new Date(date).getUTCDay();
     return days[day];
 }

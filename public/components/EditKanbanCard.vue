@@ -18,7 +18,7 @@
 		<div class="ui bottom attached tab segment active" data-tab="issue-tab">
 			<form class="ui form">
 				<div class="field">
-					<label>Campanha</label>
+					<label>Campaign</label>
 					<select class="ui dropdown" name="campaignId" v-model="state.card.campaignId" id="card-campaign-dropdown">
 						<option :value="null">-</option>
 						<option v-for="camp in campaignStore.campaigns" :key="camp.id" :value="camp.id">
@@ -31,19 +31,19 @@
 					<input type="text" name="issue" v-model="state.card.issue">
 				</div>
 				<div class="field" :class="isValidDescription || 'error'">
-					<label>Descrição</label>
+					<label>Description</label>
 					<textarea name="description" rows="2" v-model="state.card.description" @paste="handlePaste($event, state.card, 'description')"></textarea>
 				</div>
 				<div class="field">
-					<label>Fatos Relevantes</label>
+					<label>Relevant Facts</label>
 					<textarea name="relevantFacts" rows="2" v-model="state.card.relevantFacts"></textarea>
 				</div>
 				<div class="field">
-					<label>Entregas</label>
+					<label>Deliveries</label>
 					<textarea name="deliveries" rows="2" v-model="state.card.deliveries"></textarea>
 				</div>
 				<div class="field" v-show="state.card.status === 'DONE' && !isNewCard">
-					<label>Arquivado</label>
+					<label>Archived</label>
 					<div class="ui toggle checkbox" id="card-archived-checkbox">
 						<input type="checkbox" name="archived" v-model="state.card.archived">
 						<label></label>
@@ -63,30 +63,30 @@
 				<form class="ui form" style="overflow: hidden;">
 					<div class="fields">
 						<div class="four wide field" :class="isTsValidDate(ts) || 'error'">
-							<label>Data</label>
+							<label>Date</label>
 							<div class="ui calendar" :id="'ts-calendar-' + index">
 								<div class="ui input left icon">
 									<i class="calendar icon"></i>
-									<input type="text" placeholder="Data" :name="'date-' + index">
+									<input type="text" placeholder="Date" :name="'date-' + index">
 								</div>
 							</div>
 						</div>
 						<div class="four wide field" :class="isTsValidTimeSpent(ts) || 'error'">
-							<label>Esforço (HH)</label>
+							<label>Effort (HH)</label>
 							<input type="text" placeholder="0.5" v-model="ts.timeSpent">
 						</div>
 						<div class="eight wide field" :class="isTsValidCategory(ts) || 'error'">
-							<label>Categoria</label>
+							<label>Category</label>
 							<CategoryDropdown
 								v-model="ts.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>
 						</div>
 					</div>
 					<div class="field">
-						<label>Contexto</label>
+						<label>Context</label>
 						<input type="text" v-model="ts.context">
 					</div>
 					<div class="field" :class="isTsValidDescription(ts) || 'error'">
-						<label>Descrição</label>
+						<label>Description</label>
 						<textarea rows="2" v-model="ts.description" @paste="handlePaste($event, ts, 'description')"></textarea>
 					</div>
 					<button class="ui mini red circular icon button right floated" type="button" data-tooltip="Remover Timesheet" data-position="top right" @click="removeTimesheet(index)">
