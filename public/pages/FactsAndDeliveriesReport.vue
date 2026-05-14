@@ -26,9 +26,9 @@
                 <form class="ui form">
                     <div class="field">
                         <label>Categories:</label>
-                        <select class="ui search dropdown" multiple="" v-model="state.selectedCategories">
-                            <option v-for="category in state.availableCategories" :key="category" :value="category">{{ category }}</option>
-                        </select>
+                        <MultiCategoryDropdown 
+                            v-model="state.selectedCategories" 
+                            :categories="state.availableCategories" />
                     </div>
                 </form>
             </div>
@@ -47,6 +47,7 @@
 <script setup>
 import { reactive, onMounted, watch, computed } from 'vue';
 import timesheetReportApi from '../services/timesheet-report-api.mjs';
+import MultiCategoryDropdown from '../components/MultiCategoryDropdown.vue';
 
 const log = (message, object) => {
     if (object)
@@ -191,7 +192,6 @@ const copyMarkdown = async () => {
 
 onMounted(() => {
     log('Mounted...')
-    $('#facts-and-deliveries-report .ui.search.dropdown').dropdown();
 })
 </script>
 
