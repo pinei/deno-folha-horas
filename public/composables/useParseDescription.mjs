@@ -32,11 +32,24 @@ export function useParseDescription() {
         });
 
         // Breadcrumbs (lines with " > " separators)
-        richText = richText.replace(/^(.+ > .+)$/gm, (match) => {
-            const parts = match.split(' > ').map(p => p.trim());
+        richText = richText.replace(/^(\s*[-*]\s+)?(.+ > .+)$/gm, (match, bullet, text) => {
+            const parts = text.split(' > ').map(p => p.trim());
             const last = parts.pop();
             const sections = parts.map(p => `<div class="section">${p}</div><i class="right chevron icon divider"></i>`).join('');
-            return `<div class="ui breadcrumb">${sections}<div class="active section">${last}</div></div>`;
+            return `${bullet || ''}<div class="ui breadcrumb">${sections}<div class="active section">${last}</div></div>`;
+        });
+
+        // Bullet lists
+        const bulletRegex = /^(?:\s*[-*]\s+[^\r\n]*(?:\r?\n|$))+/gm;
+        richText = richText.replace(bulletRegex, (match) => {
+            const endsWithNewline = match.endsWith('\n');
+            const items = match.trimEnd().split(/\r?\n/).map(line => {
+                return line.replace(/^(\s*)[-*]\s+(.*)$/, (m, space, text) => {
+                    const indent = space.length > 0 ? ` style="margin-left: ${space.length * 0.5}em;"` : '';
+                    return `<li${indent}>${text}</li>`;
+                });
+            }).join('');
+            return `<ul class="ui bulleted list">${items}</ul>` + (endsWithNewline ? '\n' : '');
         });
 
         // Múltiplas linhas
