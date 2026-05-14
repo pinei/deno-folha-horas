@@ -18,7 +18,7 @@ export const useKanbanStore = defineStore('kanban', () => {
     const lanes = [
         { name: 'TO_DO', description: 'To Do', color: '#f4f5f7' },
         { name: 'IN_PROGRESS', description: 'In Progress', color: '#e5f1fb' },
-        { name: 'AWAITING', description: 'Awaiting', color: '#fdf3f0' },
+        { name: 'AWAITING', description: 'Awaiting', color: '#fdf4e6' },
         { name: 'DONE', description: 'Done', color: '#eef7ee' }
     ]
 
