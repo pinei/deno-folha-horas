@@ -1,19 +1,19 @@
 <template>
 	<div id="edit-campaign" class="ui modal">
 	  <i class="close icon"></i>
-	  <div class="header">{{ state.campaign.id ? `Campaign (id=${state.campaign.id})` : "Nova Campaign" }}</div>
+	  <div class="header">{{ state.campaign.id ? `Campaign (id=${state.campaign.id})` : "New Campaign" }}</div>
 	  <div class="content">
 		<form class="ui form">
 			<div class="field" :class="isValidName || 'error'">
-				<label>Nome / Título</label>
+				<label>Name / Title</label>
 				<input type="text" name="name" v-model="state.campaign.name">
 			</div>
 			
 			<div class="fields">
 				<div class="six wide field" :class="isValidType || 'error'">
-					<label>Tipo</label>
+					<label>Type</label>
 					<select class="ui dropdown" name="type" v-model="state.campaign.type" id="campaign-type-dropdown">
-						<option value="">Selecione...</option>
+						<option value="">Select...</option>
 						<option value="Project">Project</option>
 						<option value="Epic">Epic</option>
 						<option value="Release">Release</option>
@@ -23,32 +23,32 @@
 					</select>
 				</div>
 				<div class="five wide field">
-					<label>Data Início</label>
+					<label>Start Date</label>
 					<div class="ui calendar" id="campaign-start-calendar">
 						<div class="ui input left icon">
 							<i class="calendar icon"></i>
-							<input type="text" placeholder="Data Inicial" name="startDate">
+							<input type="text" placeholder="Start Date" name="startDate">
 						</div>
 					</div>
 				</div>
 				<div class="five wide field">
-					<label>Data Fim</label>
+					<label>End Date</label>
 					<div class="ui calendar" id="campaign-end-calendar">
 						<div class="ui input left icon">
 							<i class="calendar icon"></i>
-							<input type="text" placeholder="Data Final" name="endDate">
+							<input type="text" placeholder="End Date" name="endDate">
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="field">
-				<label>Descrição</label>
+				<label>Description</label>
 				<textarea name="description" rows="3" v-model="state.campaign.description"></textarea>
 			</div>
 
 			<div class="field" v-show="!isNewCampaign">
-				<label>Arquivado</label>
+				<label>Archived</label>
 				<div class="ui toggle checkbox" id="campaign-archived-checkbox">
 					<input type="checkbox" name="archived" v-model="state.campaign.archived">
 					<label></label>
