@@ -41,6 +41,10 @@ const props = defineProps({
   visible: {
 	type: Boolean,
 	required: true,
+  },
+  category: {
+	type: String,
+	required: false
   }
 });
 
@@ -48,6 +52,8 @@ const props = defineProps({
 
 const state = reactive({
 	cards: [],
+	candidateCards: [],
+	otherCards: [],
 	selectedCard: null,
 	loading: false,
 	isModalVisible: false,
@@ -59,9 +65,25 @@ async function loadAvailableCards() {
 	state.loading = true
 	try {
 		state.cards = await kanbanApi.getAvailableKanbanCards()
+		if (props.category) {
+			state.candidateCards = state.cards.filter(card => {
+				const ts = card.timesheets || []
+				return ts.some(t => t.category === props.category)
+			})
+			state.otherCards = state.cards.filter(card => {
+				const ts = card.timesheets || []
+				return !ts.some(t => t.category === props.category)
+			})
+			log(`Candidate cards for category ${props.category}:`, state.candidateCards)
+		} else {
+			state.candidateCards = []
+			state.otherCards = state.cards
+		}
 	} catch (err) {
 		console.error('Error loading available cards:', err)
 		state.cards = []
+		state.candidateCards = []
+		state.otherCards = []
 	} finally {
 		state.loading = false
 	}

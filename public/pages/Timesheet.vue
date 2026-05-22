@@ -9,6 +9,7 @@
 
     <SelectKanbanCard
         :visible="state.isSelectKanbanCardVisible"
+        :category="state.selectKanbanCardRecord?.category"
         @select="onKanbanCardSelected" @close="closeSelectKanbanCard"/>
 
     <div id="timesheet-panel">
