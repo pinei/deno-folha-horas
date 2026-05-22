@@ -96,6 +96,15 @@ async function loadAvailableCards() {
 		}
 
 		state.candidateCards = state.cards.filter(card => isCandidate(card))
+		if (props.category) {
+			state.candidateCards.sort((a, b) => {
+				const hasMatchingA = (a.timesheets || []).some(t => t.category === props.category)
+				const hasMatchingB = (b.timesheets || []).some(t => t.category === props.category)
+				if (hasMatchingA && !hasMatchingB) return -1
+				if (!hasMatchingA && hasMatchingB) return 1
+				return 0
+			})
+		}
 		state.otherCards = state.cards.filter(card => !isCandidate(card))
 		log(`Candidate cards:`, state.candidateCards)
 	} catch (err) {
