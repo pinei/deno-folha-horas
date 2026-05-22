@@ -105,6 +105,7 @@ const categoryStore = useCategoryStore();
 const state = reactive({
     searchBar: {
         searchText: '',
+        selectedCategories: [],
         calendarDate: new Date(),
     },
     isEditRecordVisible: false,
@@ -119,18 +120,12 @@ const search = () => {
     console.log(`Search: ${state.searchBar.searchText}`)
 
     let searchText = state.searchBar.searchText.trim()
+    let categories = state.searchBar.selectedCategories || []
 
-    if (searchText != '')
-    {
-        const regex = /(?:category:(\w+))?\s*(.*)/;
-        const match = regex.exec(searchText);
-
-        if (match) {
-            let category = match[1] || null;
-            let terms = match[2] || null;
-
-            timesheetStore.loadRecordsForTerms(category, terms)
-        }
+    if (searchText !== '' || categories.length > 0) {
+        timesheetStore.loadRecordsForTerms(categories, searchText || null)
+    } else {
+        timesheetStore.loadRecordsForMonth(state.searchBar.calendarDate)
     }
 
 }

@@ -76,8 +76,16 @@ class TimesheetStore {
         }
 
         if (category) {
-            sql += ` and t.CATEGORY = @category`
-            params['@category'] = category
+            if (Array.isArray(category) && category.length > 0) {
+                const placeholders = category.map((c, i) => `@cat${i}`).join(', ');
+                sql += ` and t.CATEGORY in (${placeholders})`
+                category.forEach((c, i) => {
+                    params[`@cat${i}`] = c
+                })
+            } else if (typeof category === 'string' && category.trim() !== '') {
+                sql += ` and t.CATEGORY = @category`
+                params['@category'] = category
+            }
         }
 
         if (terms) {
