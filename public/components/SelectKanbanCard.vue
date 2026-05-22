@@ -83,29 +83,27 @@ async function loadAvailableCards() {
 	try {
 		state.cards = await kanbanApi.getAvailableKanbanCards()
 		
-		const isCandidate = (card) => {
+		const candidatesMatch = []
+		const candidatesNoCategory = []
+		const others = []
+
+		state.cards.forEach(card => {
 			const ts = card.timesheets || []
 			const hasNoCategory = ts.length === 0 || ts.every(t => !t.category)
-			
-			if (props.category) {
-				const hasMatchingCategory = ts.some(t => t.category === props.category)
-				return hasMatchingCategory || hasNoCategory
-			} else {
-				return hasNoCategory
-			}
-		}
+			const hasMatchingCategory = props.category && ts.some(t => t.category === props.category)
 
-		state.candidateCards = state.cards.filter(card => isCandidate(card))
-		if (props.category) {
-			state.candidateCards.sort((a, b) => {
-				const hasMatchingA = (a.timesheets || []).some(t => t.category === props.category)
-				const hasMatchingB = (b.timesheets || []).some(t => t.category === props.category)
-				if (hasMatchingA && !hasMatchingB) return -1
-				if (!hasMatchingA && hasMatchingB) return 1
-				return 0
-			})
-		}
-		state.otherCards = state.cards.filter(card => !isCandidate(card))
+			if (hasMatchingCategory) {
+				candidatesMatch.push(card)
+			} else if (hasNoCategory) {
+				candidatesNoCategory.push(card)
+			} else {
+				others.push(card)
+			}
+		})
+
+		state.candidateCards = [...candidatesMatch, ...candidatesNoCategory]
+		state.otherCards = others
+		
 		log(`Candidate cards:`, state.candidateCards)
 	} catch (err) {
 		console.error('Error loading available cards:', err)
