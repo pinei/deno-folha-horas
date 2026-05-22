@@ -13,7 +13,7 @@
                     <Calendar v-model="state.calendarDateEnd"/>
                 </div>
             </div>
-            <div class="ui primary button" @click="generate()" data-tooltip="Gerar">Generate</div>
+            <div class="ui primary button" @click="generate()" data-tooltip="Generate">Generate</div>
         </form>
 
         <!--
@@ -36,10 +36,10 @@
 
         <div class="ui form" style="margin-top: 2em;" v-show="Object.keys(filteredAndGroupedByWeek).length > 0">
             <div class="field">
-                <label>Markdown Gerado</label>
-                <textarea rows="20" readonly style="font-family: monospace; line-height: 1.5;">{{ generateMarkdown() }}</textarea>
+                <label>Generated Markdown</label>
+                <textarea rows="120" readonly style="font-family: monospace; line-height: 1.5;">{{ generateMarkdown() }}</textarea>
             </div>
-            <div class="ui primary button" @click="copyMarkdown()" data-tooltip="Copiar Markdown para a área de transferência">Copiar Tudo</div>
+            <div class="ui primary button" @click="copyMarkdown()" data-tooltip="Copy Markdown to clipboard">Copy All</div>
         </div>
     </div>
 </template>

@@ -65,7 +65,7 @@
                         <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
                             {{ lane.label }}
                             <div class="ui custom-add-button">
-                                <button class="ui mini primary circular icon button" data-tooltip="Adicionar" @click="addCard(bucket.campaign.id, lane.key)">
+                                <button class="ui mini primary circular icon button" data-tooltip="Add" @click="addCard(bucket.campaign.id, lane.key)">
                                     <i class="plus icon"></i>
                                 </button>
                             </div>

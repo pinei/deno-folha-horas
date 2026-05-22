@@ -70,7 +70,7 @@
             </div>
 
             <form class="ui form">
-                <div class="ui primary right floated button" @click="copyTSV()" data-tooltip="Copiar para o SAP">Copy TSV</div>
+                <div class="ui primary right floated button" @click="copyTSV()" data-tooltip="Copy TSV for SAP transaction">Copy TSV</div>
             </form>
         </div>
     </div>

@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-timesheet" class="ui modal">
 	  <i class="close icon"></i>
-	  <div class="header">{{ state.record.id ? `Registro (id=${state.record.id})` : "Registro" }}</div>
+	  <div class="header">{{ state.record.id ? `Timesheet (id=${state.record.id})` : "New Timesheet" }}</div>
 	  <div class="content">
 		<!-- Tab menu -->
 		<div class="ui top attached tabular menu">
@@ -17,27 +17,27 @@
 			<div class="ui calendar">
 				<div class="ui input left icon">
 					<i class="calendar icon"></i>
-					<input type="text" placeholder="Selecione a data" name="date">
+					<input type="text" placeholder="Select a date" name="date">
 				</div>
 			</div>
 		</div>
 		<div class="fields">
 			<div class="four wide field" :class="isValidTimeSpent || 'error'">
-				<label>Esforço (HH)</label>
+				<label>Effort (HH)</label>
 				<input type="text" name="timeSpent" placeholder="0.5" v-model="state.record.timeSpent">
 			</div>
 			<div class="twelve wide field" :class="isValidCategory || 'error'">
-				<label>Categoria</label>
+				<label>Category</label>
 				<CategoryDropdown
 					v-model="state.record.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>
 			</div>
 		</div>
 		<div class="field" :class="isValidContext || 'error'">
-			<label>Contexto</label>
+			<label>Context</label>
 			<input type="text" name="context" v-model="state.record.context">
 		</div>
 		<div class="field" :class="isValidDescription || 'error'">
-			<label>Descrição</label>
+			<label>Description</label>
 			<textarea name="description" rows="2" v-model="state.record.description" @paste="handlePaste($event, state.record, 'description')"></textarea>
 		</div>
 		</form>
@@ -51,20 +51,20 @@
 				<input type="text" readonly :value="state.record.kanbanCard.issue">
 			</div>
 			<div class="field">
-				<label>Descrição</label>
+				<label>Description</label>
 				<textarea rows="2" readonly :value="state.record.kanbanCard.description"></textarea>
 			</div>
 			<div class="field">
-				<label>Fatos Relevantes</label>
+				<label>Relevant Facts</label>
 				<textarea rows="2" readonly :value="state.record.kanbanCard.relevantFacts"></textarea>
 			</div>
 			<div class="field">
-				<label>Entregas</label>
+				<label>Deliveries</label>
 				<textarea rows="2" readonly :value="state.record.kanbanCard.deliveries"></textarea>
 			</div>
 			<div class="ui divider"></div>
 			<button type="button" class="ui red basic button" @click="unlinkIssue">
-				<i class="unlink icon"></i> Desvincular
+				<i class="unlink icon"></i> Unlink
 			</button>
 		</form>
 		</div>

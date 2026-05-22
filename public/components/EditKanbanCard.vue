@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-kanban-card" class="ui modal">
 	  <i class="close icon"></i>
-	  <div class="header">{{ state.card.id ? `Card (id=${state.card.id})` : "Novo Card" }}</div>
+	  <div class="header">{{ state.card.id ? `Card (id=${state.card.id})` : "New Card" }}</div>
 	  <div class="scrolling content">
 		<!-- Tabs Menu -->
 		<div class="ui top attached tabular menu">
@@ -55,7 +55,7 @@
 		<!-- Tab 2: Timesheets -->
 		<div class="ui bottom attached tab segment" data-tab="timesheets-tab">
 			<div v-if="!state.card.timesheets || state.card.timesheets.length === 0" class="ui message">
-				<p>Nenhum timesheet associado.</p>
+				<p>No timesheet associated.</p>
 			</div>
 
 			<div v-for="(ts, index) in state.card.timesheets" :key="index">
@@ -89,14 +89,14 @@
 						<label>Description</label>
 						<textarea rows="2" v-model="ts.description" @paste="handlePaste($event, ts, 'description')"></textarea>
 					</div>
-					<button class="ui mini red circular icon button right floated" type="button" data-tooltip="Remover Timesheet" data-position="top right" @click="removeTimesheet(index)">
+					<button class="ui mini red circular icon button right floated" type="button" data-tooltip="Remove Timesheet" data-position="top right" @click="removeTimesheet(index)">
 						<i class="trash icon"></i>
 					</button>
 				</form>
 			</div>
 
 			<div class="ui divider" v-if="state.card.timesheets && state.card.timesheets.length > 0"></div>
-			<button class="ui mini primary circular icon button" type="button" data-tooltip="Adicionar Timesheet" data-position="right center" @click="addTimesheet">
+			<button class="ui mini primary circular icon button" type="button" data-tooltip="Add Timesheet" data-position="right center" @click="addTimesheet">
 				<i class="plus icon"></i>
 			</button>
 		</div>

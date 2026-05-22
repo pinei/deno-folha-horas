@@ -10,10 +10,10 @@
                 <p v-for="(line, index) in parseDescription(card.description)" :key="'d'+index">
                     <span v-html="line"></span>
                 </p>
-                <p v-for="(line, index) in parseLines(card.relevantFacts)" :key="'rf'+index" class="ui blue" data-tooltip="Fato Relevante" data-position="top left">
+                <p v-for="(line, index) in parseLines(card.relevantFacts)" :key="'rf'+index" class="ui blue" data-tooltip="Relevant Fact" data-position="top left">
                     <i class="circle exclamation icon"></i>{{ line }}
                 </p>
-                <p v-for="(line, index) in parseLines(card.deliveries)" :key="'dl'+index" class="ui green" data-tooltip="Entrega" data-position="top left">
+                <p v-for="(line, index) in parseLines(card.deliveries)" :key="'dl'+index" class="ui green" data-tooltip="Delivery" data-position="top left">
                     <i class="cube icon"></i>{{ line }}
                 </p>
             </div>

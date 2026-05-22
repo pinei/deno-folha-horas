@@ -14,8 +14,8 @@
 
     <div id="timesheet-panel">
         <div v-if="!(timesheetStore.clusters.length > 0)">
-            <h3 class="ui header">Nenhum registro encontrado</h3>
-            <button class="ui small primary circular icon button" @click="addRecord(null)" data-tooltip="Novo registro">
+            <h3 class="ui header">No records found</h3>
+            <button class="ui small primary circular icon button" @click="addRecord(null)" data-tooltip="New record">
                 <i class="plus icon"></i>
             </button>
         </div>
@@ -32,9 +32,9 @@
             <table class="ui selectable compact table">
             <thead>
             <tr>
-                <th class="one wide" data-tooltip="Tempo (esforço)"><i class="clock outline icon"></i></th>
-                <th class="one wide" data-tooltip="Categoria"><i class="tag icon"></i></th>
-                <th class="fourteen wide" data-tooltip="Descritivo"><i class="align left icon"></i></th>
+                <th class="one wide" data-tooltip="Time (effort)"><i class="clock outline icon"></i></th>
+                <th class="one wide" data-tooltip="Category"><i class="tag icon"></i></th>
+                <th class="fourteen wide" data-tooltip="Description"><i class="align left icon"></i></th>
             </tr>
             </thead>
 
@@ -71,7 +71,7 @@
 
             </table>
             <div class="ui custom-add-button">
-                <button class="ui mini primary circular icon button" @click="addRecord(cluster)" data-tooltip="Adicionar">
+                <button class="ui mini primary circular icon button" @click="addRecord(cluster)" data-tooltip="Add record">
                     <i class="plus icon"></i> 
                 </button>
             </div>

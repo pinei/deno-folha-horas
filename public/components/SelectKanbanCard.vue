@@ -1,11 +1,11 @@
 <template>
 	<div id="select-kanban-card" class="ui modal">
 	  <i class="close icon"></i>
-	  <div class="header">Selecionar Issue</div>
+	  <div class="header">Select Issue</div>
 	  <div class="scrolling content">
 		<div v-if="state.loading" class="ui active centered inline loader"></div>
 		<div v-else-if="state.cards.length === 0">
-			<p>Nenhuma issue disponível</p>
+			<p>No issue available</p>
 		</div>
 		<div v-else>
 			<div class="ui cards" v-if="state.candidateCards.length > 0">
@@ -32,8 +32,8 @@
 		</div>
 	  </div>
 	  <div class="actions">
-		<div class="ui secondary left floated button" @click="close">Cancelar</div>
-		<div class="ui primary right labeled icon button" :class="{ disabled: !state.selectedCard }" @click="confirm">Salvar <i class="checkmark icon"></i></div>
+		<div class="ui secondary left floated button" @click="close">Cancel</div>
+		<div class="ui primary right labeled icon button" :class="{ disabled: !state.selectedCard }" @click="confirm">Save <i class="checkmark icon"></i></div>
 	  </div>
 	</div>
 </template>
