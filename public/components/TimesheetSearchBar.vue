@@ -6,25 +6,25 @@
         </div>
 
         <form class="ui form" id="search-panel" @submit.prevent>
-            <div class="two fields">
-                <div class="four wide field">
+            <div class="fields">
+                <div class="two wide field">
                     <label>Month</label>
                     <Calendar v-model="state.calendarDate" :enabled="calendarEnabled"/>
                 </div>
-                <div class="twelve wide field">
+                <div class="six wide field">
                     <label>Categories</label>
                     <MultiCategoryDropdown 
                         v-model="state.selectedCategories" 
                         :categories="availableCategories" 
                         @update:modelValue="$emit('search')" />
                 </div>
-            </div>
-            <div class="field">
-                <label>Description</label>
-                <div class="ui right labeled input">
-                    <input type="text" name="search-text" placeholder="Search terms..." v-model="state.searchText" @keydown.enter="$emit('search')">
-                    <div class="ui right attached icon button" @click="$emit('search')">
-                        <i class="search icon"></i>
+                <div class="eight wide field">
+                    <label>Search text</label>
+                    <div class="ui right labeled input">
+                        <input type="text" name="search-text" placeholder="Search terms..." v-model="state.searchText" @keydown.enter="$emit('search')">
+                        <div class="ui right attached icon button" @click="$emit('search')">
+                            <i class="search icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -43,6 +43,8 @@ const props = defineProps({
     modelValue: Object, // { searchText: '', selectedCategories: [], calendarDate: Date }
 });
 
+const emit = defineEmits(['search'])
+
 const state = ref(props.modelValue)
 
 const availableCategories = computed(() => categoryStore.categories.map(c => c.name))
@@ -58,6 +60,12 @@ const calendarEnabled = computed(() => {
 
 watch(() => state.value.calendarDate, (newValue, oldValue) => {
     console.log(`[TimesheetSearchBar] Calendar date changed (search bar): ${newValue}`)
+})
+
+watch(() => state.value.searchText, (newValue) => {
+    if (newValue === '') {
+        emit('search')
+    }
 })
 
 onMounted(() => {
