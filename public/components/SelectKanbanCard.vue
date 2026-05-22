@@ -7,13 +7,28 @@
 		<div v-else-if="state.cards.length === 0">
 			<p>Nenhuma issue disponível</p>
 		</div>
-		<div v-else class="ui cards">
-			<KanbanCard
-				v-for="card in state.cards" :key="card.id"
-				:card="card"
-				:simple="true"
-				:class="{ active: state.selectedCard?.id === card.id }"
-				@click="selectCard(card)" />
+		<div v-else>
+			<div class="ui cards" v-if="state.candidateCards.length > 0">
+				<KanbanCard
+					v-for="card in state.candidateCards" :key="card.id"
+					:card="card"
+					:simple="true"
+					:class="{ active: state.selectedCard?.id === card.id }"
+					@click="selectCard(card)" />
+			</div>
+
+			<div v-if="state.otherCards.length > 0 && !state.showOtherCards" style="text-align: center; margin-top: 1em; margin-bottom: 1em;">
+				<button class="ui basic button" @click="state.showOtherCards = true">Others</button>
+			</div>
+
+			<div class="ui cards" v-if="state.showOtherCards && state.otherCards.length > 0" :style="state.candidateCards.length > 0 ? 'margin-top: 1em;' : ''">
+				<KanbanCard
+					v-for="card in state.otherCards" :key="card.id"
+					:card="card"
+					:simple="true"
+					:class="{ active: state.selectedCard?.id === card.id }"
+					@click="selectCard(card)" />
+			</div>
 		</div>
 	  </div>
 	  <div class="actions">
@@ -57,28 +72,32 @@ const state = reactive({
 	selectedCard: null,
 	loading: false,
 	isModalVisible: false,
+	showOtherCards: false,
 });
 
 /* Methods */
 
 async function loadAvailableCards() {
 	state.loading = true
+	state.showOtherCards = false
 	try {
 		state.cards = await kanbanApi.getAvailableKanbanCards()
-		if (props.category) {
-			state.candidateCards = state.cards.filter(card => {
-				const ts = card.timesheets || []
-				return ts.some(t => t.category === props.category)
-			})
-			state.otherCards = state.cards.filter(card => {
-				const ts = card.timesheets || []
-				return !ts.some(t => t.category === props.category)
-			})
-			log(`Candidate cards for category ${props.category}:`, state.candidateCards)
-		} else {
-			state.candidateCards = []
-			state.otherCards = state.cards
+		
+		const isCandidate = (card) => {
+			const ts = card.timesheets || []
+			const hasNoCategory = ts.length === 0 || ts.every(t => !t.category)
+			
+			if (props.category) {
+				const hasMatchingCategory = ts.some(t => t.category === props.category)
+				return hasMatchingCategory || hasNoCategory
+			} else {
+				return hasNoCategory
+			}
 		}
+
+		state.candidateCards = state.cards.filter(card => isCandidate(card))
+		state.otherCards = state.cards.filter(card => !isCandidate(card))
+		log(`Candidate cards:`, state.candidateCards)
 	} catch (err) {
 		console.error('Error loading available cards:', err)
 		state.cards = []
