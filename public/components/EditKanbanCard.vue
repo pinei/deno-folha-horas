@@ -54,18 +54,26 @@
 
 		<!-- Tab 2: Timesheets -->
 		<div class="ui bottom attached tab segment" data-tab="timesheets-tab">
-			<div v-if="!state.card.timesheets || state.card.timesheets.length === 0" class="ui message">
-				<p>No timesheet associated.</p>
+			<div v-if="!state.isEditingTimesheets" style="text-align: center; padding: 20px;">
+				<button class="ui primary right labeled icon button" type="button" @click="editTimesheets">
+					Editar <i class="edit icon"></i>
+				</button>
 			</div>
 
-			<EditTimesheetsFromKanbanCard
-				ref="editTimesheetsRef"
-				:timesheets="state.card.timesheets"
-				:categories="state.categories"
-				:isModalVisible="state.isModalVisible"
-				@remove-timesheet="removeTimesheet"
-				@add-timesheet="addTimesheet"
-			></EditTimesheetsFromKanbanCard>
+			<template v-else>
+				<div v-if="!state.card.timesheets || state.card.timesheets.length === 0" class="ui message">
+					<p>No timesheet associated.</p>
+				</div>
+
+				<EditTimesheetsFromKanbanCard
+					ref="editTimesheetsRef"
+					:timesheets="state.card.timesheets"
+					:categories="state.categories"
+					:isModalVisible="state.isModalVisible"
+					@remove-timesheet="removeTimesheet"
+					@add-timesheet="addTimesheet"
+				></EditTimesheetsFromKanbanCard>
+			</template>
 		</div>
 	  </div>
 
@@ -119,7 +127,8 @@ const state = reactive({
 	card: { timesheets: [] },
 	isModalVisible: false,
 	categories: [],
-	categoriesNames: []
+	categoriesNames: [],
+	isEditingTimesheets: false
 });
 
 /* Methods */
@@ -147,6 +156,15 @@ const removeTimesheet = (index) => {
 	state.card.timesheets.splice(index, 1)
 }
 
+const editTimesheets = () => {
+	state.isEditingTimesheets = true;
+	setTimeout(() => {
+		if (editTimesheetsRef.value) {
+			editTimesheetsRef.value.initAllTimesheetCalendars()
+		}
+	}, 100)
+}
+
 /* Watches */
 
 watch(() => categoryStore.categories, (newValue) => {
@@ -159,6 +177,7 @@ watch(() => categoryStore.categories, (newValue) => {
 watch(() => props.item, (newValue) => {
 	log(`Card changed:`, newValue)
 	state.card = { ...newValue };
+	state.isEditingTimesheets = false;
 
 	if (!state.card.timesheets)
 		state.card.timesheets = []
@@ -188,6 +207,7 @@ watch(visible, (newValue) => {
 	log(`Modal visible changed: ${newValue} and isModalVisible = ${state.isModalVisible}`)
 
 	if (newValue == true) {
+		state.isEditingTimesheets = false;
 		if (!state.isModalVisible) {
 			$('#edit-kanban-card .tabular.menu .item').tab('change tab', 'issue-tab');
 			$('#edit-kanban-card').modal('show');
