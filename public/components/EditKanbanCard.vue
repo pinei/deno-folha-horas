@@ -58,47 +58,14 @@
 				<p>No timesheet associated.</p>
 			</div>
 
-			<div v-for="(ts, index) in state.card.timesheets" :key="index">
-				<div class="ui clearing divider" v-if="index > 0"></div>
-				<form class="ui form" style="overflow: hidden;">
-					<div class="fields">
-						<div class="four wide field" :class="isTsValidDate(ts) || 'error'">
-							<label>Date</label>
-							<div class="ui calendar" :id="'ts-calendar-' + index">
-								<div class="ui input left icon">
-									<i class="calendar icon"></i>
-									<input type="text" placeholder="Date" :name="'date-' + index">
-								</div>
-							</div>
-						</div>
-						<div class="four wide field" :class="isTsValidTimeSpent(ts) || 'error'">
-							<label>Effort (HH)</label>
-							<input type="text" placeholder="0.5" v-model="ts.timeSpent">
-						</div>
-						<div class="eight wide field" :class="isTsValidCategory(ts) || 'error'">
-							<label>Category</label>
-							<CategoryDropdown
-								v-model="ts.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>
-						</div>
-					</div>
-					<div class="field">
-						<label>Context</label>
-						<input type="text" v-model="ts.context">
-					</div>
-					<div class="field" :class="isTsValidDescription(ts) || 'error'">
-						<label>Description</label>
-						<textarea rows="2" v-model="ts.description" @paste="handlePaste($event, ts, 'description')"></textarea>
-					</div>
-					<button class="ui mini red circular icon button right floated" type="button" data-tooltip="Remove Timesheet" data-position="top right" @click="removeTimesheet(index)">
-						<i class="trash icon"></i>
-					</button>
-				</form>
-			</div>
-
-			<div class="ui divider" v-if="state.card.timesheets && state.card.timesheets.length > 0"></div>
-			<button class="ui mini primary circular icon button" type="button" data-tooltip="Add Timesheet" data-position="right center" @click="addTimesheet">
-				<i class="plus icon"></i>
-			</button>
+			<EditTimesheetsFromKanbanCard
+				ref="editTimesheetsRef"
+				:timesheets="state.card.timesheets"
+				:categories="state.categories"
+				:isModalVisible="state.isModalVisible"
+				@remove-timesheet="removeTimesheet"
+				@add-timesheet="addTimesheet"
+			></EditTimesheetsFromKanbanCard>
 		</div>
 	  </div>
 
@@ -114,11 +81,13 @@ import { defineEmits, defineModel, computed, watch, onMounted, onUnmounted, ref,
 import { useCategoryStore } from '../stores/category-store.mjs';
 import { useCampaignStore } from '../stores/campaign-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
+import EditTimesheetsFromKanbanCard from './EditTimesheetsFromKanbanCard.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 
 const categoryStore = useCategoryStore();
 const campaignStore = useCampaignStore();
 const { handlePaste } = usePaste();
+const editTimesheetsRef = ref(null);
 
 const log = (message, object) => {
 	if (object)
@@ -168,51 +137,14 @@ const addTimesheet = () => {
 	})
 	// Initialize the calendar for the new timesheet after DOM update
 	setTimeout(() => {
-		initTimesheetCalendar(state.card.timesheets.length - 1)
+		if (editTimesheetsRef.value) {
+			editTimesheetsRef.value.initTimesheetCalendar(state.card.timesheets.length - 1)
+		}
 	}, 100)
 }
 
 const removeTimesheet = (index) => {
 	state.card.timesheets.splice(index, 1)
-}
-
-const initTimesheetCalendar = (index) => {
-	const calendarOptions = {
-		type: 'date',
-		today: true,
-		formatter: {
-			date: (date, settings) => {
-				if (!date) return '';
-				const day = date.getDate();
-				const month = date.getMonth() + 1;
-				const year = date.getFullYear();
-				return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-			}
-		},
-		onChange: (date, text, mode) => {
-			if (date && state.card.timesheets[index]) {
-				state.card.timesheets[index].date = date.toISOString().substring(0, 10);
-			}
-		}
-	}
-
-	$(`#ts-calendar-${index}`).calendar(calendarOptions);
-
-	// Set existing date value
-	const ts = state.card.timesheets[index]
-	if (ts && ts.date) {
-		const localDate = ts.date.replace(/-/g, '/');
-		const dateValue = new Date(localDate)
-		$(`#ts-calendar-${index}`).calendar('set date', dateValue, true, false);
-	}
-}
-
-const initAllTimesheetCalendars = () => {
-	if (state.card.timesheets) {
-		for (let i = 0; i < state.card.timesheets.length; i++) {
-			initTimesheetCalendar(i)
-		}
-	}
 }
 
 /* Watches */
@@ -246,7 +178,9 @@ watch(() => props.item, (newValue) => {
 
 	// Initialize timesheet calendars after DOM update
 	setTimeout(() => {
-		initAllTimesheetCalendars()
+		if (editTimesheetsRef.value) {
+			editTimesheetsRef.value.initAllTimesheetCalendars()
+		}
 	}, 200)
 });
 
