@@ -54,34 +54,13 @@
 
 		<!-- Tab 2: Timesheets -->
 		<div class="ui bottom attached tab segment" data-tab="timesheets-tab">
-			<div v-if="!state.isEditingTimesheets">
-				<div style="text-align: right; margin-bottom: 1em;">
-					<button class="ui primary right labeled icon button" type="button" @click="editTimesheets">
-						Editar <i class="edit icon"></i>
-					</button>
-				</div>
-
-				<div v-if="!state.card.timesheets || state.card.timesheets.length === 0" class="ui message">
-					<p>No timesheet associated.</p>
-				</div>
-
-				<TimesheetsFromKanbanCard v-else :timesheets="state.card.timesheets"></TimesheetsFromKanbanCard>
-			</div>
-
-			<template v-else>
-				<div v-if="!state.card.timesheets || state.card.timesheets.length === 0" class="ui message">
-					<p>No timesheet associated.</p>
-				</div>
-
-				<EditTimesheetsFromKanbanCard
-					ref="editTimesheetsRef"
-					:timesheets="state.card.timesheets"
-					:categories="state.categories"
-					:isModalVisible="state.isModalVisible"
-					@remove-timesheet="removeTimesheet"
-					@add-timesheet="addTimesheet"
-				></EditTimesheetsFromKanbanCard>
-			</template>
+			<TimesheetsFromKanbanCard
+				:timesheets="state.card.timesheets"
+				:categories="state.categories"
+				:isModalVisible="state.isModalVisible"
+				@remove-timesheet="removeTimesheet"
+				@add-timesheet="addTimesheet"
+			></TimesheetsFromKanbanCard>
 		</div>
 	  </div>
 
@@ -97,14 +76,12 @@ import { defineEmits, defineModel, computed, watch, onMounted, onUnmounted, ref,
 import { useCategoryStore } from '../stores/category-store.mjs';
 import { useCampaignStore } from '../stores/campaign-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
-import EditTimesheetsFromKanbanCard from './EditTimesheetsFromKanbanCard.vue';
 import TimesheetsFromKanbanCard from './TimesheetsFromKanbanCard.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 
 const categoryStore = useCategoryStore();
 const campaignStore = useCampaignStore();
 const { handlePaste } = usePaste();
-const editTimesheetsRef = ref(null);
 
 const log = (message, object) => {
 	if (object)
@@ -136,8 +113,7 @@ const state = reactive({
 	card: { timesheets: [] },
 	isModalVisible: false,
 	categories: [],
-	categoriesNames: [],
-	isEditingTimesheets: false
+	categoriesNames: []
 });
 
 /* Methods */
@@ -153,25 +129,10 @@ const addTimesheet = () => {
 		context: '',
 		description: ''
 	})
-	// Initialize the calendar for the new timesheet after DOM update
-	setTimeout(() => {
-		if (editTimesheetsRef.value) {
-			editTimesheetsRef.value.initTimesheetCalendar(state.card.timesheets.length - 1)
-		}
-	}, 100)
 }
 
 const removeTimesheet = (index) => {
 	state.card.timesheets.splice(index, 1)
-}
-
-const editTimesheets = () => {
-	state.isEditingTimesheets = true;
-	setTimeout(() => {
-		if (editTimesheetsRef.value) {
-			editTimesheetsRef.value.initAllTimesheetCalendars()
-		}
-	}, 100)
 }
 
 /* Watches */
@@ -186,7 +147,6 @@ watch(() => categoryStore.categories, (newValue) => {
 watch(() => props.item, (newValue) => {
 	log(`Card changed:`, newValue)
 	state.card = { ...newValue };
-	state.isEditingTimesheets = false;
 
 	if (!state.card.timesheets)
 		state.card.timesheets = []
@@ -203,20 +163,12 @@ watch(() => props.item, (newValue) => {
 	setTimeout(() => {
 		$('#card-campaign-dropdown').dropdown('set selected', state.card.campaignId || null);
 	}, 100);
-
-	// Initialize timesheet calendars after DOM update
-	setTimeout(() => {
-		if (editTimesheetsRef.value) {
-			editTimesheetsRef.value.initAllTimesheetCalendars()
-		}
-	}, 200)
 });
 
 watch(visible, (newValue) => {
 	log(`Modal visible changed: ${newValue} and isModalVisible = ${state.isModalVisible}`)
 
 	if (newValue == true) {
-		state.isEditingTimesheets = false;
 		if (!state.isModalVisible) {
 			$('#edit-kanban-card .tabular.menu .item').tab('change tab', 'issue-tab');
 			$('#edit-kanban-card').modal('show');
