@@ -23,10 +23,10 @@ export const useKanbanStore = defineStore('kanban', () => {
     ]
 
     const useDateAsGroupKey = (item) => {
-        // Menor data entre os timesheets
+        // Maior data entre os timesheets
         const ts = item.timesheets || []
         if (ts.length === 0) return 'EMPTY'
-        return ts.reduce((min, t) => t.date < min ? t.date : min, ts[0].date)
+        return ts.reduce((max, t) => t.date > max ? t.date : max, ts[0].date)
     }
 
     for (const lane of lanes) {
