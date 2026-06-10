@@ -23,9 +23,13 @@
         <!-- <div v-for="cluster in timesheetStore.clusters" :key="cluster.key" style="position: relative"> -->
         <div v-for="cluster in timesheetStore.clusters" :key="cluster.key" class="ui form">
 
-            <h4 class="ui header">{{ cluster.key }}
-                <div class="ui basic olive label">
-                    {{ dayOfWeek(cluster.key) }}
+            <h4 class="ui header">
+                {{ getClusterDate(cluster.key) }}
+                <div class="ui basic olive label" style="margin-left: 0.5em;">
+                    {{ dayOfWeek(getClusterDate(cluster.key)) }}
+                </div>
+                <div class="ui basic grey label" v-if="getClusterWeek(cluster.key)" style="margin-left: 0.5em;">
+                    {{ getClusterWeek(cluster.key) }}
                 </div>
             </h4>
 
@@ -144,6 +148,16 @@ const timeSpentClass = (value) => {
     return  { 'olive': true }
 }
 
+const getClusterDate = (key) => {
+    if (!key) return '';
+    return key.split('|')[0] || '';
+}
+
+const getClusterWeek = (key) => {
+    if (!key) return '';
+    return key.split('|')[1] || '';
+}
+
 const dayOfWeek = (date) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const day = new Date(date).getUTCDay();
@@ -161,7 +175,7 @@ const editRecord = (record) => {
 const addRecord = (cluster) => {
     state.selectedRecord = {};
 
-    const date = cluster?.key || (new Date()).toISOString().substring(0, 10);
+    const date = cluster?.key ? getClusterDate(cluster.key) : (new Date()).toISOString().substring(0, 10);
     state.selectedRecord.date = date;
 
     log(`New record:`, state.selectedRecord)

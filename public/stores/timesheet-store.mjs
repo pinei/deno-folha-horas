@@ -9,7 +9,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
 
     const currentDate = ref(new Date())
 
-    const clusters = reactive(new Clusters((item) => item.date, 'DESC'))
+    const clusters = reactive(new Clusters((item) => item.week ? `${item.date}|${item.week}` : `${item.date}|`, 'DESC'))
 
     const summary = ref({
         categories: [],
