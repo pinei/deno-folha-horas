@@ -65,7 +65,7 @@
 	  </div>
 
 	  <SaveCancelRemoveActions
-	   :visible="visible" :disableSave="!isValidCard" :disableRemove="isNewCard"
+	   :visible="visible" :disableSave="!isValidCard || (!state.card.isEdited && !isNewCard)" :disableRemove="isNewCard"
 	   @save="save" @remove="remove" @close="close" @clone="clone"></SaveCancelRemoveActions>
 	</div>
 
@@ -144,9 +144,12 @@ watch(() => categoryStore.categories, (newValue) => {
 	state.categories = newValue;
 }, { immediate: true });
 
+let isInitializingCard = false;
+
 watch(() => props.item, (newValue) => {
 	log(`Card changed:`, newValue)
-	state.card = { ...newValue };
+	isInitializingCard = true;
+	state.card = JSON.parse(JSON.stringify(newValue || { timesheets: [] }));
 
 	if (!state.card.timesheets)
 		state.card.timesheets = []
@@ -163,7 +166,18 @@ watch(() => props.item, (newValue) => {
 	setTimeout(() => {
 		$('#card-campaign-dropdown').dropdown('set selected', state.card.campaignId || null);
 	}, 100);
+
+	setTimeout(() => {
+		isInitializingCard = false;
+	}, 300);
 });
+
+watch(() => state.card, (newValue) => {
+	if (!isInitializingCard && !state.card.isEdited) {
+		log('Card modified in memory, setting isEdited = true');
+		state.card.isEdited = true;
+	}
+}, { deep: true });
 
 watch(visible, (newValue) => {
 	log(`Modal visible changed: ${newValue} and isModalVisible = ${state.isModalVisible}`)
@@ -236,6 +250,7 @@ const emits = defineEmits(['save', 'remove', 'close', 'clone'])
 const save = () => {
 	if (isValidCard.value) {
 		log('Saving...')
+		state.card.isEdited = false;
 		emits('save', state.card);
 	}
 	else {
