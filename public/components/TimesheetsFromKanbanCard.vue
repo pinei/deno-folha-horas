@@ -34,7 +34,7 @@
 			<!-- Edit Mode -->
 			<form v-else class="content ui form" style="overflow: hidden;">
 				<div class="fields">
-					<div class="four wide field" :class="isTsValidDate(ts) || 'error'">
+					<div class="four wide field" :class="isTsValidDate(editingTimesheet) || 'error'">
 						<label>Date</label>
 						<div class="ui calendar" :id="'ts-calendar-' + index">
 							<div class="ui input left icon">
@@ -43,30 +43,33 @@
 							</div>
 						</div>
 					</div>
-					<div class="four wide field" :class="isTsValidTimeSpent(ts) || 'error'">
+					<div class="four wide field" :class="isTsValidTimeSpent(editingTimesheet) || 'error'">
 						<label>Effort (HH)</label>
-						<input type="text" placeholder="0.5" v-model="ts.timeSpent">
+						<input type="text" placeholder="0.5" v-model="editingTimesheet.timeSpent">
 					</div>
-					<div class="eight wide field" :class="isTsValidCategory(ts) || 'error'">
+					<div class="eight wide field" :class="isTsValidCategory(editingTimesheet) || 'error'">
 						<label>Category</label>
 						<CategoryDropdown
-							v-model="ts.category" :categories="categories" :enabled="isModalVisible"></CategoryDropdown>
+							v-model="editingTimesheet.category" :categories="categories" :enabled="isModalVisible"></CategoryDropdown>
 					</div>
 				</div>
 				<div class="field">
 					<label>Context</label>
-					<input type="text" v-model="ts.context">
+					<input type="text" v-model="editingTimesheet.context">
 				</div>
-				<div class="field" :class="isTsValidDescription(ts) || 'error'">
+				<div class="field" :class="isTsValidDescription(editingTimesheet) || 'error'">
 					<label>Description</label>
-					<textarea rows="2" v-model="ts.description" @paste="handlePaste($event, ts, 'description')"></textarea>
+					<textarea rows="2" v-model="editingTimesheet.description" @paste="handlePaste($event, editingTimesheet, 'description')"></textarea>
 				</div>
 				
 				<div style="margin-top: 1em; display: flex; justify-content: flex-end; gap: 0.5em;">
 					<button class="ui mini red circular icon button" type="button" data-tooltip="Remove Timesheet" data-position="top right" @click.stop="removeTimesheet(index)">
 						<i class="trash icon"></i>
 					</button>
-					<button class="ui mini green circular icon button" type="button" data-tooltip="Done" data-position="top right" @click.stop="stopEditing()">
+					<button class="ui mini grey circular icon button" type="button" data-tooltip="Cancel" data-position="top right" @click.stop="cancelEditing(index)">
+						<i class="undo icon"></i>
+					</button>
+					<button class="ui mini green circular icon button" type="button" data-tooltip="Done" data-position="top right" @click.stop="stopEditing(index)">
 						<i class="checkmark icon"></i>
 					</button>
 				</div>
@@ -110,6 +113,8 @@ const props = defineProps({
 const emits = defineEmits(['remove-timesheet', 'add-timesheet']);
 
 const editingIndex = ref(null);
+const originalTimesheetState = ref(null);
+const editingTimesheet = ref(null);
 let lastLength = 0;
 
 const categoryClass = (value) => {
@@ -118,18 +123,38 @@ const categoryClass = (value) => {
 
 const startEditing = (index) => {
 	editingIndex.value = index;
+	originalTimesheetState.value = props.timesheets[index] ? { ...props.timesheets[index] } : null;
+	editingTimesheet.value = props.timesheets[index] ? { ...props.timesheets[index] } : null;
 	setTimeout(() => {
 		initTimesheetCalendar(index);
 	}, 50);
 }
 
-const stopEditing = () => {
+const stopEditing = (index) => {
+	if (editingTimesheet.value && props.timesheets[index]) {
+		Object.assign(props.timesheets[index], editingTimesheet.value);
+	}
 	editingIndex.value = null;
+	originalTimesheetState.value = null;
+	editingTimesheet.value = null;
+}
+
+const cancelEditing = (index) => {
+	const original = props.timesheets[index];
+	if (original && (!original.description || original.description.trim() === '') && (!original.category || original.category.trim() === '')) {
+		removeTimesheet(index);
+	} else {
+		editingIndex.value = null;
+		originalTimesheetState.value = null;
+		editingTimesheet.value = null;
+	}
 }
 
 const removeTimesheet = (index) => {
 	if (editingIndex.value === index) {
 		editingIndex.value = null;
+		originalTimesheetState.value = null;
+		editingTimesheet.value = null;
 	}
 	emits('remove-timesheet', index);
 }
@@ -166,8 +191,8 @@ const initTimesheetCalendar = (index) => {
 			}
 		},
 		onChange: (date, text, mode) => {
-			if (date && props.timesheets[index]) {
-				props.timesheets[index].date = date.toISOString().substring(0, 10);
+			if (date && editingTimesheet.value) {
+				editingTimesheet.value.date = date.toISOString().substring(0, 10);
 			}
 		}
 	};
@@ -175,7 +200,7 @@ const initTimesheetCalendar = (index) => {
 	$(`#ts-calendar-${index}`).calendar(calendarOptions);
 
 	// Set existing date value
-	const ts = props.timesheets[index];
+	const ts = editingTimesheet.value;
 	if (ts && ts.date) {
 		const localDate = ts.date.replace(/-/g, '/');
 		const dateValue = new Date(localDate);
@@ -187,6 +212,8 @@ const initTimesheetCalendar = (index) => {
 watch(() => props.timesheets, (newVal, oldVal) => {
 	if (newVal !== oldVal) {
 		editingIndex.value = null;
+		originalTimesheetState.value = null;
+		editingTimesheet.value = null;
 		lastLength = newVal ? newVal.length : 0;
 	} else {
 		const newLength = newVal ? newVal.length : 0;
@@ -200,6 +227,8 @@ watch(() => props.timesheets, (newVal, oldVal) => {
 watch(() => props.isModalVisible, (newVal) => {
 	if (!newVal) {
 		editingIndex.value = null;
+		originalTimesheetState.value = null;
+		editingTimesheet.value = null;
 	}
 });
 </script>
