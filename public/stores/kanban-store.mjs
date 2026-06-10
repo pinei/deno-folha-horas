@@ -26,7 +26,8 @@ export const useKanbanStore = defineStore('kanban', () => {
         // Maior data entre os timesheets
         const ts = item.timesheets || []
         if (ts.length === 0) return 'EMPTY'
-        return ts.reduce((max, t) => t.date > max ? t.date : max, ts[0].date)
+        const maxTs = ts.reduce((max, t) => t.date > max.date ? t : max, ts[0])
+        return maxTs.week ? `${maxTs.date}|${maxTs.week}` : `${maxTs.date}|`
     }
 
     for (const lane of lanes) {

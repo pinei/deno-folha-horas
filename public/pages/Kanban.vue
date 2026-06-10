@@ -31,7 +31,13 @@
                                 No timesheets
                             </h4>
                             <h4 class="ui header kanban-group-header" v-else>
-                                {{ cluster.key }} <div class="ui basic olive label">{{ dayOfWeek(cluster.key) }}</div>
+                                {{ getClusterDate(cluster.key) }}
+                                <div class="ui basic olive label" style="margin-left: 0.5em;">
+                                    {{ dayOfWeek(getClusterDate(cluster.key)) }}
+                                </div>
+                                <div class="ui basic grey label" v-if="getClusterWeek(cluster.key)" style="margin-left: 0.5em;">
+                                    {{ getClusterWeek(cluster.key) }}
+                                </div>
                             </h4>
                             
                             <KanbanCard
@@ -187,6 +193,14 @@ export default {
                     this.kanbanStore.moveCard(draggedCard, toBucket);
                 }
             }
+        },
+        getClusterDate(key) {
+            if (!key) return '';
+            return key.split('|')[0] || '';
+        },
+        getClusterWeek(key) {
+            if (!key) return '';
+            return key.split('|')[1] || '';
         },
         dayOfWeek(key) {
             if (!key) return '';
