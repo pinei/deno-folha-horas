@@ -81,7 +81,7 @@ class KanbanCardStore {
     }
 
     _loadTimesheets(kanbanCardId: number): TimesheetRecord[] {
-        const sql = `select * from TIMESHEET where KANBAN_CARD_ID = @kanbanCardId order by DATE desc`
+        const sql = `select *, strftime('W%V', DATE) as WEEK from TIMESHEET where KANBAN_CARD_ID = @kanbanCardId order by DATE desc`
         const stmt = database.prepare(sql);
         const results = stmt.all({ '@kanbanCardId': kanbanCardId });
 
@@ -92,7 +92,8 @@ class KanbanCardStore {
                 category: result.CATEGORY,
                 timeSpent: result.TIME_SPENT,
                 description: result.DESCRIPTION,
-                context: result.CONTEXT
+                context: result.CONTEXT,
+                week: result.WEEK
             })
         })
     }

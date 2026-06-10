@@ -8,6 +8,7 @@ class TimesheetRecord {
     timeSpent = 0
     description = ''
     context: string | null = null
+    week: string | null = null
     kanbanCard?: {
         id: number
         issue?: string | null
@@ -61,6 +62,7 @@ class TimesheetStore {
 
         let sql = `select
                 t.*,
+                strftime('W%V', t.DATE) as WEEK,
                 k.ISSUE as KANBAN_ISSUE,
                 k.DESCRIPTION as KANBAN_DESCRIPTION,
                 k.STATUS as KANBAN_STATUS,
@@ -116,6 +118,7 @@ class TimesheetStore {
                 timeSpent: result.TIME_SPENT,
                 description: result.DESCRIPTION,
                 context: result.CONTEXT,
+                week: result.WEEK,
                 kanbanCard: result.KANBAN_CARD_ID ? {
                     id: result.KANBAN_CARD_ID,
                     issue: result.KANBAN_ISSUE,
@@ -179,6 +182,7 @@ class TimesheetStore {
 
         const sql = `select
                 t.*,
+                strftime('W%V', t.DATE) as WEEK,
                 k.ISSUE as KANBAN_ISSUE,
                 k.DESCRIPTION as KANBAN_DESCRIPTION,
                 k.STATUS as KANBAN_STATUS,
@@ -198,6 +202,7 @@ class TimesheetStore {
             timeSpent: result.TIME_SPENT,
             description: result.DESCRIPTION,
             context: result.CONTEXT,
+            week: result.WEEK,
             kanbanCard: result.KANBAN_CARD_ID ? {
                 id: result.KANBAN_CARD_ID,
                 issue: result.KANBAN_ISSUE,
