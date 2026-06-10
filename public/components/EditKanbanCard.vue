@@ -54,10 +54,18 @@
 
 		<!-- Tab 2: Timesheets -->
 		<div class="ui bottom attached tab segment" data-tab="timesheets-tab">
-			<div v-if="!state.isEditingTimesheets" style="text-align: center; padding: 20px;">
-				<button class="ui primary right labeled icon button" type="button" @click="editTimesheets">
-					Editar <i class="edit icon"></i>
-				</button>
+			<div v-if="!state.isEditingTimesheets">
+				<div style="text-align: right; margin-bottom: 1em;">
+					<button class="ui primary right labeled icon button" type="button" @click="editTimesheets">
+						Editar <i class="edit icon"></i>
+					</button>
+				</div>
+
+				<div v-if="!state.card.timesheets || state.card.timesheets.length === 0" class="ui message">
+					<p>No timesheet associated.</p>
+				</div>
+
+				<TimesheetsFromKanbanCard v-else :timesheets="state.card.timesheets"></TimesheetsFromKanbanCard>
 			</div>
 
 			<template v-else>
@@ -90,6 +98,7 @@ import { useCategoryStore } from '../stores/category-store.mjs';
 import { useCampaignStore } from '../stores/campaign-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
 import EditTimesheetsFromKanbanCard from './EditTimesheetsFromKanbanCard.vue';
+import TimesheetsFromKanbanCard from './TimesheetsFromKanbanCard.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 
 const categoryStore = useCategoryStore();
