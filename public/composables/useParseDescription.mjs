@@ -31,6 +31,13 @@ export function useParseDescription() {
             return `${space}<span class="ui ${color} tag label" style="margin-right: 0.3em;">${tag}</span>`;
         });
 
+        // Attributes (inicio da linha ou logo apos espaço em branco: :attribute name:)
+        const attrRegex = /(^|\s):([^:\r\n]+):/g;
+        richText = richText.replace(attrRegex, (match, space, attrName) => {
+            const color = tagColor(attrName);
+            return `${space}<div class="ui ${color} right pointing basic label">${attrName}</div>`;
+        });
+
         // Breadcrumbs (lines with " > " separators)
         richText = richText.replace(/^(\s*[-*]\s+)?(.+ > .+)$/gm, (match, bullet, text) => {
             const parts = text.split(' > ').map(p => p.trim());

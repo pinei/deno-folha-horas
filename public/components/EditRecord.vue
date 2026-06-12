@@ -12,21 +12,21 @@
 		<!-- Timesheet tab -->
 		<div class="ui bottom attached tab segment active" data-tab="timesheet">
 		<form class="ui form">
-		<div class="field" :class="isValidDate || 'error'">
-			<label>Data</label>
-			<div class="ui calendar">
-				<div class="ui input left icon">
-					<i class="calendar icon"></i>
-					<input type="text" placeholder="Select a date" name="date">
+		<div class="fields">
+			<div class="four wide field" :class="isValidDate || 'error'">
+				<label>Data</label>
+				<div class="ui calendar">
+					<div class="ui input left icon">
+						<i class="calendar icon"></i>
+						<input type="text" placeholder="Select a date" name="date">
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="fields">
 			<div class="four wide field" :class="isValidTimeSpent || 'error'">
 				<label>Effort (HH)</label>
 				<input type="text" name="timeSpent" placeholder="0.5" v-model="state.record.timeSpent">
 			</div>
-			<div class="twelve wide field" :class="isValidCategory || 'error'">
+			<div class="eight wide field" :class="isValidCategory || 'error'">
 				<label>Category</label>
 				<CategoryDropdown
 					v-model="state.record.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>

@@ -31,7 +31,6 @@
                 <!-- Tab Menu for the Day -->
                 <div class="ui top attached tabular menu">
                     <div class="active item">
-                        <i class="calendar alternate outline icon"></i>
                         {{ dayNode.key }}
                     </div>
                     <div class="right menu">

@@ -8,15 +8,6 @@ body {
     margin-top: 7em;
 }
 
-#timesheet-panel table {
-    margin-top: 0.8em;
-    margin-bottom: 1.4em;
-}
-
-#timesheet-panel {
-    padding-bottom: 0.8em;
-}
-
 #search-panel .field {
     max-width: 100%;
 }
