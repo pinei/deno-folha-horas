@@ -1,168 +1,63 @@
 /*
- * Cluster is a group of items with the same key.
+ * ClusterNode is a node in the grouping tree.
+ * For leaf level, items contains the grouped elements.
+ * For intermediate levels, children contains the sub-clusters.
  */
-export class Cluster {
-    key: string
-    items: any[] = []
-}
-
-/*
- * Clusters is an ordered list of clusters, where the order is determined by the cluster key.
- * The order can be ascending (ex: names) or descending (ex: dates).
- */
-export class Clusters {
-    clusters: Cluster[] = []
-
-    // Function to get the key of the group
-    keyFunction: (record: any) => string
-
-    // Ordering of the keys
-    ordering: 'ASC' | 'DESC'
-
-    constructor(
-        keyFunction: (record: any) => string,
-        ordering: 'ASC' | 'DESC' = 'DESC'
-    ) {
-        this.keyFunction = keyFunction
-        this.ordering = ordering
-    }
-
-    findCluster(key: string) {
-        return this.clusters.find((cluster) => cluster.key === key)
-    }
-
-    clear() {
-        this.clusters = []
-    }
-
-    findItemById(id: number | string) {
-        for (const cluster of this.clusters) {
-            const item = cluster.items.find((item: any) => item.id === id)
-            if (item) {
-                return item
-            }
-        }
-        return null
-    }
-
-    sortByKey() {
-        this.clusters.sort((a, b) => {
-            if (this.ordering === 'ASC') {
-                return a.key.localeCompare(b.key)
-            } else {
-                return b.key.localeCompare(a.key)
-            }
-        })
-    }
-
-    setItems(items: any[]) {
-        this.clusters.splice(0, this.clusters.length)
-
-        let mapClusterByKey = new Map()
-
-        for (const item of items) {
-            const key = this.keyFunction(item)
-
-            if (!mapClusterByKey.has(key)) {
-                mapClusterByKey.set(key, [])
-            }
-
-            mapClusterByKey.get(key).push(item)
-        }
-
-        for (const [key, items] of mapClusterByKey) {
-            this.clusters.push({
-                key: key,
-                items: items,
-            })
-        }
-
-        this.sortByKey()
-    }
-
-    getItems() {
-        return this.clusters.flatMap((cluster) => cluster.items)
-    }
-
-    getClusters() {
-        return this.clusters
-    }
-
-    addItem(item: any) {
-        const key = this.keyFunction(item)
-
-        if (!this.findCluster(key)) {
-            this.clusters.push({
-                key: key,
-                items: [item],
-            })
-        }
-        else {
-            this.findCluster(key).items.push(item)
-        }
-
-        this.sortByKey()
-    }
-
-    removeItem(item: any) {
-        const key = this.keyFunction(item)
-        let cluster = this.findCluster(key)
-        let index = -1
-
-        // Try finding by key first
-        if (cluster) {
-            index = cluster.items.findIndex((i: any) => i.id === item.id)
-        }
-
-        // Fallback: search all clusters by id (key may have changed after editing)
-        if (index === -1) {
-            for (const c of this.clusters) {
-                index = c.items.findIndex((i: any) => i.id === item.id)
-                if (index !== -1) {
-                    cluster = c
-                    break
-                }
-            }
-        }
-
-        if (cluster && index !== -1) {
-            cluster.items.splice(index, 1)
-
-            if (cluster.items.length === 0) {
-                const clusterIndex = this.clusters.findIndex((c) => c.key === cluster.key)
-                this.clusters.splice(clusterIndex, 1)
-            }
-        }
-
-        this.sortByKey()
-    }
-}
-
 export class ClusterNode {
     key: string = ''
     children: ClusterNode[] = []
     items: any[] = []
 }
 
-export class NestedClusters {
+/*
+ * Clusters is an ordered list of clusters, where the order is determined by the cluster key.
+ * It supports both single-level flat groupings (backwards compatible) and multi-level nested groupings.
+ */
+export class Clusters {
     nodes: ClusterNode[] = []
     keyFunctions: Array<(record: any) => string>
     orderings: Array<'ASC' | 'DESC'>
 
     constructor(
-        keyFunctions: Array<(record: any) => string>,
-        orderings: Array<'ASC' | 'DESC'> = ['DESC']
+        keyFunctionOrArray: ((record: any) => string) | Array<(record: any) => string>,
+        orderingOrArray: 'ASC' | 'DESC' | Array<'ASC' | 'DESC'> = 'DESC'
     ) {
-        this.keyFunctions = keyFunctions
-        this.orderings = orderings
+        if (Array.isArray(keyFunctionOrArray)) {
+            this.keyFunctions = keyFunctionOrArray
+        } else {
+            this.keyFunctions = [keyFunctionOrArray]
+        }
+
+        if (Array.isArray(orderingOrArray)) {
+            this.orderings = orderingOrArray
+        } else {
+            this.orderings = [orderingOrArray]
+        }
     }
 
     clear() {
         this.nodes.splice(0, this.nodes.length)
     }
 
-    getClusters() {
-        return this.nodes
+    findCluster(key: string): ClusterNode | undefined {
+        return this.nodes.find((node) => node.key === key)
+    }
+
+    findItemById(id: number | string): any | null {
+        return this._findItemInNodes(this.nodes, id, 0)
+    }
+
+    _findItemInNodes(nodes: ClusterNode[], id: number | string, levelIndex: number): any | null {
+        for (const node of nodes) {
+            if (levelIndex === this.keyFunctions.length - 1) {
+                const item = node.items.find((item: any) => item.id === id)
+                if (item) return item
+            } else {
+                const item = this._findItemInNodes(node.children, id, levelIndex + 1)
+                if (item) return item
+            }
+        }
+        return null
     }
 
     setItems(items: any[]) {
@@ -203,23 +98,6 @@ export class NestedClusters {
         return nodes
     }
 
-    findItemById(id: number | string): any | null {
-        return this._findItemInNodes(this.nodes, id, 0)
-    }
-
-    _findItemInNodes(nodes: ClusterNode[], id: number | string, levelIndex: number): any | null {
-        for (const node of nodes) {
-            if (levelIndex === this.keyFunctions.length - 1) {
-                const item = node.items.find((item: any) => item.id === id)
-                if (item) return item
-            } else {
-                const item = this._findItemInNodes(node.children, id, levelIndex + 1)
-                if (item) return item
-            }
-        }
-        return null
-    }
-
     getItems(): any[] {
         return this._collectItems(this.nodes, 0)
     }
@@ -229,6 +107,10 @@ export class NestedClusters {
             return nodes.flatMap(n => n.items)
         }
         return nodes.flatMap(n => this._collectItems(n.children, levelIndex + 1))
+    }
+
+    getClusters() {
+        return this.nodes
     }
 
     addItem(item: any) {
@@ -312,4 +194,3 @@ export class NestedClusters {
         return false
     }
 }
-

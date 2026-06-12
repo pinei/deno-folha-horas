@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert';
-import { Clusters, NestedClusters } from './clusters';
+import { Clusters } from './clusters';
 
 describe('Clusters', () => {
     test('should initialize empty', () => {
@@ -110,9 +110,9 @@ describe('Clusters', () => {
     });
 });
 
-describe('NestedClusters', () => {
+describe('Clusters (nested)', () => {
     test('should initialize empty', () => {
-        const clusters = new NestedClusters([
+        const clusters = new Clusters([
             (item: any) => item.week,
             (item: any) => item.date
         ]);
@@ -121,7 +121,7 @@ describe('NestedClusters', () => {
     });
 
     test('addItem and setItems should group recursively and sort correctly', () => {
-        const clusters = new NestedClusters([
+        const clusters = new Clusters([
             (item: any) => item.week,
             (item: any) => item.date
         ], ['DESC', 'DESC']);
@@ -157,7 +157,7 @@ describe('NestedClusters', () => {
     });
 
     test('removeItem should clean up empty branches recursively', () => {
-        const clusters = new NestedClusters([
+        const clusters = new Clusters([
             (item: any) => item.week,
             (item: any) => item.date
         ], ['DESC', 'DESC']);
@@ -179,7 +179,7 @@ describe('NestedClusters', () => {
     });
 
     test('findItemById', () => {
-        const clusters = new NestedClusters([
+        const clusters = new Clusters([
             (item: any) => item.week,
             (item: any) => item.date
         ]);
