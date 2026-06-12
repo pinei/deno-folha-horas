@@ -31,15 +31,20 @@
                 <!-- Tab Menu for the Day -->
                 <div class="ui top attached tabular menu">
                     <div class="active item">
+                        <i class="calendar alternate outline icon"></i>
                         {{ dayNode.key }}
-                        <div class="ui basic olive label" style="margin-left: 0.5em;">
-                            {{ dayOfWeek(dayNode.key) }}
+                    </div>
+                    <div class="right menu">
+                        <div class="item">
+                            <div class="ui basic medium olive label">
+                                {{ dayOfWeek(dayNode.key) }}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tab Segment for the Day's Timesheets -->
-                <div class="ui bottom attached active tab segment" style="position: relative;">
+                <div class="ui bottom attached active tab segment">
                     <table class="ui very basic selectable compact table">
                     <thead>
                     <tr>
@@ -60,7 +65,9 @@
                         <td @click="editRecord(record)">
                             <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
                                 <h5 v-if="record.context">{{ record.context }}</h5>
-                                <button class="ui mini button" @click.stop="openSelectKanbanCard(record)">No issue</button>
+                                <button class="ui mini circular tiny grey basic icon button" @click.stop="openSelectKanbanCard(record)" data-tooltip="Link issue">
+                                    <i class="linkify icon"></i>
+                                </button>
                             </div>
                             <h5 v-else-if="record.context">{{ record.context }}</h5>
 
@@ -74,7 +81,7 @@
                     <tfoot class="full-width">
                     <tr>
                         <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(dayNode.items))">= <b>{{ timesheetStore.totalTimeSpent(dayNode.items) }}</b></span></th>
-                        <th colspan="2" style="text-align: right; padding-right: 0.5em;">
+                        <th colspan="2" style="text-align: right;">
                             <button class="ui mini primary circular icon button" @click="addRecord({ key: dayNode.key })" data-tooltip="Add record">
                                 <i class="plus icon"></i> 
                             </button>
