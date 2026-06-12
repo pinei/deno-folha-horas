@@ -27,59 +27,62 @@
             </h3>
 
             <!-- 2nd Level: Group by Day within the Week -->
-            <div v-for="dayNode in weekNode.children" :key="dayNode.key" class="ui form" style="margin-top: 1.5em; position: relative;">
-                <h4 class="ui header">
-                    {{ dayNode.key }}
-                    <div class="ui basic olive label" style="margin-left: 0.5em;">
-                        {{ dayOfWeek(dayNode.key) }}
-                    </div>
-                </h4>
-
-                <table class="ui selectable compact table">
-                <thead>
-                <tr>
-                    <th class="one wide" data-tooltip="Time (effort)"><i class="clock outline icon"></i></th>
-                    <th class="one wide" data-tooltip="Category"><i class="tag icon"></i></th>
-                    <th class="fourteen wide" data-tooltip="Description"><i class="align left icon"></i></th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr v-if="!(dayNode.items?.length > 0)">
-                    <td colspan="4">No records</td>
-                </tr>
-
-                <tr v-for="record in dayNode.items" :key="record.id">
-                    <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
-                    <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
-                    <td @click="editRecord(record)">
-                        <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
-                            <h5 v-if="record.context">{{ record.context }}</h5>
-                            <button class="ui mini button" @click.stop="openSelectKanbanCard(record)">No issue</button>
+            <div v-for="dayNode in weekNode.children" :key="dayNode.key" style="margin-top: 1.5em;">
+                <!-- Tab Menu for the Day -->
+                <div class="ui top attached tabular menu">
+                    <div class="active item">
+                        {{ dayNode.key }}
+                        <div class="ui basic olive label" style="margin-left: 0.5em;">
+                            {{ dayOfWeek(dayNode.key) }}
                         </div>
-                        <h5 v-else-if="record.context">{{ record.context }}</h5>
+                    </div>
+                </div>
 
-                        <p v-for="line in parseDescription(record.description)">
-                            <span v-html="line"></span>
-                        </p>
-                    </td>
-                </tr>
-                </tbody>
+                <!-- Tab Segment for the Day's Timesheets -->
+                <div class="ui bottom attached active tab segment" style="position: relative;">
+                    <table class="ui very basic selectable compact table">
+                    <thead>
+                    <tr>
+                        <th class="one wide" data-tooltip="Time (effort)"><i class="clock outline icon"></i></th>
+                        <th class="one wide" data-tooltip="Category"><i class="tag icon"></i></th>
+                        <th class="fourteen wide" data-tooltip="Description"><i class="align left icon"></i></th>
+                    </tr>
+                    </thead>
 
-                <tfoot class="full-width">
-                <tr>
-                    <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(dayNode.items))">= <b>{{ timesheetStore.totalTimeSpent(dayNode.items) }}</b></span></th>
-                    <th colspan="2">
-                        <!-- Reservado -->
-                    </th>
-                </tr>
-                </tfoot>
+                    <tbody>
+                    <tr v-if="!(dayNode.items?.length > 0)">
+                        <td colspan="4">No records</td>
+                    </tr>
 
-                </table>
-                <div class="ui custom-add-button">
-                    <button class="ui mini primary circular icon button" @click="addRecord({ key: dayNode.key })" data-tooltip="Add record">
-                        <i class="plus icon"></i> 
-                    </button>
+                    <tr v-for="record in dayNode.items" :key="record.id">
+                        <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
+                        <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
+                        <td @click="editRecord(record)">
+                            <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
+                                <h5 v-if="record.context">{{ record.context }}</h5>
+                                <button class="ui mini button" @click.stop="openSelectKanbanCard(record)">No issue</button>
+                            </div>
+                            <h5 v-else-if="record.context">{{ record.context }}</h5>
+
+                            <p v-for="line in parseDescription(record.description)">
+                                <span v-html="line"></span>
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                    <tfoot class="full-width">
+                    <tr>
+                        <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(dayNode.items))">= <b>{{ timesheetStore.totalTimeSpent(dayNode.items) }}</b></span></th>
+                        <th colspan="2" style="text-align: right; padding-right: 0.5em;">
+                            <button class="ui mini primary circular icon button" @click="addRecord({ key: dayNode.key })" data-tooltip="Add record">
+                                <i class="plus icon"></i> 
+                            </button>
+                        </th>
+                    </tr>
+                    </tfoot>
+
+                    </table>
                 </div>
             </div>
         </div>
@@ -252,10 +255,16 @@ span.ui.tag.label {
     padding-left: 1em;
     padding-right: 1em;
 }
+#timesheet-panel .ui.segment {
+    padding-bottom: 0;
+}
 
-#timesheet-panel div.ui.custom-add-button {
-    position: absolute;
-    bottom: 0.5em;
-    right: -3em;
+#timesheet-panel table {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#timesheet-panel {
+    padding-bottom: 0.8em;
 }
 </style>
