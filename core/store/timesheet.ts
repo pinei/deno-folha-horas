@@ -146,7 +146,7 @@ class TimesheetStore {
         assert(database.lastInsertRowId > 0, 'Row ID should be greater than zero');
 
         record.id = database.lastInsertRowId
-        return record
+        return this.getRecord(record.id)
     }
 
     _updateRecord(record: TimesheetRecord): TimesheetRecord {
@@ -158,7 +158,7 @@ class TimesheetStore {
         const changes = database.update('TIMESHEET', fields, values, `ID = ${record.id}`);
 
         assert(changes > 0, 'Changes should be greater than zero');
-        return record
+        return this.getRecord(record.id)
     }
 
     mergeRecord(record: TimesheetRecord): TimesheetRecord {
@@ -180,6 +180,10 @@ class TimesheetStore {
         const changes = database.update('TIMESHEET', ['KANBAN_CARD_ID'], [kanbanCardId], `ID = ${timesheetId}`);
         assert(changes > 0, 'Changes should be greater than zero');
 
+        return this.getRecord(timesheetId)
+    }
+
+    getRecord(id: number): TimesheetRecord {
         const sql = `select
                 t.*,
                 strftime('W%V', t.DATE) as WEEK,
@@ -190,10 +194,11 @@ class TimesheetStore {
                 k.DELIVERIES as KANBAN_DELIVERIES
             from TIMESHEET t
             left join KANBAN_CARD k on t.KANBAN_CARD_ID = k.ID
-            where t.ID = @timesheetId`
+            where t.ID = @id`
 
         const stmt = database.prepare(sql);
-        const result: any = stmt.get({ '@timesheetId': timesheetId });
+        const result: any = stmt.get({ '@id': id });
+        assert(result, `Record not found for id ${id}`);
 
         return new TimesheetRecord({
             id: result.ID,
