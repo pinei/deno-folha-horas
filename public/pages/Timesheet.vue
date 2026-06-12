@@ -20,66 +20,68 @@
             </button>
         </div>
 
-        <!-- <div v-for="cluster in timesheetStore.clusters" :key="cluster.key" style="position: relative"> -->
-        <div v-for="cluster in timesheetStore.clusters" :key="cluster.key" class="ui form">
+        <!-- 1st Level: Group by Week -->
+        <div v-for="weekNode in timesheetStore.clusters" :key="weekNode.key">
+            <h3 class="ui" style="margin-top: 2em; margin-bottom: 1em; color: #333;">
+                <i class="calendar alternate outline icon"></i> {{ weekNode.key }}
+            </h3>
 
-            <h4 class="ui header">
-                {{ getClusterDate(cluster.key) }}
-                <div class="ui basic olive label" style="margin-left: 0.5em;">
-                    {{ dayOfWeek(getClusterDate(cluster.key)) }}
-                </div>
-                <div class="ui basic grey label" v-if="getClusterWeek(cluster.key)" style="margin-left: 0.5em;">
-                    {{ getClusterWeek(cluster.key) }}
-                </div>
-            </h4>
-
-            <table class="ui selectable compact table">
-            <thead>
-            <tr>
-                <th class="one wide" data-tooltip="Time (effort)"><i class="clock outline icon"></i></th>
-                <th class="one wide" data-tooltip="Category"><i class="tag icon"></i></th>
-                <th class="fourteen wide" data-tooltip="Description"><i class="align left icon"></i></th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr v-if="!(cluster.items?.length > 0)">
-                <td colspan="4">No records</td>
-            </tr>
-
-            <tr v-for="record in cluster.items" :key="record.id">
-                <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
-                <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
-                <td @click="editRecord(record)">
-                    <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
-                        <h5 v-if="record.context">{{ record.context }}</h5>
-                        <button class="ui mini button" @click.stop="openSelectKanbanCard(record)">No issue</button>
+            <!-- 2nd Level: Group by Day within the Week -->
+            <div v-for="dayNode in weekNode.children" :key="dayNode.key" class="ui form" style="margin-top: 1.5em; position: relative;">
+                <h4 class="ui header">
+                    {{ dayNode.key }}
+                    <div class="ui basic olive label" style="margin-left: 0.5em;">
+                        {{ dayOfWeek(dayNode.key) }}
                     </div>
-                    <h5 v-else-if="record.context">{{ record.context }}</h5>
+                </h4>
 
-                    <p v-for="line in parseDescription(record.description)">
-                        <span v-html="line"></span>
-                    </p>
-                </td>
-            </tr>
-            </tbody>
+                <table class="ui selectable compact table">
+                <thead>
+                <tr>
+                    <th class="one wide" data-tooltip="Time (effort)"><i class="clock outline icon"></i></th>
+                    <th class="one wide" data-tooltip="Category"><i class="tag icon"></i></th>
+                    <th class="fourteen wide" data-tooltip="Description"><i class="align left icon"></i></th>
+                </tr>
+                </thead>
 
-            <tfoot class="full-width">
-            <tr>
-                <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(cluster.items))">= <b>{{ timesheetStore.totalTimeSpent(cluster.items) }}</b></span></th>
-                <th colspan="2">
-                    <!-- Reservado -->
-                </th>
-            </tr>
-            </tfoot>
+                <tbody>
+                <tr v-if="!(dayNode.items?.length > 0)">
+                    <td colspan="4">No records</td>
+                </tr>
 
-            </table>
-            <div class="ui custom-add-button">
-                <button class="ui mini primary circular icon button" @click="addRecord(cluster)" data-tooltip="Add record">
-                    <i class="plus icon"></i> 
-                </button>
+                <tr v-for="record in dayNode.items" :key="record.id">
+                    <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
+                    <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
+                    <td @click="editRecord(record)">
+                        <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
+                            <h5 v-if="record.context">{{ record.context }}</h5>
+                            <button class="ui mini button" @click.stop="openSelectKanbanCard(record)">No issue</button>
+                        </div>
+                        <h5 v-else-if="record.context">{{ record.context }}</h5>
+
+                        <p v-for="line in parseDescription(record.description)">
+                            <span v-html="line"></span>
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+
+                <tfoot class="full-width">
+                <tr>
+                    <th><span class="ui circular label inverted large" :class="timeSpentClass(timesheetStore.totalTimeSpent(dayNode.items))">= <b>{{ timesheetStore.totalTimeSpent(dayNode.items) }}</b></span></th>
+                    <th colspan="2">
+                        <!-- Reservado -->
+                    </th>
+                </tr>
+                </tfoot>
+
+                </table>
+                <div class="ui custom-add-button">
+                    <button class="ui mini primary circular icon button" @click="addRecord({ key: dayNode.key })" data-tooltip="Add record">
+                        <i class="plus icon"></i> 
+                    </button>
+                </div>
             </div>
-
         </div>
     </div>
 </template>

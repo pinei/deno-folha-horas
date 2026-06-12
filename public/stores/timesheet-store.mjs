@@ -2,14 +2,17 @@ import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 import timesheetService from '../services/timesheet-api.mjs'
 
-import { Clusters } from '../domain/clusters.ts'
+import { NestedClusters } from '../domain/clusters.ts'
 
 export const useTimesheetStore = defineStore('timesheet', () => {
     console.log('Setting up Timesheet Store...')
 
     const currentDate = ref(new Date())
 
-    const clusters = reactive(new Clusters((item) => item.week ? `${item.date}|${item.week}` : `${item.date}|`, 'DESC'))
+    const clusters = reactive(new NestedClusters([
+        (item) => item.week || 'Sem Semana',
+        (item) => item.date || 'Sem Data'
+    ], ['DESC', 'DESC']))
 
     const summary = ref({
         categories: [],

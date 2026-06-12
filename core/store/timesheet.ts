@@ -62,7 +62,7 @@ class TimesheetStore {
 
         let sql = `select
                 t.*,
-                strftime('W%V', t.DATE) as WEEK,
+                strftime('%Y-W%V', t.DATE) as WEEK,
                 k.ISSUE as KANBAN_ISSUE,
                 k.DESCRIPTION as KANBAN_DESCRIPTION,
                 k.STATUS as KANBAN_STATUS,
@@ -186,7 +186,7 @@ class TimesheetStore {
     getRecord(id: number): TimesheetRecord {
         const sql = `select
                 t.*,
-                strftime('W%V', t.DATE) as WEEK,
+                strftime('%Y-W%V', t.DATE) as WEEK,
                 k.ISSUE as KANBAN_ISSUE,
                 k.DESCRIPTION as KANBAN_DESCRIPTION,
                 k.STATUS as KANBAN_STATUS,
