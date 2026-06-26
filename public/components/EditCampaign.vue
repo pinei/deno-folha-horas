@@ -1,9 +1,9 @@
 <template>
-	<div id="edit-campaign" class="ui modal">
+	<div id="edit-campaign" class="ui modal" :class="{ inverted: themeStore.isDark }">
 	  <i class="close icon"></i>
 	  <div class="header">{{ state.campaign.id ? `Campaign (id=${state.campaign.id})` : "New Campaign" }}</div>
 	  <div class="content">
-		<form class="ui form">
+		<form class="ui form" :class="{ inverted: themeStore.isDark }">
 			<div class="field" :class="isValidName || 'error'">
 				<label>Name / Title</label>
 				<input type="text" name="name" v-model="state.campaign.name">
@@ -24,18 +24,18 @@
 				</div>
 				<div class="five wide field">
 					<label>Start Date</label>
-					<div class="ui calendar" id="campaign-start-calendar">
-						<div class="ui input left icon">
-							<i class="calendar icon"></i>
+					<div class="ui calendar" :class="{ inverted: themeStore.isDark }" id="campaign-start-calendar">
+						<div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+							<i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
 							<input type="text" placeholder="Start Date" name="startDate">
 						</div>
 					</div>
 				</div>
 				<div class="five wide field">
 					<label>End Date</label>
-					<div class="ui calendar" id="campaign-end-calendar">
-						<div class="ui input left icon">
-							<i class="calendar icon"></i>
+					<div class="ui calendar" :class="{ inverted: themeStore.isDark }" id="campaign-end-calendar">
+						<div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+							<i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
 							<input type="text" placeholder="End Date" name="endDate">
 						</div>
 					</div>
@@ -65,6 +65,9 @@
 
 <script setup>
 import { defineEmits, defineModel, computed, watch, onMounted, onUnmounted, reactive } from 'vue';
+import { useThemeStore } from '../stores/theme-store.mjs';
+
+const themeStore = useThemeStore();
 
 const log = (message, object) => {
 	if (object)

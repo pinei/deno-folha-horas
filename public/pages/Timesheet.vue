@@ -22,7 +22,7 @@
 
         <!-- 1st Level: Group by Week -->
         <div v-for="weekNode in timesheetStore.clusters" :key="weekNode.key">
-            <h3 class="ui" style="margin-top: 2em; margin-bottom: 1em; color: #333;">
+            <h3 class="ui timesheet-week-header" style="margin-top: 2em; margin-bottom: 1em;">
                 <i class="calendar alternate outline icon"></i> {{ weekNode.key }}
             </h3>
 
@@ -35,7 +35,7 @@
                     </div>
                     <div class="right menu">
                         <div class="item">
-                            <div class="ui basic medium olive label">
+                            <div class="ui basic medium olive label" :class="{ inverted: themeStore.isDark }">
                                 {{ dayOfWeek(dayNode.key) }}
                             </div>
                         </div>
@@ -43,8 +43,8 @@
                 </div>
 
                 <!-- Tab Segment for the Day's Timesheets -->
-                <div class="ui bottom attached active tab segment">
-                    <table class="ui very basic selectable compact table">
+                <div class="ui bottom attached active tab segment" :class="{ inverted: themeStore.isDark }">
+                    <table class="ui very basic selectable compact table" :class="{ inverted: themeStore.isDark }">
                     <thead>
                     <tr>
                         <th class="one wide" data-tooltip="Time (effort)"><i class="clock outline icon"></i></th>
@@ -60,7 +60,7 @@
 
                     <tr v-for="record in dayNode.items" :key="record.id">
                         <td @click="editRecord(record)"><span class="ui circular olive label inverted large">{{ record.timeSpent }}</span></td>
-                        <td @click="editRecord(record)"><span class="ui label" :class="categoryClass(record.category)">{{ record.category }}</span></td>
+                        <td @click="editRecord(record)"><span class="ui label" :class="[categoryClass(record.category), { inverted: themeStore.isDark }]">{{ record.category }}</span></td>
                         <td @click="editRecord(record)">
                             <div v-if="!record.kanbanCard" style="display: flex; justify-content: space-between;">
                                 <h5 v-if="record.context">{{ record.context }}</h5>
@@ -101,6 +101,9 @@ import { useTimesheetStore } from '../stores/timesheet-store.mjs';
 import { useCategoryStore } from '../stores/category-store.mjs';
 import { useParseDescription } from '../composables/useParseDescription.mjs';
 import SelectKanbanCard from '../components/SelectKanbanCard.vue';
+import { useThemeStore } from '../stores/theme-store.mjs';
+
+const themeStore = useThemeStore();
 
 const { parseDescription } = useParseDescription();
 

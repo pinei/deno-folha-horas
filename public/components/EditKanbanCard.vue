@@ -1,22 +1,22 @@
 <template>
-	<div id="edit-kanban-card" class="ui modal">
+	<div id="edit-kanban-card" class="ui modal" :class="{ inverted: themeStore.isDark }">
 	  <i class="close icon"></i>
 	  <div class="header">{{ state.card.id ? `Card (id=${state.card.id})` : "New Card" }}</div>
 	  <div class="scrolling content">
 		<!-- Tabs Menu -->
-		<div class="ui top attached tabular menu">
+		<div class="ui top attached tabular menu" :class="{ inverted: themeStore.isDark }">
 			<a class="item active" data-tab="issue-tab">Issue</a>
 			<a class="item" data-tab="timesheets-tab">
 				Timesheets 
-				<span class="ui circular small label" v-if="state.card.timesheets && state.card.timesheets.length > 0">
+				<span class="ui circular small label" :class="{ inverted: themeStore.isDark }" v-if="state.card.timesheets && state.card.timesheets.length > 0">
 					{{ state.card.timesheets.length }}
 				</span>
 			</a>
 		</div>
 
 		<!-- Tab 1: Issue -->
-		<div class="ui bottom attached tab segment active" data-tab="issue-tab">
-			<form class="ui form">
+		<div class="ui bottom attached tab segment active" :class="{ inverted: themeStore.isDark }" data-tab="issue-tab">
+			<form class="ui form" :class="{ inverted: themeStore.isDark }">
 				<div class="field">
 					<label>Campaign</label>
 					<select class="ui dropdown" name="campaignId" v-model="state.card.campaignId" id="card-campaign-dropdown">
@@ -53,7 +53,7 @@
 		</div>
 
 		<!-- Tab 2: Timesheets -->
-		<div class="ui bottom attached tab segment" data-tab="timesheets-tab">
+		<div class="ui bottom attached tab segment" :class="{ inverted: themeStore.isDark }" data-tab="timesheets-tab">
 			<TimesheetsFromKanbanCard
 				:timesheets="state.card.timesheets"
 				:categories="state.categories"
@@ -78,10 +78,12 @@ import { useCampaignStore } from '../stores/campaign-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
 import TimesheetsFromKanbanCard from './TimesheetsFromKanbanCard.vue';
 import { usePaste } from '../composables/usePaste.mjs';
+import { useThemeStore } from '../stores/theme-store.mjs';
 
 const categoryStore = useCategoryStore();
 const campaignStore = useCampaignStore();
 const { handlePaste } = usePaste();
+const themeStore = useThemeStore();
 
 const log = (message, object) => {
 	if (object)

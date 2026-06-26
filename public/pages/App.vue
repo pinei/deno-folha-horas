@@ -1,13 +1,16 @@
 <script>
+import { useThemeStore } from '../stores/theme-store.mjs'
+
 export default {
-  data() {
-    return { }
-    }
+  setup() {
+    const themeStore = useThemeStore()
+    return { themeStore }
+  }
 }
 </script>
 
 <template>
-    <div class="ui fixed menu">
+    <div class="ui fixed menu" :class="{ inverted: themeStore.isDark }">
         <div class="ui container">
             <a href="#" class="header item">
             <img class="logo" src="/images/petrobras-8-logo-svg-vector.svg">
@@ -32,6 +35,13 @@ export default {
                     <router-link to="/export" class="item">Export</router-link>
                     <router-link to="/import" class="item">Import</router-link>
                 </div>
+            </div>
+
+            <div class="right menu">
+                <a class="item" @click="themeStore.toggleTheme" title="Alterar Tema">
+                    <i class="moon icon" v-if="!themeStore.isDark"></i>
+                    <i class="sun icon" v-else></i>
+                </a>
             </div>
         </div>
     </div>

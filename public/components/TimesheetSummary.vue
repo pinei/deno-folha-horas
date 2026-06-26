@@ -1,10 +1,10 @@
 <template>
-    <div v-if="state.summary.total > 0" class="ui segment">
+    <div v-if="state.summary.total > 0" class="ui segment" :class="{ inverted: themeStore.isDark }">
         <div v-for="category of state.summary.categories" :key="category.name"
             :data-name="category.name"
             :data-value="category != null ? category.timeSpent : 0"
             :data-total="state.summary.total"
-            class="ui olive progress">
+            class="ui olive progress" :class="{ inverted: themeStore.isDark }">
             <div class="label">{{ category.name }}</div>
             <div class="bar">
                 <div class="progress"></div>
@@ -15,6 +15,9 @@
 
 <script setup>
 import { onMounted, watch, nextTick, reactive } from 'vue'
+import { useThemeStore } from '../stores/theme-store.mjs'
+
+const themeStore = useThemeStore()
 
 const log = (message, object) => {
 	if (object)

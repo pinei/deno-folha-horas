@@ -1,23 +1,23 @@
 <template>
-	<div id="edit-timesheet" class="ui modal">
+	<div id="edit-timesheet" class="ui modal" :class="{ inverted: themeStore.isDark }">
 	  <i class="close icon"></i>
 	  <div class="header">{{ state.record.id ? `Timesheet (id=${state.record.id})` : "New Timesheet" }}</div>
 	  <div class="content">
 		<!-- Tab menu -->
-		<div class="ui top attached tabular menu">
+		<div class="ui top attached tabular menu" :class="{ inverted: themeStore.isDark }">
 			<a class="item active" data-tab="timesheet">Timesheet</a>
 			<a class="item" data-tab="issue" v-if="state.record.kanbanCard">Issue</a>
 		</div>
 
 		<!-- Timesheet tab -->
-		<div class="ui bottom attached tab segment active" data-tab="timesheet">
-		<form class="ui form">
+		<div class="ui bottom attached tab segment active" :class="{ inverted: themeStore.isDark }" data-tab="timesheet">
+		<form class="ui form" :class="{ inverted: themeStore.isDark }">
 		<div class="fields">
 			<div class="four wide field" :class="isValidDate || 'error'">
 				<label>Data</label>
-				<div class="ui calendar">
-					<div class="ui input left icon">
-						<i class="calendar icon"></i>
+				<div class="ui calendar" :class="{ inverted: themeStore.isDark }">
+					<div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+						<i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
 						<input type="text" placeholder="Select a date" name="date">
 					</div>
 				</div>
@@ -44,8 +44,8 @@
 		</div>
 
 		<!-- Issue tab -->
-		<div class="ui bottom attached tab segment" data-tab="issue" v-if="state.record.kanbanCard">
-		<form class="ui form">
+		<div class="ui bottom attached tab segment" :class="{ inverted: themeStore.isDark }" data-tab="issue" v-if="state.record.kanbanCard">
+		<form class="ui form" :class="{ inverted: themeStore.isDark }">
 			<div class="field">
 				<label>Issue</label>
 				<input type="text" readonly :value="state.record.kanbanCard.issue">
@@ -63,7 +63,7 @@
 				<textarea rows="2" readonly :value="state.record.kanbanCard.deliveries"></textarea>
 			</div>
 			<div class="ui divider"></div>
-			<button type="button" class="ui red basic button" @click="unlinkIssue">
+			<button type="button" class="ui red basic button" :class="{ inverted: themeStore.isDark }" @click="unlinkIssue">
 				<i class="unlink icon"></i> Unlink
 			</button>
 		</form>
@@ -82,9 +82,11 @@ import { defineEmits, computed, watch, onMounted, onUnmounted, ref, reactive } f
 import { useCategoryStore } from '../stores/category-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
 import { usePaste } from '../composables/usePaste.mjs';
+import { useThemeStore } from '../stores/theme-store.mjs';
 
 const categoryStore = useCategoryStore();
 const { handlePaste } = usePaste();
+const themeStore = useThemeStore();
 
 const log = (message, object) => {
 	if (object)

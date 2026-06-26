@@ -1,5 +1,5 @@
 <template>
-    <div :id="dropdownId" class="ui fluid multiple search selection dropdown">
+    <div :id="dropdownId" class="ui fluid multiple search selection dropdown" :class="{ inverted: themeStore.isDark }">
         <input type="hidden" name="categories">
         <i class="dropdown icon"></i>
         <div class="default text">Select Categories</div>
@@ -14,6 +14,9 @@
 <script setup>
 import { onMounted, watch, defineModel, nextTick } from 'vue'
 import { useCategoryStore } from '../stores/category-store.mjs'
+import { useThemeStore } from '../stores/theme-store.mjs'
+
+const themeStore = useThemeStore()
 
 const categoryStore = useCategoryStore()
 

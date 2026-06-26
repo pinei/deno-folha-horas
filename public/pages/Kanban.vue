@@ -11,8 +11,8 @@
         <h1 class="ui header">Kanban</h1>
         
         <div class="ui four column stackable grid">
-            <div class="column vertical-lane" v-for="lane in kanbanStore.buckets.getBuckets()" :key="lane">
-                <div class="ui segment" :style="{ backgroundColor: lane.color }" 
+            <div class="column vertical-lane" v-for="lane in kanbanStore.buckets.getBuckets()" :key="lane.name">
+                <div class="ui segment" :class="{ inverted: themeStore.isDark }" :style="laneStyle(lane)" 
                      @drop="onDrop($event, lane.name)" 
                      @dragover.prevent 
                      @dragenter.prevent>
@@ -32,10 +32,10 @@
                             </h4>
                             <h4 class="ui header kanban-group-header" v-else>
                                 {{ getClusterDate(cluster.key) }}
-                                <div class="ui basic olive label" style="margin-left: 0.5em;">
+                                <div class="ui basic olive label" :class="{ inverted: themeStore.isDark }" style="margin-left: 0.5em;">
                                     {{ dayOfWeek(getClusterDate(cluster.key)) }}
                                 </div>
-                                <div class="ui basic grey label" v-if="getClusterWeek(cluster.key)" style="margin-left: 0.5em;">
+                                <div class="ui basic grey label" :class="{ inverted: themeStore.isDark }" v-if="getClusterWeek(cluster.key)" style="margin-left: 0.5em;">
                                     {{ getClusterWeek(cluster.key) }}
                                 </div>
                             </h4>
@@ -61,7 +61,7 @@
         <!-- Search archived cards -->
         <div style="text-align: center;">
             <div class="ui search" style="display: inline-block;">
-                <div class="ui icon input" style="width: 350px;">
+                <div class="ui icon input" :class="{ inverted: themeStore.isDark }" style="width: 350px;">
                     <input class="prompt" type="text" placeholder="Pesquisar cards arquivados" v-model="searchQuery" @input="searchArchivedCards">
                     <i class="search icon"></i>
                 </div>
@@ -88,6 +88,7 @@
 
 <script>
 import { useKanbanStore } from '../stores/kanban-store.mjs'
+import { useThemeStore } from '../stores/theme-store.mjs'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
 import KanbanCard from '../components/KanbanCard.vue'
 import kanbanApi from '../services/kanban-api.mjs'
@@ -110,7 +111,8 @@ export default {
     },
     setup() {
         const dragAndDrop = useKanbanDragAndDrop();
-        return { dragAndDrop, draggedCardId: dragAndDrop.draggedCardId };
+        const themeStore = useThemeStore();
+        return { dragAndDrop, draggedCardId: dragAndDrop.draggedCardId, themeStore };
     },
     data() {
         return {
@@ -211,6 +213,33 @@ export default {
                 return days[day];
             }
             return key;
+        },
+        laneStyle(lane) {
+            const key = lane.name || lane.key;
+            if (this.themeStore.isDark) {
+                const darkColors = {
+                    'TO_DO': '#767676',       // Neutral / Gray
+                    'IN_PROGRESS': '#2185d0', // Blue
+                    'AWAITING': '#f2711c',    // Orange/Amber
+                    'DONE': '#21ba45'         // Green
+                };
+                const color = darkColors[key] || '#767676';
+                return {
+                    borderTop: `4px solid ${color}`,
+                    backgroundColor: 'transparent'
+                };
+            } else {
+                const lightColors = {
+                    'TO_DO': '#f4f5f7',
+                    'IN_PROGRESS': '#e5f1fb',
+                    'AWAITING': '#fdf4e6',
+                    'DONE': '#eef7ee'
+                };
+                const color = lightColors[key] || '#f4f5f7';
+                return {
+                    backgroundColor: color
+                };
+            }
         }
     },
     mounted() {

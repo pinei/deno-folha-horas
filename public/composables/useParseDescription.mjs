@@ -1,4 +1,8 @@
+import { useThemeStore } from '../stores/theme-store.mjs'
+
 export function useParseDescription() {
+    const themeStore = useThemeStore()
+
     const tagColor = (text) => {
         const colors = [
             'red', 'orange', 'yellow', 'olive', 'green', 'teal',
@@ -28,14 +32,16 @@ export function useParseDescription() {
         richText = richText.replace(regex, (match, space, tagWithHash) => {
             const tag = tagWithHash.substring(1);
             const color = tagColor(tag);
-            return `${space}<span class="ui ${color} tag label" style="margin-right: 0.3em;">${tag}</span>`;
+            const invertedClass = themeStore.isDark ? 'inverted' : '';
+            return `${space}<span class="ui ${color} ${invertedClass} tag label" style="margin-right: 0.3em;">${tag}</span>`;
         });
 
         // Attributes (inicio da linha ou logo apos espaço em branco: :attribute name:)
         const attrRegex = /(^|\s):([^:\r\n]+):/g;
         richText = richText.replace(attrRegex, (match, space, attrName) => {
             const color = tagColor(attrName);
-            return `${space}<div class="ui ${color} right pointing basic label">${attrName}</div>`;
+            const invertedClass = themeStore.isDark ? 'inverted' : '';
+            return `${space}<div class="ui ${color} ${invertedClass} right pointing basic label">${attrName}</div>`;
         });
 
         // Breadcrumbs (lines with " > " separators)
@@ -43,7 +49,8 @@ export function useParseDescription() {
             const parts = text.split(' > ').map(p => p.trim());
             const last = parts.pop();
             const sections = parts.map(p => `<div class="section">${p}</div><i class="right chevron icon divider"></i>`).join('');
-            return `${bullet || ''}<div class="ui breadcrumb">${sections}<div class="active section">${last}</div></div>`;
+            const invertedClass = themeStore.isDark ? 'inverted' : '';
+            return `${bullet || ''}<div class="ui ${invertedClass} breadcrumb">${sections}<div class="active section">${last}</div></div>`;
         });
 
         // Bullet lists
@@ -56,7 +63,8 @@ export function useParseDescription() {
                     return `<li${indent}>${text}</li>`;
                 });
             }).join('');
-            return `<ul class="ui bulleted list">${items}</ul>` + (endsWithNewline ? '\n' : '');
+            const invertedClass = themeStore.isDark ? 'inverted' : '';
+            return `<ul class="ui ${invertedClass} bulleted list">${items}</ul>` + (endsWithNewline ? '\n' : '');
         });
 
         // Múltiplas linhas

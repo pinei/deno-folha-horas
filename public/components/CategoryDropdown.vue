@@ -1,5 +1,5 @@
 <template>
-    <div :id="dropdownId" class="ui fluid selection dropdown">
+    <div :id="dropdownId" class="ui fluid selection dropdown" :class="{ inverted: themeStore.isDark }">
         <input type="hidden" name="category">
         <i class="dropdown icon"></i>
         <div class="default text">Select Category</div>
@@ -13,6 +13,9 @@
 
 <script setup>
 import { onMounted, watch, defineModel } from 'vue'
+import { useThemeStore } from '../stores/theme-store.mjs'
+
+const themeStore = useThemeStore()
 
 let _instanceCounter = 0
 

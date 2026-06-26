@@ -1,7 +1,7 @@
 <template>
-    <div ref="calendarEl" class="ui calendar">
-        <div class="ui input left icon">
-            <i class="calendar icon"></i>
+    <div ref="calendarEl" class="ui calendar" :class="{ inverted: themeStore.isDark }">
+        <div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+            <i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
             <input type="text">
         </div>
     </div>
@@ -9,6 +9,9 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useThemeStore } from '../stores/theme-store.mjs'
+
+const themeStore = useThemeStore()
 
 /*
  * To declare options like props and emits with full type inference support,

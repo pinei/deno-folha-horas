@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="extra content">
-            <span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="categoryClass(cat)">{{ cat }}</span>
+            <span v-for="cat in cardCategories(card)" :key="cat" class="ui label" :class="[categoryClass(cat), { inverted: themeStore.isDark }]">{{ cat }}</span>
             <span v-if="!simple" class="ui circular olive label inverted large right floated">{{ totalTimeSpent(card) }}</span>
         </div>
     </div>
@@ -28,9 +28,11 @@
 <script setup>
 import { useParseDescription } from '../composables/useParseDescription.mjs';
 import { useCategoryStore } from '../stores/category-store.mjs';
+import { useThemeStore } from '../stores/theme-store.mjs';
 
 const { parseDescription } = useParseDescription();
 const categoryStore = useCategoryStore();
+const themeStore = useThemeStore();
 
 defineProps({
     card: {

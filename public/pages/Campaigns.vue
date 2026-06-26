@@ -23,12 +23,12 @@
             </button>
         </h1>
         
-        <div class="ui segment mural" v-for="bucket in campaignStore.buckets.getBuckets()" :key="bucket.name">
+        <div class="ui segment mural" :class="{ inverted: themeStore.isDark }" v-for="bucket in campaignStore.buckets.getBuckets()" :key="bucket.name">
             <div class="ui grid">
                 <!-- 4 wide for Campaign info -->
                 <div class="four wide column campaign-info-col">
                     <div class="ui fluid card borderless-card" @click="editCampaign(bucket.campaign)" style="cursor: pointer; box-shadow: none; border: none; background: transparent;">
-                        <div class="content" style="padding-left: 0; padding-top: 0;">
+                        <div class="content">
                             <div class="header" style="font-size: 1.5em; margin-bottom: 0.5em;">{{ bucket.campaign.name }}</div>
                             <div class="meta" style="margin-bottom: 1em;">
                                 <span class="ui blue label">{{ bucket.campaign.type }}</span>
@@ -39,26 +39,39 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="extra content" v-if="bucket.campaign.startDate || bucket.campaign.endDate" style="padding-left: 0; border-top: none;">
-                            <i class="calendar icon"></i>
-                            <span v-if="bucket.campaign.startDate">{{ bucket.campaign.startDate }}</span>
-                            <span v-if="bucket.campaign.startDate && bucket.campaign.endDate"> a </span>
-                            <span v-if="bucket.campaign.endDate">{{ bucket.campaign.endDate }}</span>
+                        <div class="extra content" v-if="bucket.campaign.startDate || bucket.campaign.endDate" style="border-top: none; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div style="flex: 1; text-align: left;">
+                                <span v-if="bucket.campaign.startDate" data-tooltip="Data de início" data-position="top left">
+                                    <i class="hourglass start icon"></i>{{ bucket.campaign.startDate }}
+                                </span>
+                            </div>
+                            
+                            <div style="flex: 0 0 auto; text-align: center; padding: 0 0.5em;">
+                                <span v-if="getCampaignDurationDays(bucket.campaign) !== null" class="ui grey basic label" :class="{ inverted: themeStore.isDark }">
+                                    {{ getCampaignDurationDays(bucket.campaign) }} days
+                                </span>
+                            </div>
+                            
+                            <div style="flex: 1; text-align: right;">
+                                <span v-if="bucket.campaign.endDate" data-tooltip="Data de término" data-position="top right">
+                                    <i class="hourglass end icon"></i>{{ bucket.campaign.endDate }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 12 wide for Kanban Cards -->
                 <div class="twelve wide column">
-                    <div class="ui segment horizontal-lane"
+                    <div class="ui segment horizontal-lane" :class="{ inverted: themeStore.isDark }"
                          v-for="lane in [
-                             { key: 'TO_DO', label: 'To Do', color: '#f4f5f7' },
-                             { key: 'IN_PROGRESS', label: 'In Progress', color: '#e5f1fb' },
-                             { key: 'AWAITING', label: 'Awaiting', color: '#fdf4e6' },
-                             { key: 'DONE', label: 'Done', color: '#eef7ee' }
+                             { key: 'TO_DO', label: 'To Do' },
+                             { key: 'IN_PROGRESS', label: 'In Progress' },
+                             { key: 'AWAITING', label: 'Awaiting' },
+                             { key: 'DONE', label: 'Done' }
                          ]"
                          :key="lane.key"
-                         :style="{ backgroundColor: lane.color }"
+                         :style="laneStyle(lane)"
                          @drop="onDrop($event, lane.key, bucket.name)" 
                          @dragover.prevent 
                          @dragenter.prevent>
@@ -92,6 +105,7 @@
 
 <script>
 import { useCampaignStore } from '../stores/campaign-store.mjs'
+import { useThemeStore } from '../stores/theme-store.mjs'
 import EditCampaign from '../components/EditCampaign.vue'
 import EditKanbanCard from '../components/EditKanbanCard.vue'
 import KanbanCard from '../components/KanbanCard.vue'
@@ -108,7 +122,8 @@ export default {
     setup() {
         const { parseDescription } = useParseDescription();
         const dragAndDrop = useKanbanDragAndDrop();
-        return { parseDescription, dragAndDrop, draggedCardId: dragAndDrop.draggedCardId };
+        const themeStore = useThemeStore();
+        return { parseDescription, dragAndDrop, draggedCardId: dragAndDrop.draggedCardId, themeStore };
     },
     data() {
         return {
@@ -208,6 +223,43 @@ export default {
                     }
                 }
             }
+        },
+        laneStyle(lane) {
+            const key = lane.name || lane.key;
+            if (this.themeStore.isDark) {
+                const darkColors = {
+                    'TO_DO': '#767676',       // Neutral / Gray
+                    'IN_PROGRESS': '#2185d0', // Blue
+                    'AWAITING': '#f2711c',    // Orange/Amber
+                    'DONE': '#21ba45'         // Green
+                };
+                const color = darkColors[key] || '#767676';
+                return {
+                    borderTop: `4px solid ${color}`,
+                    backgroundColor: 'transparent'
+                };
+            } else {
+                const lightColors = {
+                    'TO_DO': '#f4f5f7',
+                    'IN_PROGRESS': '#e5f1fb',
+                    'AWAITING': '#fdf4e6',
+                    'DONE': '#eef7ee'
+                };
+                const color = lightColors[key] || '#f4f5f7';
+                return {
+                    backgroundColor: color
+                };
+            }
+        },
+        getCampaignDurationDays(campaign) {
+            if (!campaign.startDate || !campaign.endDate) return null;
+            const start = new Date(`${campaign.startDate}T00:00:00`);
+            const end = new Date(`${campaign.endDate}T00:00:00`);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
+            const diffTime = end.getTime() - start.getTime();
+            if (diffTime < 0) return 0;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            return diffDays;
         }
     },
     mounted() {
@@ -238,6 +290,10 @@ export default {
 .ui.segment.horizontal-lane {
     min-height: 150px;
     padding-bottom: 1em !important;
+}
+
+body.dark .ui.segment.mural {
+    background-color: #1b1c1d !important;
 }
 
 .campaigns-container .horizontal-lane > .ui.cards > .card {

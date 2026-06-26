@@ -1,11 +1,11 @@
 <template>
-    <div class="ui placeholder segment">
+    <div class="ui placeholder segment" :class="{ inverted: themeStore.isDark }">
         <div class="ui icon header">
             <i class="search icon"></i>
             Records by month or historical search by category and description
         </div>
 
-        <form class="ui form" id="search-panel" @submit.prevent>
+        <form class="ui form" id="search-panel" :class="{ inverted: themeStore.isDark }" @submit.prevent>
             <div class="fields">
                 <div class="two wide field">
                     <label>Month</label>
@@ -20,24 +20,25 @@
                 </div>
                 <div class="eight wide field">
                     <label>Search text</label>
-                    <div class="ui right labeled input">
+                    <div class="ui right labeled input" :class="{ inverted: themeStore.isDark }">
                         <input type="text" name="search-text" placeholder="Search terms..." v-model="state.searchText" @keydown.enter="$emit('search')">
-                        <div class="ui right attached icon button" @click="$emit('search')">
+                        <div class="ui right attached icon button" :class="{ inverted: themeStore.isDark }" @click="$emit('search')">
                             <i class="search icon"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-    </div>
-</template>
+    </div></template>
 
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue'
 import MultiCategoryDropdown from './MultiCategoryDropdown.vue'
 import { useCategoryStore } from '../stores/category-store.mjs'
+import { useThemeStore } from '../stores/theme-store.mjs'
 
 const categoryStore = useCategoryStore()
+const themeStore = useThemeStore()
 
 const props = defineProps({
     modelValue: Object, // { searchText: '', selectedCategories: [], calendarDate: Date }

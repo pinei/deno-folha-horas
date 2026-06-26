@@ -1,5 +1,5 @@
 <template>
-	<div id="select-kanban-card" class="ui modal">
+	<div id="select-kanban-card" class="ui modal" :class="{ inverted: themeStore.isDark }">
 	  <i class="close icon"></i>
 	  <div class="header">Select Issue</div>
 	  <div class="scrolling content">
@@ -42,6 +42,9 @@
 import { reactive, watch, onMounted, onUnmounted } from 'vue';
 import kanbanApi from '../services/kanban-api.mjs';
 import KanbanCard from '../components/KanbanCard.vue';
+import { useThemeStore } from '../stores/theme-store.mjs';
+
+const themeStore = useThemeStore();
 
 const log = (message, object) => {
 	if (object)

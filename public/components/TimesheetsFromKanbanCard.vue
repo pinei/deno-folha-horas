@@ -24,7 +24,7 @@
 					</div>
 				</div>
 				<div class="extra content" v-if="ts.category || ts.timeSpent">
-					<span class="ui label" :class="categoryClass(ts.category)" v-if="ts.category">{{ ts.category }}</span>
+					<span class="ui label" :class="[categoryClass(ts.category), { inverted: themeStore.isDark }]" v-if="ts.category">{{ ts.category }}</span>
 					<span class="ui circular label olive inverted large right floated" v-if="ts.timeSpent">
 						{{ ts.timeSpent }}
 					</span>
@@ -32,13 +32,13 @@
 			</template>
 
 			<!-- Edit Mode -->
-			<form v-else class="content ui form" style="overflow: hidden;">
+			<form v-else class="content ui form" :class="{ inverted: themeStore.isDark }" style="overflow: hidden;">
 				<div class="fields">
 					<div class="four wide field" :class="isTsValidDate(editingTimesheet) || 'error'">
 						<label>Date</label>
-						<div class="ui calendar" :id="'ts-calendar-' + index">
-							<div class="ui input left icon">
-								<i class="calendar icon"></i>
+						<div class="ui calendar" :class="{ inverted: themeStore.isDark }" :id="'ts-calendar-' + index">
+							<div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+								<i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
 								<input type="text" placeholder="Date" :name="'date-' + index">
 							</div>
 						</div>
@@ -88,6 +88,9 @@
 import { defineProps, defineEmits, ref, watch } from 'vue';
 import { useParseDescription } from '../composables/useParseDescription.mjs';
 import { useCategoryStore } from '../stores/category-store.mjs';
+import { useThemeStore } from '../stores/theme-store.mjs';
+
+const themeStore = useThemeStore();
 import CategoryDropdown from './CategoryDropdown.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 
