@@ -283,3 +283,14 @@ body.dark .ui.form .fields.error .field textarea {
     color: #e0b4b4 !important;
 }
 
+/* Custom text selection highlights in dark mode */
+body.dark ::selection {
+    background-color: #1e40af !important;
+    color: #ffffff !important;
+}
+body.dark *::selection {
+    background-color: #1e40af !important;
+    color: #ffffff !important;
+}
+
+
