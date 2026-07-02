@@ -15,26 +15,26 @@ body.dark .ui.modal {
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 1px rgba(255, 255, 255, 0.15) !important;
 }
 
-body.dark .ui.modal > .header {
+body.dark .ui.modal>.header {
     background: #1b1c1d !important;
     color: #ffffff !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-body.dark .ui.modal > .content {
+body.dark .ui.modal>.content {
     background: #1b1c1d !important;
     color: #ffffff !important;
 }
 
-body.dark .ui.modal > .actions {
+body.dark .ui.modal>.actions {
     background: #1b1c1d !important;
     border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
 }
 
 /* Forms, inputs and textareas in dark mode */
-body.dark input, 
-body.dark textarea, 
+body.dark input,
+body.dark textarea,
 body.dark select,
 body.dark .ui.dropdown,
 body.dark .ui.dropdown .menu,
@@ -78,28 +78,28 @@ body.dark .ui.dimmer {
 }
 
 /* Cards dark styling */
-body.dark .ui.card, 
+body.dark .ui.card,
 body.dark .ui.cards>.card {
     background-color: #1e1e1e !important;
     color: rgba(255, 255, 255, 0.87) !important;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
 }
 
-body.dark .ui.card>.content>.header, 
+body.dark .ui.card>.content>.header,
 body.dark .ui.cards>.card>.content>.header,
-body.dark .ui.card .header, 
+body.dark .ui.card .header,
 body.dark .ui.cards>.card .header {
     color: rgba(255, 255, 255, 0.95) !important;
 }
 
-body.dark .ui.card>.content>.description, 
+body.dark .ui.card>.content>.description,
 body.dark .ui.cards>.card>.content>.description,
 body.dark .ui.card>.content>.meta,
 body.dark .ui.cards>.card>.content>.meta {
     color: rgba(255, 255, 255, 0.7) !important;
 }
 
-body.dark .ui.card>.extra, 
+body.dark .ui.card>.extra,
 body.dark .ui.cards>.card>.extra {
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
     color: rgba(255, 255, 255, 0.5) !important;
@@ -127,12 +127,12 @@ body.dark .ui.menu .dropdown .menu {
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-body.dark .ui.menu .dropdown .menu > .item {
+body.dark .ui.menu .dropdown .menu>.item {
     color: rgba(255, 255, 255, 0.8) !important;
     background-color: #1b1c1d !important;
 }
 
-body.dark .ui.menu .dropdown .menu > .item:hover {
+body.dark .ui.menu .dropdown .menu>.item:hover {
     color: #ffffff !important;
     background-color: #2d2d2d !important;
 }
@@ -143,12 +143,13 @@ body.dark .ui.progress>.label {
     mix-blend-mode: normal !important;
 }
 
-body.dark .ui.progress .bar > .progress {
+body.dark .ui.progress .bar>.progress {
     color: #ffffff !important;
 }
 
 body.dark .ui.olive.progress .bar {
-    background-color: #2e6930 !important; /* darker green/olive */
+    background-color: #2e6930 !important;
+    /* darker green/olive */
 }
 
 /* Tabular menus and tab segments custom blending */
@@ -164,15 +165,17 @@ body.dark .ui.tabular.menu .active.item {
     background-color: #1b1c1d !important;
     color: #ffffff !important;
     border-color: #555 !important;
-    border-bottom-color: #1b1c1d !important; /* Hide bottom border to blend with tab content */
+    border-bottom-color: #1b1c1d !important;
+    /* Hide bottom border to blend with tab content */
 }
 
 /* If tabs are directly on body, like in Timesheet.vue page */
-body.dark .ui.main.container > .ui.bottom.attached.tab.segment {
+body.dark .ui.main.container>.ui.bottom.attached.tab.segment {
     background-color: #121212 !important;
     border-color: #555 !important;
 }
-body.dark .ui.main.container > .ui.tabular.menu .active.item {
+
+body.dark .ui.main.container>.ui.tabular.menu .active.item {
     background-color: #121212 !important;
     border-bottom-color: #121212 !important;
 }
@@ -214,15 +217,16 @@ body.dark .ui.calendar.popup .ui.table tr td.active {
 }
 
 /* Bullet list and breadcrumb overrides for custom description rendering */
-body.dark .ui.bulleted.list, 
-body.dark .ui.bulleted.list .item, 
+body.dark .ui.bulleted.list,
+body.dark .ui.bulleted.list .item,
 body.dark .ui.bulleted.list .item::before,
 body.dark .ui.bulleted.list li,
 body.dark .ui.bulleted.list li::before {
     color: rgba(255, 255, 255, 0.87) !important;
 }
-body.dark .ui.breadcrumb, 
-body.dark .ui.breadcrumb .section, 
+
+body.dark .ui.breadcrumb,
+body.dark .ui.breadcrumb .section,
 body.dark .ui.breadcrumb .divider {
     color: rgba(255, 255, 255, 0.87) !important;
 }
@@ -231,14 +235,19 @@ body.dark .ui.breadcrumb .divider {
 body.dark .timesheet-week-header {
     color: #ffffff !important;
 }
+
 body.dark .timesheet-card-item h5 span.right.floated {
     color: rgba(255, 255, 255, 0.4) !important;
 }
+
 body.dark .kanban-card p.ui.blue {
-    color: #8bb3f9 !important; /* Lighter blue for dark background readability */
+    color: #8bb3f9 !important;
+    /* Lighter blue for dark background readability */
 }
+
 body.dark .kanban-card p.ui.green {
-    color: #87db8a !important; /* Lighter green for dark background readability */
+    color: #87db8a !important;
+    /* Lighter green for dark background readability */
 }
 
 /* Selected categories labels inside search selection dropdown in dark mode */
@@ -257,22 +266,29 @@ body.dark .ui.dropdown .ui.label .delete.icon:hover {
 }
 
 /* Card extra content icons and standalone calendar icons color in dark mode */
-body.dark .ui.card > .extra.content i.icon,
-body.dark .ui.cards > .card > .extra.content i.icon {
+body.dark .ui.card>.extra.content i.icon,
+body.dark .ui.cards>.card>.extra.content i.icon {
     color: rgba(255, 255, 255, 0.7) !important;
 }
+
 /* Ensure the tag label hole uses a dark background when inverted */
 .ui.inverted.tag.label::after,
 .ui.inverted.tag.labels .label::after {
     background-color: #1b1c1d !important;
 }
 
+/* Error label color in dark mode */
+body.dark .ui.form .error.field label,
+body.dark .ui.form .fields.error .field label,
+body.dark .ui.inverted.form .error.field label,
+body.dark .ui.inverted.form .fields.error .field label {
+    color: rgb(255 165 0) !important;
+}
+
 /* Error fields and dropdown overrides in dark mode */
 body.dark .ui.form .field.error .ui.dropdown,
-body.dark .ui.form .field.error .ui.dropdown .item,
 body.dark .ui.form .field.error .ui.dropdown>.text,
 body.dark .ui.form .fields.error .field .ui.dropdown,
-body.dark .ui.form .fields.error .field .ui.dropdown .item,
 body.dark .ui.form .field.error input,
 body.dark .ui.form .field.error select,
 body.dark .ui.form .field.error textarea,
@@ -280,7 +296,8 @@ body.dark .ui.form .fields.error .field input,
 body.dark .ui.form .fields.error .field select,
 body.dark .ui.form .fields.error .field textarea {
     background-color: transparent !important;
-    color: #e0b4b4 !important;
+    color: rgb(255 165 0) !important;
+    border-color: rgb(255 165 0) !important;
 }
 
 /* Custom text selection highlights in dark mode */
@@ -288,9 +305,8 @@ body.dark ::selection {
     background-color: #1e40af !important;
     color: #ffffff !important;
 }
+
 body.dark *::selection {
     background-color: #1e40af !important;
     color: #ffffff !important;
 }
-
-
