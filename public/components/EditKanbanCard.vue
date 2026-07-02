@@ -79,11 +79,13 @@ import CategoryDropdown from './CategoryDropdown.vue';
 import TimesheetsFromKanbanCard from './TimesheetsFromKanbanCard.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 import { useThemeStore } from '../stores/theme-store.mjs';
+import { useValidateRecord } from '../composables/useValidateRecord.mjs';
 
 const categoryStore = useCategoryStore();
 const campaignStore = useCampaignStore();
 const { handlePaste } = usePaste();
 const themeStore = useThemeStore();
+const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidDescription, isTimesheetValid } = useValidateRecord();
 
 const log = (message, object) => {
 	if (object)
@@ -218,27 +220,7 @@ const isValidCard = computed(() => {
 });
 
 
-/* Timesheet Validation Helpers */
-
-const isTsValidDate = (ts) => {
-	return ts?.date && /^(\d{4})-(\d{2})-(\d{2})$/.test(ts.date) && !isNaN(new Date(ts.date).getTime())
-}
-
-const isTsValidTimeSpent = (ts) => {
-	return typeof(ts?.timeSpent) === 'number' || (ts?.timeSpent?.toString().trim().length > 0 && parseFloat(ts?.timeSpent) > 0)
-}
-
-const isTsValidCategory = (ts) => {
-	return ts?.category?.trim().length > 0
-}
-
-const isTsValidDescription = (ts) => {
-	return ts?.description?.trim().length > 0
-}
-
-const isTimesheetValid = (ts) => {
-	return isTsValidDate(ts) && isTsValidTimeSpent(ts) && isTsValidCategory(ts) && isTsValidDescription(ts)
-}
+/* Timesheet validation helpers are imported from useValidateRecord composable */
 
 const areTimesheetsValid = computed(() => {
 	const timesheets = state.card.timesheets || []

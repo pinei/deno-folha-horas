@@ -83,10 +83,12 @@ import { useCategoryStore } from '../stores/category-store.mjs';
 import CategoryDropdown from './CategoryDropdown.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 import { useThemeStore } from '../stores/theme-store.mjs';
+import { useValidateRecord } from '../composables/useValidateRecord.mjs';
 
 const categoryStore = useCategoryStore();
 const { handlePaste } = usePaste();
 const themeStore = useThemeStore();
+const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidDescription } = useValidateRecord();
 
 const log = (message, object) => {
 	if (object)
@@ -165,29 +167,15 @@ const isNewRecord = computed(() => {
 });
 
 const isValidDate = computed(() => {
-	const record = state.record;
-	return (
-		record?.date
-		&& /^(\d{4})-(\d{2})-(\d{2})$/.test(record.date)
-		&& !isNaN(new Date(record.date).getTime())
-	)
+	return isTsValidDate(state.record);
 })
 
 const isValidTimeSpent = computed(() => {
-	const record = state.record;
-	return (
-		typeof(record?.timeSpent) === 'number' ||
-		(
-			record?.timeSpent?.trim().length > 0
-			&& parseFloat(record?.timeSpent) > 0
-		)
-	)
+	return isTsValidTimeSpent(state.record);
 })
 
 const isValidCategory = computed(() => {
-	return (
-		state.record?.category?.trim().length > 0
-	)
+	return isTsValidCategory(state.record);
 })
 
 const isValidContext = computed(() => {
@@ -195,9 +183,7 @@ const isValidContext = computed(() => {
 })
 
 const isValidDescription = computed(() => {
-	return (
-		state.record?.description?.trim().length > 0
-	)
+	return isTsValidDescription(state.record);
 })
 
 const isValidRecord = computed(() => {

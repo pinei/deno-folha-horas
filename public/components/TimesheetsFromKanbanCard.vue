@@ -93,10 +93,12 @@ import { useThemeStore } from '../stores/theme-store.mjs';
 const themeStore = useThemeStore();
 import CategoryDropdown from './CategoryDropdown.vue';
 import { usePaste } from '../composables/usePaste.mjs';
+import { useValidateRecord } from '../composables/useValidateRecord.mjs';
 
 const { parseDescription } = useParseDescription();
 const categoryStore = useCategoryStore();
 const { handlePaste } = usePaste();
+const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidDescription } = useValidateRecord();
 
 const props = defineProps({
 	timesheets: {
@@ -162,22 +164,7 @@ const removeTimesheet = (index) => {
 	emits('remove-timesheet', index);
 }
 
-/* Validation Helpers */
-const isTsValidDate = (ts) => {
-	return ts?.date && /^(\d{4})-(\d{2})-(\d{2})$/.test(ts.date) && !isNaN(new Date(ts.date).getTime());
-}
-
-const isTsValidTimeSpent = (ts) => {
-	return typeof(ts?.timeSpent) === 'number' || (ts?.timeSpent?.toString().trim().length > 0 && parseFloat(ts?.timeSpent) > 0);
-}
-
-const isTsValidCategory = (ts) => {
-	return ts?.category?.trim().length > 0;
-}
-
-const isTsValidDescription = (ts) => {
-	return ts?.description?.trim().length > 0;
-}
+/* Validation Helpers are imported from useValidateRecord composable */
 
 /* Calendar Initialization */
 const initTimesheetCalendar = (index) => {
