@@ -310,3 +310,16 @@ body.dark *::selection {
     background-color: #1e40af !important;
     color: #ffffff !important;
 }
+
+/* Secondary actions buttons visibility overrides in dark mode */
+body.dark .ui.secondary.button,
+body.dark .ui.secondary.buttons .button {
+    background-color: #3b3b3b !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+body.dark .ui.secondary.button:hover,
+body.dark .ui.secondary.buttons .button:hover {
+    background-color: #4a4a4a !important;
+    color: #ffffff !important;
+}
