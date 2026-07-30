@@ -1,9 +1,8 @@
 import express from "express";
 import { statSync } from "node:fs";
+import serverConfig from './core/config';
 
 const app = express();
-
-const HTTP_PORT = 1025;
 
 import api from './core/api';
 
@@ -34,8 +33,8 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve('public/index.html'));
 });
 
-app.listen(HTTP_PORT, () => {
-    console.log(`Example app listening on port ${HTTP_PORT}`)
+app.listen(serverConfig.httpPort, () => {
+    console.log(`Timesheet listening on port ${serverConfig.httpPort}`)
 })
 
 

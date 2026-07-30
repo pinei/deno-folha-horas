@@ -18,6 +18,12 @@ Inicie em PowerShell:
 
 O script configura `NODE_EXTRA_CA_CERTS` e executa `main.ts` com `tsx`. Sem necessidade do certificado adicional, use `npm start`.
 
+Por padrão, o servidor escuta na porta `1025` e usa `./data/sqlite3.db`. Os valores podem ser alterados na inicialização:
+
+```powershell
+npm start -- --port 3000 --db-path ./data/outro.db
+```
+
 ## Backup
 
 Para tornar mais confiável o uso de bases SQLite foi criada a ferramenta `litestream` que faz a replicação de dados automática.

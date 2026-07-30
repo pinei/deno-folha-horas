@@ -1,7 +1,6 @@
 import assert from 'node:assert'
 import { DatabaseSync } from 'node:sqlite';
-
-const DB_PATH = './data/sqlite3.db'
+import serverConfig from './config.ts';
 
 const SQL_SCHEMA_VERSION = `
   CREATE TABLE IF NOT EXISTS SCHEMA_VERSION (
@@ -216,7 +215,7 @@ class SQLDatabase {
   }
 }
 
-const database = new SQLDatabase(DB_PATH);
+const database = new SQLDatabase(serverConfig.dbPath);
 database.migrate();
 
 export default database

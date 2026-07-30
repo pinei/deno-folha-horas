@@ -5,12 +5,12 @@
 - Aplicação local e individual para registrar horas, tarefas, demandas, campanhas e entregas.
 - O runtime é Node.js e o entrypoint é [main.ts](main.ts).
 - O backend Express serve a API e os arquivos de `public/`. O frontend Vue 3 não possui etapa de build: módulos e componentes são carregados no navegador pelo import map e pelo `vue3-sfc-loader`.
-- O SQLite local fica em `data/sqlite3.db`. Importar [core/database.ts](core/database.ts) abre esse arquivo e aplica migrations pendentes.
+- O SQLite local usa `data/sqlite3.db` por padrão. Importar [core/database.ts](core/database.ts) abre o caminho configurado por `--db-path` e aplica migrations pendentes.
 
 ## Comandos
 
 - Instale dependências com `npm ci`.
-- Inicie com `npm start` ou `./run.ps1`; a aplicação escuta em `http://localhost:1025`.
+- Inicie com `npm start` ou `./run.ps1`; a porta padrão é `1025`. Use `--port` e `--db-path` para substituir os defaults.
 - Valide TypeScript com `npx tsc --noEmit`.
 - Execute os testes com `npx tsx --test public/domain/*.test.ts`.
 - Não use `npm test`: o projeto não define esse script.
