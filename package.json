@@ -1,7 +1,7 @@
 {
   "name": "timesheet",
   "version": "1.0.0",
-  "description": "Deno Folha Horas migrated to Node.js",
+  "description": "Local work log and timesheet application for Node.js",
   "main": "main.ts",
   "type": "module",
   "scripts": {

@@ -1,1 +1,0 @@
-deno compile --no-check --allow-read main.ts
