@@ -4,9 +4,9 @@
 	  <div class="header">Select Issue</div>
 	  <div class="scrolling content">
 		<div v-if="state.loading" class="ui active centered inline loader"></div>
-		<div v-else-if="state.cards.length === 0">
-			<p>No issue available</p>
-		</div>
+		<NagMessage v-else-if="state.cards.length === 0" :inverted="themeStore.isDark">
+			No issues are available to link.
+		</NagMessage>
 		<div v-else>
 			<div class="ui cards" v-if="state.candidateCards.length > 0">
 				<KanbanCard
@@ -42,6 +42,7 @@
 import { reactive, watch, onMounted, onUnmounted } from 'vue';
 import kanbanApi from '../services/kanban-api.mjs';
 import KanbanCard from '../components/KanbanCard.vue';
+import NagMessage from '../components/NagMessage.vue';
 import { useThemeStore } from '../stores/theme-store.mjs';
 
 const themeStore = useThemeStore();
@@ -201,7 +202,7 @@ onUnmounted(() => {
 }
 
 #select-kanban-card .card.kanban-card.active {
-	border: 2px solid #2185d0;
+	border: 2px solid var(--app-blue);
 	box-shadow: 0 0 10px rgba(33, 133, 208, 0.5);
     background-color: #f7fbff;
 }

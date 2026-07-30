@@ -20,6 +20,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
     })
 
     const loading = ref(false)
+    const loaded = ref(false)
     const error = ref(null)
 
     function _updateSummary(records) {
@@ -84,6 +85,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
             setRecords(records)
         } finally {
             loading.value = false
+            loaded.value = true
         }
     }
 
@@ -97,6 +99,7 @@ export const useTimesheetStore = defineStore('timesheet', () => {
             error.value = err
         } finally {
             loading.value = false
+            loaded.value = true
         }
     }
 
@@ -180,6 +183,8 @@ export const useTimesheetStore = defineStore('timesheet', () => {
         loadRecordsForTerms,
         loadRecordsForMonth,
         linkKanbanCard,
-        summary
+        summary,
+        loading,
+        loaded
     }
 })

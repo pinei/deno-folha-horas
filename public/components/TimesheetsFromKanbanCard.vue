@@ -1,7 +1,7 @@
 <template>
-	<div v-if="!timesheets || timesheets.length === 0" class="ui message">
-		<p>No timesheet associated.</p>
-	</div>
+	<NagMessage v-if="!timesheets || timesheets.length === 0" :inverted="themeStore.isDark">
+		No timesheets are linked to this card yet. Add one to start tracking time.
+	</NagMessage>
 
 	<div v-else class="ui fluid cards timesheet-cards-list">
 		<div v-for="(ts, index) in timesheets" :key="index"
@@ -92,6 +92,7 @@ import { useThemeStore } from '../stores/theme-store.mjs';
 
 const themeStore = useThemeStore();
 import CategoryDropdown from './CategoryDropdown.vue';
+import NagMessage from './NagMessage.vue';
 import { usePaste } from '../composables/usePaste.mjs';
 import { useValidateRecord } from '../composables/useValidateRecord.mjs';
 
@@ -237,7 +238,7 @@ watch(() => props.isModalVisible, (newVal) => {
 
 .card.timesheet-card-item.editing {
 	box-shadow: 0 2px 8px 0 rgba(34, 36, 38, .2), 0 2px 4px 0 rgba(34, 36, 38, .15) !important;
-	border: 1px solid #2185d0 !important; /* Blue border to highlight active edit */
+	border: 1px solid var(--app-blue) !important; /* Blue border to highlight active edit */
 }
 
 .card.timesheet-card-item.consulting {

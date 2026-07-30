@@ -4,10 +4,8 @@ import { ref, load } from './vue-loader.mjs'
 console.log('Setting up router...')
 
 // import Timesheet from '../pages/Timesheet.vue';
-// import SAPCodes from '../pages/SAPCodes.vue';
-
 const Timesheet = ref('../pages/Timesheet.vue')
-const SAPCodes = ref('../pages/SAPCodes.vue')
+const Categories = ref('../pages/Categories.vue')
 const MonthTimeReport = ref('../pages/TimesheetMonthTimeReport.vue')
 const FactsAndDeliveriesReport = ref('../pages/FactsAndDeliveriesReport.vue')
 const Kanban = ref('../pages/Kanban.vue')
@@ -25,9 +23,13 @@ export const routes = [
         component: Timesheet
     },
     {
-        name: 'sap-codes',
+        name: 'categories',
+        path: '/categories',
+        component: Categories
+    },
+    {
         path: '/sap-codes',
-        component: SAPCodes
+        redirect: '/categories'
     },
     {
         name: 'kanban',

@@ -1,21 +1,27 @@
-import sapCodesService from '../services/sap-codes-api.mjs'
+import categoriesService from '../services/categories-api.mjs'
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 
 export const useCategoryStore = defineStore('categories', () => {
     console.log('Setting up Category Store...')
 
     const categories = ref([])
+        const loading = ref(false)
+        const loaded = ref(false)
     const error = ref(null)
 
     async function loadCategories() {
-    try {
-        console.log(':. [SAPCodeStore] Fetching Categories...')
-        const data = await sapCodesService.getCategories()
+            try {
+        console.log(':. [CategoryStore] Fetching Categories...')
+                loading.value = true
+        const data = await categoriesService.getActiveCategories()
         categories.value = data
-    } catch (err) {
-        error.value = `:. [SAPCodeStore] Erro ao buscar categorias: ${err}`
-    }
+            } catch (err) {
+        error.value = `:. [CategoryStore] Erro ao buscar categorias: ${err}`
+            } finally {
+                loading.value = false
+                loaded.value = true
+            }
     }
 
     function getCategoryColor(name) {
@@ -27,6 +33,8 @@ export const useCategoryStore = defineStore('categories', () => {
     loadCategories,
     getCategoryColor,
     categories,
+    loading,
+    loaded,
     }
 
 })

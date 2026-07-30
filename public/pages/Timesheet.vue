@@ -12,13 +12,19 @@
         :category="state.selectKanbanCardRecord?.category"
         @select="onKanbanCardSelected" @close="closeSelectKanbanCard"/>
 
+    <NagMessage v-if="showNoCategories" :inverted="themeStore.isDark">
+        No categories registered. <router-link to="/categories">Add a category</router-link> to get started.
+    </NagMessage>
+
     <div id="timesheet-panel">
-        <div v-if="!(timesheetStore.clusters.length > 0)">
-            <h3 class="ui header">No records found</h3>
-            <button class="ui small primary circular icon button" @click="addRecord(null)" data-tooltip="New record">
-                <i class="plus icon"></i>
-            </button>
-        </div>
+		<template v-if="showNoRecords">
+            <NagMessage :inverted="themeStore.isDark">No records found for the selected search criteria.</NagMessage>
+            <div style="margin-top: 1em;">
+                <button class="ui small primary circular icon button" @click="addRecord(null)" data-tooltip="New record">
+                    <i class="plus icon"></i>
+                </button>
+            </div>
+        </template>
 
         <!-- 1st Level: Group by Week -->
         <div v-for="weekNode in timesheetStore.clusters" :key="weekNode.key">
@@ -101,6 +107,7 @@ import { useTimesheetStore } from '../stores/timesheet-store.mjs';
 import { useCategoryStore } from '../stores/category-store.mjs';
 import { useParseDescription } from '../composables/useParseDescription.mjs';
 import SelectKanbanCard from '../components/SelectKanbanCard.vue';
+import NagMessage from '../components/NagMessage.vue';
 import { useThemeStore } from '../stores/theme-store.mjs';
 
 const themeStore = useThemeStore();
@@ -118,6 +125,16 @@ log('Setting up...')
 
 const timesheetStore = useTimesheetStore();
 const categoryStore = useCategoryStore();
+
+const showNoCategories = computed(() => {
+    return categoryStore.loaded && !categoryStore.loading && categoryStore.categories.length === 0;
+});
+
+const showNoRecords = computed(() => {
+    return categoryStore.loaded && timesheetStore.loaded &&
+        !categoryStore.loading && !timesheetStore.loading &&
+        categoryStore.categories.length > 0 && timesheetStore.clusters.length === 0;
+});
 
 /* State */
 

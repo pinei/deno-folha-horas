@@ -1,35 +1,41 @@
 /* ================= Dark Mode Styles ================= */
 body.dark {
-    background-color: #121212;
-    color: #ffffff;
+    --dark-page-background: #121212;
+    --dark-surface-background: #1b1c1d;
+    --dark-hover-background: #2d2d2d;
+    --dark-text-color: #ffffff;
+    --dark-text-primary: rgba(255, 255, 255, 0.87);
+    --dark-border-color: rgba(255, 255, 255, 0.15);
+    background-color: var(--dark-page-background);
+    color: var(--dark-text-color);
 }
 
 body.dark .ui.header {
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 /* Modal styling in dark mode */
 body.dark .ui.modal {
-    background: #1b1c1d !important;
-    color: #ffffff !important;
-    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 1px rgba(255, 255, 255, 0.15) !important;
+    background: var(--dark-surface-background) !important;
+    color: var(--dark-text-color) !important;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 1px var(--dark-border-color) !important;
 }
 
 body.dark .ui.modal>.header {
-    background: #1b1c1d !important;
-    color: #ffffff !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background: var(--dark-surface-background) !important;
+    color: var(--dark-text-color) !important;
+    border-bottom: 1px solid var(--dark-border-color) !important;
 }
 
 body.dark .ui.modal>.content {
-    background: #1b1c1d !important;
-    color: #ffffff !important;
+    background: var(--dark-surface-background) !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark .ui.modal>.actions {
-    background: #1b1c1d !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
+    background: var(--dark-surface-background) !important;
+    border-top: 1px solid var(--dark-border-color) !important;
+    color: var(--dark-text-color) !important;
 }
 
 /* Forms, inputs and textareas in dark mode */
@@ -39,9 +45,9 @@ body.dark select,
 body.dark .ui.dropdown,
 body.dark .ui.dropdown .menu,
 body.dark .ui.dropdown .menu>.item {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    background-color: var(--dark-page-background) !important;
+    color: var(--dark-text-color) !important;
+    border-color: var(--dark-border-color) !important;
 }
 
 body.dark .ui.dropdown .menu>.item {
@@ -50,7 +56,7 @@ body.dark .ui.dropdown .menu>.item {
 
 body.dark .ui.dropdown .menu>.item:hover {
     background-color: #1d1d1d !important;
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark .ui.dropdown .menu>.active.item {
@@ -69,7 +75,43 @@ body.dark .ui.checkbox label {
 }
 
 body.dark .ui.checkbox input:focus~label {
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
+}
+
+/* Tabbed tables */
+body.dark .ui.table.tabbed {
+    background-color: transparent !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark .ui.table.tabbed tr.tab-row>th {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+body.dark .ui.table.tabbed thead tr:not(.tab-row)>th {
+    background-color: #242526 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    border-color: var(--dark-border-color) !important;
+}
+
+body.dark .ui.table.tabbed tbody>tr>td {
+    background-color: var(--dark-surface-background) !important;
+    color: var(--dark-text-primary) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.dark .ui.selectable.table.tabbed tbody>tr:hover>td {
+    background-color: var(--dark-hover-background) !important;
+    color: var(--dark-text-color) !important;
+}
+
+body.dark .ui.table.tabbed tr.tab-row+tr>th:nth-child(-n+2),
+body.dark .ui.table.tabbed thead tr:not(.tab-row)>th:first-child,
+body.dark .ui.table.tabbed tbody tr>td:first-child,
+body.dark .ui.table.tabbed thead tr:not(.tab-row)>th:last-child,
+body.dark .ui.table.tabbed tbody tr>td:last-child,
+body.dark .ui.table.tabbed tbody tr:last-child>td {
+    border-color: var(--dark-border-color) !important;
 }
 
 /* Modals dimmer background */
@@ -81,7 +123,7 @@ body.dark .ui.dimmer {
 body.dark .ui.card,
 body.dark .ui.cards>.card {
     background-color: #1e1e1e !important;
-    color: rgba(255, 255, 255, 0.87) !important;
+    color: var(--dark-text-primary) !important;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -114,37 +156,47 @@ body.dark .card.kanban-card.is-dragging {
     border: 2px dashed rgba(255, 255, 255, 0.3) !important;
 }
 
+body.dark .kanban-container.drag-active .vertical-lane>.ui.segment {
+    background-color: var(--dark-surface-background) !important;
+    box-shadow: inset 0 0 0 1px var(--dark-border-color) !important;
+}
+
+body.dark .kanban-container.drag-active .vertical-lane>.ui.segment.drag-over {
+    background-color: #242526 !important;
+    box-shadow: inset 0 0 0 2px var(--app-blue) !important;
+}
+
 /* Active card highlight in dark mode */
 body.dark #select-kanban-card .card.kanban-card.active {
-    border: 2px solid #2185d0 !important;
-    box-shadow: 0 0 10px rgba(33, 133, 208, 0.7) !important;
+    border: 2px solid var(--app-blue) !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--app-blue) 70%, transparent) !important;
     background-color: #0b2545 !important;
 }
 
 /* Submenu/Dropdown inside fixed menu in dark mode */
 body.dark .ui.menu .dropdown .menu {
-    background-color: #1b1c1d !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background-color: var(--dark-surface-background) !important;
+    border: 1px solid var(--dark-border-color) !important;
 }
 
 body.dark .ui.menu .dropdown .menu>.item {
     color: rgba(255, 255, 255, 0.8) !important;
-    background-color: #1b1c1d !important;
+    background-color: var(--dark-surface-background) !important;
 }
 
 body.dark .ui.menu .dropdown .menu>.item:hover {
-    color: #ffffff !important;
-    background-color: #2d2d2d !important;
+    color: var(--dark-text-color) !important;
+    background-color: var(--dark-hover-background) !important;
 }
 
 /* Progress bar overrides */
 body.dark .ui.progress>.label {
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
     mix-blend-mode: normal !important;
 }
 
 body.dark .ui.progress .bar>.progress {
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark .ui.olive.progress .bar {
@@ -162,47 +214,47 @@ body.dark .ui.tabular.menu .item {
 }
 
 body.dark .ui.tabular.menu .active.item {
-    background-color: #1b1c1d !important;
-    color: #ffffff !important;
+    background-color: var(--dark-surface-background) !important;
+    color: var(--dark-text-color) !important;
     border-color: #555 !important;
-    border-bottom-color: #1b1c1d !important;
+    border-bottom-color: var(--dark-surface-background) !important;
     /* Hide bottom border to blend with tab content */
 }
 
 /* If tabs are directly on body, like in Timesheet.vue page */
 body.dark .ui.main.container>.ui.bottom.attached.tab.segment {
-    background-color: #121212 !important;
+    background-color: var(--dark-page-background) !important;
     border-color: #555 !important;
 }
 
 body.dark .ui.main.container>.ui.tabular.menu .active.item {
-    background-color: #121212 !important;
-    border-bottom-color: #121212 !important;
+    background-color: var(--dark-page-background) !important;
+    border-bottom-color: var(--dark-page-background) !important;
 }
 
 /* Fomantic Calendar popups */
 body.dark .ui.calendar .ui.popup,
 body.dark .ui.calendar.popup,
 body.dark .ui.popup {
-    background-color: #1b1c1d !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background-color: var(--dark-surface-background) !important;
+    color: var(--dark-text-color) !important;
+    border: 1px solid var(--dark-border-color) !important;
 }
 
 body.dark .ui.calendar .ui.table,
 body.dark .ui.calendar.popup .ui.table {
-    background-color: #1b1c1d !important;
-    color: #ffffff !important;
+    background-color: var(--dark-surface-background) !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark .ui.calendar .ui.table tr td,
 body.dark .ui.calendar.popup .ui.table tr td {
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark .ui.calendar .ui.table tr td.link:hover,
 body.dark .ui.calendar.popup .ui.table tr td.link:hover {
-    background-color: #2d2d2d !important;
+    background-color: var(--dark-hover-background) !important;
 }
 
 body.dark .ui.calendar .ui.table tr td.today,
@@ -213,7 +265,7 @@ body.dark .ui.calendar.popup .ui.table tr td.today {
 
 body.dark .ui.calendar .ui.table tr td.active,
 body.dark .ui.calendar.popup .ui.table tr td.active {
-    background-color: #2185d0 !important;
+    background-color: var(--app-blue) !important;
 }
 
 /* Bullet list and breadcrumb overrides for custom description rendering */
@@ -222,18 +274,18 @@ body.dark .ui.bulleted.list .item,
 body.dark .ui.bulleted.list .item::before,
 body.dark .ui.bulleted.list li,
 body.dark .ui.bulleted.list li::before {
-    color: rgba(255, 255, 255, 0.87) !important;
+    color: var(--dark-text-primary) !important;
 }
 
 body.dark .ui.breadcrumb,
 body.dark .ui.breadcrumb .section,
 body.dark .ui.breadcrumb .divider {
-    color: rgba(255, 255, 255, 0.87) !important;
+    color: var(--dark-text-primary) !important;
 }
 
 /* Specific text color overrides */
 body.dark .timesheet-week-header {
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark .timesheet-card-item h5 span.right.floated {
@@ -254,7 +306,7 @@ body.dark .kanban-card p.ui.green {
 body.dark .ui.dropdown .ui.label {
     background-color: rgba(255, 255, 255, 0.1) !important;
     color: rgba(255, 255, 255, 0.8) !important;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset !important;
+    box-shadow: 0 0 0 1px var(--dark-border-color) inset !important;
 }
 
 body.dark .ui.dropdown .ui.label .delete.icon {
@@ -274,7 +326,7 @@ body.dark .ui.cards>.card>.extra.content i.icon {
 /* Ensure the tag label hole uses a dark background when inverted */
 .ui.inverted.tag.label::after,
 .ui.inverted.tag.labels .label::after {
-    background-color: #1b1c1d !important;
+    background-color: var(--dark-surface-background) !important;
 }
 
 /* Error label color in dark mode */
@@ -303,23 +355,24 @@ body.dark .ui.form .fields.error .field textarea {
 /* Custom text selection highlights in dark mode */
 body.dark ::selection {
     background-color: #1e40af !important;
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 body.dark *::selection {
     background-color: #1e40af !important;
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }
 
 /* Secondary actions buttons visibility overrides in dark mode */
 body.dark .ui.secondary.button,
 body.dark .ui.secondary.buttons .button {
     background-color: #3b3b3b !important;
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
+
 body.dark .ui.secondary.button:hover,
 body.dark .ui.secondary.buttons .button:hover {
     background-color: #4a4a4a !important;
-    color: #ffffff !important;
+    color: var(--dark-text-color) !important;
 }

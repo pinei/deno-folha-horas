@@ -21,14 +21,29 @@
             https://altcodeunicode.com/alt-codes-arrow-keyboard-arrow-dingbat-arrow-symbols/
          -->
         <div v-show="state.availableCategories.length > 0">
-            <div class="ui segment">
+            <div class="ui segment" :class="{ inverted: themeStore.isDark }">
                 <h4 class="ui dividing header">Configurations</h4>
-                <form class="ui form">
+                <form class="ui form" :class="{ inverted: themeStore.isDark }">
                     <div class="field">
                         <label>Categories:</label>
                         <MultiCategoryDropdown 
                             v-model="state.selectedCategories" 
                             :categories="state.availableCategories" />
+                    </div>
+                    <div class="inline fields">
+                        <label>Include:</label>
+                        <div class="field">
+                            <div class="ui checkbox">
+                                <input type="checkbox" v-model="state.includeFacts" tabindex="0" class="hidden">
+                                <label>Facts</label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui checkbox">
+                                <input type="checkbox" v-model="state.includeDeliveries" tabindex="0" class="hidden">
+                                <label>Deliveries</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -37,7 +52,7 @@
         <div class="ui form" style="margin-top: 2em;" v-show="Object.keys(filteredAndGroupedByWeek).length > 0">
             <div class="field">
                 <label>Generated Markdown</label>
-                <textarea rows="120" readonly style="font-family: monospace; line-height: 1.5;">{{ generateMarkdown() }}</textarea>
+                <textarea class="generated-markdown" readonly>{{ generateMarkdown() }}</textarea>
             </div>
             <div class="ui primary button" @click="copyMarkdown()" data-tooltip="Copy Markdown to clipboard">Copy All</div>
         </div>
@@ -48,6 +63,9 @@
 import { reactive, onMounted, watch, computed } from 'vue';
 import timesheetReportApi from '../services/timesheet-report-api.mjs';
 import MultiCategoryDropdown from '../components/MultiCategoryDropdown.vue';
+import { useThemeStore } from '../stores/theme-store.mjs';
+
+const themeStore = useThemeStore();
 
 const log = (message, object) => {
     if (object)
@@ -63,7 +81,9 @@ const state = reactive({
     calendarDateEnd: new Date(),
     groupedByWeek: {},
     availableCategories: [],
-    selectedCategories: []
+    selectedCategories: [],
+    includeFacts: true,
+    includeDeliveries: true
 });
 
 /* Watches */
@@ -163,11 +183,11 @@ const generateMarkdown = () => {
 
             let combinedText = '';
 
-            if (allFacts.length > 0) {
+            if (state.includeFacts && allFacts.length > 0) {
                 combinedText += `\n**Fatos Relevantes**\n${allFacts.join('\n')}\n`;
             }
 
-            if (allDeliveries.length > 0) {
+            if (state.includeDeliveries && allDeliveries.length > 0) {
                 combinedText += `\n**Entregas**\n${allDeliveries.join('\n')}\n`;
             }
 
@@ -192,6 +212,7 @@ const copyMarkdown = async () => {
 
 onMounted(() => {
     log('Mounted...')
+    $('#facts-and-deliveries-report .ui.checkbox').checkbox()
 })
 </script>
 
@@ -210,6 +231,15 @@ onMounted(() => {
     position: absolute;
     bottom: 2.5em;
     right: -3em;
+}
+
+#facts-and-deliveries-report textarea.generated-markdown {
+    /* height: 35vh; */
+    min-height: 20rem;
+    max-height: none;
+    font-family: monospace;
+    line-height: 1.5;
+    resize: vertical;
 }
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="ui container kanban-container">
+    <div class="ui container kanban-container" :class="{ 'drag-active': draggedCardId !== null }">
         <EditKanbanCard 
             :item="selectedCard" 
             v-model:visible="isModalVisible"
@@ -12,10 +12,10 @@
         
         <div class="ui four column stackable grid">
             <div class="column vertical-lane" v-for="lane in kanbanStore.buckets.getBuckets()" :key="lane.name">
-                <div class="ui segment" :class="{ inverted: themeStore.isDark }" :style="laneStyle(lane)" 
-                     @drop="onDrop($event, lane.name)" 
-                     @dragover.prevent 
-                     @dragenter.prevent>
+                <div class="ui segment" :class="{ inverted: themeStore.isDark, 'drag-over': dragOverLane === lane.name }" :style="laneStyle(lane)"
+                    @drop="onDrop($event, lane.name)"
+                    @dragover.prevent="dragOverLane = lane.name"
+                    @dragenter.prevent>
                     <h3 class="ui dividing header" style="display: flex; justify-content: space-between; align-items: center;">
                         {{ lane.label }}
                         <div class="ui custom-add-button">
@@ -119,6 +119,7 @@ export default {
             kanbanStore: useKanbanStore(),
             isModalVisible: false,
             selectedCard: {},
+            dragOverLane: null,
             searchQuery: '',
             searchResults: []
         }
@@ -184,6 +185,7 @@ export default {
         },
         endDrag(evt) {
             this.dragAndDrop.endVisualDrag(evt);
+            this.dragOverLane = null;
         },
         onDrop(evt, laneId) {
             const cardId = parseInt(evt.dataTransfer.getData('cardId'));
@@ -195,6 +197,7 @@ export default {
                     this.kanbanStore.moveCard(draggedCard, toBucket);
                 }
             }
+            this.dragOverLane = null;
         },
         getClusterDate(key) {
             if (!key) return '';
@@ -219,7 +222,7 @@ export default {
             if (this.themeStore.isDark) {
                 const darkColors = {
                     'TO_DO': '#767676',       // Neutral / Gray
-                    'IN_PROGRESS': '#2185d0', // Blue
+                    'IN_PROGRESS': 'var(--app-blue)', // Blue
                     'AWAITING': '#f2711c',    // Orange/Amber
                     'DONE': '#21ba45'         // Green
                 };

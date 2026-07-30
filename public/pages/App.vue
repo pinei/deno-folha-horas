@@ -31,7 +31,7 @@ export default {
             <div class="ui simple dropdown item">
                 Administration <i class="dropdown icon"></i>
                 <div class="menu">
-                    <router-link to="/sap-codes" class="item">SAP Codes</router-link>
+                    <router-link to="/categories" class="item">Categories</router-link>
                     <router-link to="/export" class="item">Export</router-link>
                     <router-link to="/import" class="item">Import</router-link>
                 </div>
@@ -54,7 +54,7 @@ export default {
 
 <style>
 .ui.fixed.menu .item.router-link-exact-active {
-    background-color: #2185d0 !important;
+    background-color: var(--app-blue) !important;
     color: #ffffff !important;
 }
 </style>

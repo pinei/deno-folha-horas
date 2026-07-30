@@ -229,7 +229,7 @@ export default {
             if (this.themeStore.isDark) {
                 const darkColors = {
                     'TO_DO': '#767676',       // Neutral / Gray
-                    'IN_PROGRESS': '#2185d0', // Blue
+                    'IN_PROGRESS': 'var(--app-blue)', // Blue
                     'AWAITING': '#f2711c',    // Orange/Amber
                     'DONE': '#21ba45'         // Green
                 };
