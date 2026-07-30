@@ -34,7 +34,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(serverConfig.httpPort, () => {
-    console.log(`Timesheet listening on port ${serverConfig.httpPort}`)
+    console.log(`Timesheet pronto para uso! Acesse http://localhost:${serverConfig.httpPort}`)
 })
 
 
