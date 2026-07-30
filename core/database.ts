@@ -1,4 +1,6 @@
 import assert from 'node:assert'
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import serverConfig from './config.ts';
 
@@ -139,6 +141,9 @@ class SQLDatabase {
   _lastInsertRowId: number = 0;
 
   constructor(path: string) {
+    // Ensure the directory exists before opening the database
+    const dir = dirname(path);
+    mkdirSync(dir, { recursive: true });
     this._conn = new DatabaseSync(path);
     this._conn.exec('PRAGMA foreign_keys = ON;');
   }
