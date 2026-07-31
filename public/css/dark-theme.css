@@ -80,8 +80,12 @@ body.dark .ui.checkbox input:focus~label {
 }
 
 /* Make Fomantic table headers distinct from body cells on the dark page background. */
-body.dark .ui.table thead>tr>th {
+body.dark .ui.table:not(.very.basic) thead>tr:not(.tab-row)>th {
     background-color: var(--dark-hover-background) !important;
+}
+body.dark .ui.inverted.very.basic.table thead>tr>th {
+    background-color: transparent !important;
+    transition: none !important;
 }
 
 /* Modals dimmer background */
