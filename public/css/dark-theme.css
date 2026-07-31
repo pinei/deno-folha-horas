@@ -317,6 +317,16 @@ body.dark .ui.dropdown .ui.label .delete.icon:hover {
     color: rgba(255, 255, 255, 0.8) !important;
 }
 
+body.dark .ui.corner.label {
+    border-color: var(--dark-hover-background) !important;
+    color: var(--dark-text-color) !important;
+    transition: none !important;
+}
+
+body.dark .ui.corner.label::after {
+    transition: none !important;
+}
+
 /* Card extra content icons and standalone calendar icons color in dark mode */
 body.dark .ui.card>.extra.content i.icon,
 body.dark .ui.cards>.card>.extra.content i.icon {
@@ -335,6 +345,12 @@ body.dark .ui.form .fields.error .field label,
 body.dark .ui.inverted.form .error.field label,
 body.dark .ui.inverted.form .fields.error .field label {
     color: rgb(255 165 0) !important;
+}
+
+body.dark .ui.form .field.error .ui.corner.label,
+body.dark .ui.inverted.form .field.error .ui.corner.label {
+    border-color: rgb(255 165 0) !important;
+    color: var(--dark-text-color) !important;
 }
 
 /* Error fields and dropdown overrides in dark mode */

@@ -37,29 +37,42 @@
 					<div class="four wide field" :class="isTsValidDate(editingTimesheet) || 'error'">
 						<label>Date</label>
 						<div class="ui calendar" :class="{ inverted: themeStore.isDark }" :id="'ts-calendar-' + index">
-							<div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+							<div class="ui input left icon corner labeled" :class="{ inverted: themeStore.isDark }">
 								<i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
 								<input type="text" placeholder="Date" :name="'date-' + index">
+								<div class="ui corner label"><i class="asterisk icon"></i></div>
 							</div>
 						</div>
 					</div>
 					<div class="four wide field" :class="isTsValidTimeSpent(editingTimesheet) || 'error'">
 						<label>Effort (HH)</label>
-						<input type="text" placeholder="0.5" v-model="editingTimesheet.timeSpent">
+						<div class="ui corner labeled input">
+							<input type="text" placeholder="0.5" v-model="editingTimesheet.timeSpent">
+							<div class="ui corner label"><i class="asterisk icon"></i></div>
+						</div>
 					</div>
 					<div class="eight wide field" :class="isTsValidCategory(editingTimesheet) || 'error'">
 						<label>Category</label>
-						<CategoryDropdown
-							v-model="editingTimesheet.category" :categories="categories" :enabled="isModalVisible"></CategoryDropdown>
+						<div class="ui corner labeled input">
+							<CategoryDropdown
+								v-model="editingTimesheet.category" :categories="categories" :enabled="isModalVisible"></CategoryDropdown>
+							<div class="ui corner label"><i class="asterisk icon"></i></div>
+						</div>
 					</div>
 				</div>
-				<div class="field">
+				<div class="field" :class="isTsValidContext(editingTimesheet) || 'error'">
 					<label>Context</label>
-					<input type="text" v-model="editingTimesheet.context">
+					<div class="ui corner labeled input">
+						<input type="text" v-model="editingTimesheet.context">
+						<div class="ui corner label"><i class="asterisk icon"></i></div>
+					</div>
 				</div>
 				<div class="field" :class="isTsValidDescription(editingTimesheet) || 'error'">
 					<label>Description</label>
-					<textarea rows="2" v-model="editingTimesheet.description" @paste="handlePaste($event, editingTimesheet, 'description')"></textarea>
+					<div class="ui corner labeled input">
+						<textarea rows="2" v-model="editingTimesheet.description" @paste="handlePaste($event, editingTimesheet, 'description')"></textarea>
+						<div class="ui corner label"><i class="asterisk icon"></i></div>
+					</div>
 				</div>
 				
 				<div style="margin-top: 1em; display: flex; justify-content: flex-end; gap: 0.5em;">
@@ -99,7 +112,7 @@ import { useValidateRecord } from '../composables/useValidateRecord.mjs';
 const { parseDescription } = useParseDescription();
 const categoryStore = useCategoryStore();
 const { handlePaste } = usePaste();
-const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidDescription } = useValidateRecord();
+const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidContext, isTsValidDescription } = useValidateRecord();
 
 const props = defineProps({
 	timesheets: {

@@ -9,7 +9,10 @@
 					<div class="fields">
 						<div class="eight wide field" :class="isValidCategory || 'error'">
 							<label>Category</label>
-							<input type="text" name="category" placeholder="MISC" v-model="state.category.category">
+							<div class="ui corner labeled input">
+								<input type="text" name="category" placeholder="MISC" v-model="state.category.category">
+								<div class="ui corner label"><i class="asterisk icon"></i></div>
+							</div>
 						</div>
 						<div class="four wide field">
 							<label>Marcação (cor)</label>

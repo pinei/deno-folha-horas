@@ -16,29 +16,42 @@
 			<div class="four wide field" :class="isValidDate || 'error'">
 				<label>Data</label>
 				<div class="ui calendar" :class="{ inverted: themeStore.isDark }">
-					<div class="ui input left icon" :class="{ inverted: themeStore.isDark }">
+					<div class="ui input left icon corner labeled" :class="{ inverted: themeStore.isDark }">
 						<i class="calendar icon" :class="{ inverted: themeStore.isDark }"></i>
 						<input type="text" placeholder="Select a date" name="date">
+						<div class="ui corner label"><i class="asterisk icon"></i></div>
 					</div>
 				</div>
 			</div>
 			<div class="four wide field" :class="isValidTimeSpent || 'error'">
 				<label>Effort (HH)</label>
-				<input type="text" name="timeSpent" placeholder="0.5" v-model="state.record.timeSpent">
+				<div class="ui corner labeled input">
+					<input type="text" name="timeSpent" placeholder="0.5" v-model="state.record.timeSpent">
+					<div class="ui corner label"><i class="asterisk icon"></i></div>
+				</div>
 			</div>
 			<div class="eight wide field" :class="isValidCategory || 'error'">
 				<label>Category</label>
-				<CategoryDropdown
-					v-model="state.record.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>
+				<div class="ui corner labeled input">
+					<CategoryDropdown
+						v-model="state.record.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>
+					<div class="ui corner label"><i class="asterisk icon"></i></div>
+				</div>
 			</div>
 		</div>
 		<div class="field" :class="isValidContext || 'error'">
 			<label>Context</label>
-			<input type="text" name="context" v-model="state.record.context">
+			<div class="ui corner labeled input">
+				<input type="text" name="context" v-model="state.record.context">
+				<div class="ui corner label"><i class="asterisk icon"></i></div>
+			</div>
 		</div>
 		<div class="field" :class="isValidDescription || 'error'">
 			<label>Description</label>
-			<textarea name="description" rows="2" v-model="state.record.description" @paste="handlePaste($event, state.record, 'description')"></textarea>
+			<div class="ui corner labeled input">
+				<textarea name="description" rows="2" v-model="state.record.description" @paste="handlePaste($event, state.record, 'description')"></textarea>
+				<div class="ui corner label"><i class="asterisk icon"></i></div>
+			</div>
 		</div>
 		</form>
 		</div>
@@ -88,7 +101,7 @@ import { useValidateRecord } from '../composables/useValidateRecord.mjs';
 const categoryStore = useCategoryStore();
 const { handlePaste } = usePaste();
 const themeStore = useThemeStore();
-const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidDescription } = useValidateRecord();
+const { isTsValidDate, isTsValidTimeSpent, isTsValidCategory, isTsValidContext, isTsValidDescription } = useValidateRecord();
 
 const log = (message, object) => {
 	if (object)
@@ -179,7 +192,7 @@ const isValidCategory = computed(() => {
 })
 
 const isValidContext = computed(() => {
-	return true
+	return isTsValidContext(state.record);
 })
 
 const isValidDescription = computed(() => {
@@ -187,7 +200,7 @@ const isValidDescription = computed(() => {
 })
 
 const isValidRecord = computed(() => {
-	return isValidCategory.value && isValidDescription.value && isValidDate.value && isValidTimeSpent.value && isValidContext;
+	return isValidCategory.value && isValidDescription.value && isValidDate.value && isValidTimeSpent.value && isValidContext.value;
 });
 
 

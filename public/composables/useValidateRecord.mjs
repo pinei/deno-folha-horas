@@ -15,18 +15,23 @@ export function useValidateRecord() {
         return !!(ts?.category?.trim().length > 0);
     }
 
+    const isTsValidContext = (ts) => {
+        return !!(ts?.context?.trim().length > 0);
+    }
+
     const isTsValidDescription = (ts) => {
         return !!(ts?.description?.trim().length > 0);
     }
 
     const isTimesheetValid = (ts) => {
-        return isTsValidDate(ts) && isTsValidTimeSpent(ts) && isTsValidCategory(ts) && isTsValidDescription(ts);
+        return isTsValidDate(ts) && isTsValidTimeSpent(ts) && isTsValidCategory(ts) && isTsValidContext(ts) && isTsValidDescription(ts);
     }
 
     return {
         isTsValidDate,
         isTsValidTimeSpent,
         isTsValidCategory,
+        isTsValidContext,
         isTsValidDescription,
         isTimesheetValid
     }

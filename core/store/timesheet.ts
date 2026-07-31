@@ -33,16 +33,13 @@ class TimesheetRecord {
         this.checkRequired('date', 'Date is required')
         this.checkRequired('category', 'Category is required')
         this.checkRequired('timeSpent', 'Time is required')
+        this.checkRequired('context', 'Context is required')
         this.checkRequired('description', 'Description is required')
 
         if (isNaN(this.timeSpent)) throw new Error('Time is invalid')
 
         if (typeof this.timeSpent === 'string') {
             this.timeSpent = parseFloat(this.timeSpent)
-        }
-
-        if (this.context && this.context.trim() === '') {
-            this.context = null
         }
 
         return this

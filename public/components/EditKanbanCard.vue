@@ -28,11 +28,17 @@
 				</div>
 				<div class="field" :class="isValidIssue || 'error'">
 					<label>Issue</label>
-					<input type="text" name="issue" v-model="state.card.issue">
+					<div class="ui corner labeled input">
+						<input type="text" name="issue" v-model="state.card.issue">
+						<div class="ui corner label"><i class="asterisk icon"></i></div>
+					</div>
 				</div>
 				<div class="field" :class="isValidDescription || 'error'">
 					<label>Description</label>
-					<textarea name="description" rows="2" v-model="state.card.description" @paste="handlePaste($event, state.card, 'description')"></textarea>
+					<div class="ui corner labeled input">
+						<textarea name="description" rows="2" v-model="state.card.description" @paste="handlePaste($event, state.card, 'description')"></textarea>
+						<div class="ui corner label"><i class="asterisk icon"></i></div>
+					</div>
 				</div>
 				<div class="field">
 					<label>Relevant Facts</label>

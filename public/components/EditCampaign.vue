@@ -6,21 +6,27 @@
 		<form class="ui form" :class="{ inverted: themeStore.isDark }">
 			<div class="field" :class="isValidName || 'error'">
 				<label>Name / Title</label>
-				<input type="text" name="name" v-model="state.campaign.name">
+				<div class="ui corner labeled input">
+					<input type="text" name="name" v-model="state.campaign.name">
+					<div class="ui corner label"><i class="asterisk icon"></i></div>
+				</div>
 			</div>
 			
 			<div class="fields">
 				<div class="six wide field" :class="isValidType || 'error'">
 					<label>Type</label>
-					<select class="ui dropdown" name="type" v-model="state.campaign.type" id="campaign-type-dropdown">
-						<option value="">Select...</option>
-						<option value="Project">Project</option>
-						<option value="Epic">Epic</option>
-						<option value="Release">Release</option>
-						<option value="Feature">Feature</option>
-						<option value="Package">Package</option>
-						<option value="Sprint">Sprint</option>
-					</select>
+					<div class="ui corner labeled input">
+						<select class="ui dropdown" name="type" v-model="state.campaign.type" id="campaign-type-dropdown">
+							<option value="">Select...</option>
+							<option value="Project">Project</option>
+							<option value="Epic">Epic</option>
+							<option value="Release">Release</option>
+							<option value="Feature">Feature</option>
+							<option value="Package">Package</option>
+							<option value="Sprint">Sprint</option>
+						</select>
+						<div class="ui corner label"><i class="asterisk icon"></i></div>
+					</div>
 				</div>
 				<div class="five wide field">
 					<label>Start Date</label>
