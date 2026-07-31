@@ -33,9 +33,8 @@ class TimesheetReport {
                 ${columns.join(',')}
             FROM
                 TIMESHEET LEFT OUTER JOIN
-                SAP_CAT2_OBJECT ON (
-                    SAP_CAT2_OBJECT.ACTIVE = 1 AND TRIM(TIMESHEET.CATEGORY) = SAP_CAT2_OBJECT.CATEGORY
-                )
+                CATEGORY ON (CATEGORY.ACTIVE = 1 AND TRIM(TIMESHEET.CATEGORY) = CATEGORY.CATEGORY_NAME)
+                LEFT OUTER JOIN SAP_CODE ON SAP_CODE.CATEGORY_ID = CATEGORY.ID
             WHERE
                 strftime('%Y-%m', DATE) = '${yearStr}-${monthStr}'
             GROUP BY

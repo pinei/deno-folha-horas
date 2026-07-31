@@ -133,6 +133,46 @@ const SQL_MIGRATE = [
       ALTER TABLE KANBAN_CARD ADD COLUMN CAMPAIGN_ID integer REFERENCES CAMPAIGN(ID) ON DELETE SET NULL;
     `
   },
+  {
+    version: '1.6.0',
+    description: 'Split categories and SAP codes',
+    sql: `
+      CREATE TABLE CATEGORY (
+        ID integer primary key autoincrement,
+        ACTIVE integer,
+        CATEGORY_NAME text,
+        CATEGORY_COLOR text
+      );
+
+      CREATE TABLE SAP_CODE (
+        ID integer primary key autoincrement,
+        CATEGORY_ID integer NOT NULL UNIQUE REFERENCES CATEGORY(ID) ON DELETE CASCADE,
+        TIPO_ATIVIDADE text,
+        ELEMENTO_PEP text,
+        DIAGRAMA_REDE text,
+        OPERACAO text,
+        SUBOPERACAO text,
+        PARTICAO text,
+        CENTRO_TRABALHO text,
+        CENTRO text
+      );
+
+      INSERT INTO CATEGORY (ID, ACTIVE, CATEGORY_NAME, CATEGORY_COLOR)
+      SELECT ID, ACTIVE, CATEGORY, CATEGORY_COLOR
+      FROM SAP_CAT2_OBJECT;
+
+      INSERT INTO SAP_CODE (
+        ID, CATEGORY_ID, TIPO_ATIVIDADE, ELEMENTO_PEP, DIAGRAMA_REDE,
+        OPERACAO, SUBOPERACAO, PARTICAO, CENTRO_TRABALHO, CENTRO
+      )
+      SELECT
+        ID, ID, TIPO_ATIVIDADE, ELEMENTO_PEP, DIAGRAMA_REDE,
+        OPERACAO, SUBOPERACAO, PARTICAO, CENTRO_TRABALHO, CENTRO
+      FROM SAP_CAT2_OBJECT;
+
+      DROP TABLE SAP_CAT2_OBJECT;
+    `
+  },
 ]
 
 
@@ -157,10 +197,28 @@ class SQLDatabase {
     for (const migration of SQL_MIGRATE) {
       if (!versions.includes(migration.version)) {
         console.log(`Migrating to version ${migration.version}: ${migration.description}`);
-        this.exec(migration.sql);
-        this.insert('SCHEMA_VERSION', ['DATETIME', 'VERSION', 'DESCRIPTION'], [new Date().toISOString(), migration.version, migration.description]);
+        this.transaction(() => {
+          this.exec(migration.sql);
+          this.insert('SCHEMA_VERSION', ['DATETIME', 'VERSION', 'DESCRIPTION'], [new Date().toISOString(), migration.version, migration.description]);
+        });
       }
     }
+  }
+
+  transaction<T>(callback: () => T): T {
+    this._conn.exec('BEGIN');
+    try {
+      const result = callback();
+      this._conn.exec('COMMIT');
+      return result;
+    } catch (error) {
+      this._conn.exec('ROLLBACK');
+      throw error;
+    }
+  }
+
+  close() {
+    this._conn.close();
   }
 
   prepare(sql: string) {

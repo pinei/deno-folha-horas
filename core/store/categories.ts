@@ -51,16 +51,24 @@ class CategorySummary {
 }
 
 class CategoryStore {
-    private fields = [
-        'CATEGORY', 'CATEGORY_COLOR', 'TIPO_ATIVIDADE', 'CENTRO_TRABALHO',
-        'CENTRO', 'ELEMENTO_PEP', 'DIAGRAMA_REDE', 'OPERACAO',
-        'SUBOPERACAO', 'PARTICAO', 'ACTIVE'
-    ]
+    private categoryFields = ['CATEGORY_NAME', 'CATEGORY_COLOR', 'ACTIVE']
 
-    private values(category: Category) {
+    private categoryValues(category: Category) {
         return [
             category.category,
             category.categoryColor,
+            category.active ? 1 : 0
+        ]
+    }
+
+    private sapCodeFields = [
+        'CATEGORY_ID', 'TIPO_ATIVIDADE', 'CENTRO_TRABALHO', 'CENTRO',
+        'ELEMENTO_PEP', 'DIAGRAMA_REDE', 'OPERACAO', 'SUBOPERACAO', 'PARTICAO'
+    ]
+
+    private sapCodeValues(category: Category) {
+        return [
+            category.id,
             category.sap.tipoAtividade,
             category.sap.centroTrabalho,
             category.sap.centro,
@@ -68,33 +76,48 @@ class CategoryStore {
             category.sap.diagramaRede,
             category.sap.operacao,
             category.sap.subOperacao,
-            category.sap.particao,
-            category.active ? 1 : 0
+            category.sap.particao
         ]
     }
 
     private insert(category: Category): Category {
         category.validated()
-        const changes = database.insert('SAP_CAT2_OBJECT', this.fields, this.values(category))
+        return database.transaction(() => {
+            const categoryChanges = database.insert('CATEGORY', this.categoryFields, this.categoryValues(category))
 
-        assert(changes > 0, 'Changes should be greater than zero')
-        assert(database.lastInsertRowId > 0, 'Row ID should be greater than zero')
+            assert(categoryChanges > 0, 'Changes should be greater than zero')
+            assert(database.lastInsertRowId > 0, 'Row ID should be greater than zero')
 
-        category.id = database.lastInsertRowId
-        return category
+            category.id = database.lastInsertRowId
+            const sapCodeChanges = database.insert('SAP_CODE', this.sapCodeFields, this.sapCodeValues(category))
+            assert(sapCodeChanges > 0, 'Changes should be greater than zero')
+
+            return category
+        })
     }
 
     private update(category: Category): Category {
         category.validated()
-        const changes = database.update(
-            'SAP_CAT2_OBJECT',
-            this.fields,
-            this.values(category),
-            `ID = ${category.id}`
-        )
+        return database.transaction(() => {
+            const categoryStatement = database.prepare(`
+                UPDATE CATEGORY
+                SET CATEGORY_NAME = ?, CATEGORY_COLOR = ?, ACTIVE = ?
+                WHERE ID = ?
+            `)
+            const categoryChanges = Number(categoryStatement.run(...this.categoryValues(category), category.id).changes)
+            assert(categoryChanges > 0, 'Changes should be greater than zero')
 
-        assert(changes > 0, 'Changes should be greater than zero')
-        return category
+            const sapCodeStatement = database.prepare(`
+                UPDATE SAP_CODE
+                SET TIPO_ATIVIDADE = ?, CENTRO_TRABALHO = ?, CENTRO = ?, ELEMENTO_PEP = ?,
+                    DIAGRAMA_REDE = ?, OPERACAO = ?, SUBOPERACAO = ?, PARTICAO = ?
+                WHERE CATEGORY_ID = ?
+            `)
+            const sapCodeChanges = Number(sapCodeStatement.run(...this.sapCodeValues(category).slice(1), category.id).changes)
+            assert(sapCodeChanges > 0, 'Changes should be greater than zero')
+
+            return category
+        })
     }
 
     merge(category: Category): Category {
@@ -102,17 +125,26 @@ class CategoryStore {
     }
 
     delete(id: number): boolean {
-        const changes = database.delete('SAP_CAT2_OBJECT', `ID = ${id}`)
+        const statement = database.prepare('DELETE FROM CATEGORY WHERE ID = ?')
+        const changes = Number(statement.run(id).changes)
         assert(changes > 0, 'Changes should be greater than zero')
         return changes > 0
     }
 
     list(): Category[] {
-        const results = database.select('SAP_CAT2_OBJECT', '*', '1 = 1', 'CATEGORY')
+        const results = database.query(`
+            SELECT
+                c.ID, c.CATEGORY_NAME, c.CATEGORY_COLOR, c.ACTIVE,
+                s.TIPO_ATIVIDADE, s.ELEMENTO_PEP, s.DIAGRAMA_REDE, s.OPERACAO,
+                s.SUBOPERACAO, s.PARTICAO, s.CENTRO_TRABALHO, s.CENTRO
+            FROM CATEGORY c
+            INNER JOIN SAP_CODE s ON s.CATEGORY_ID = c.ID
+            ORDER BY c.CATEGORY_NAME
+        `)
 
         return results.map((result: any) => new Category({
             id: result.ID,
-            category: result.CATEGORY,
+            category: result.CATEGORY_NAME,
             categoryColor: result.CATEGORY_COLOR,
             active: result.ACTIVE > 0,
             sap: {
@@ -130,13 +162,13 @@ class CategoryStore {
 
     listActive(): CategorySummary[] {
         const results = database.select(
-            'SAP_CAT2_OBJECT',
-            'CATEGORY, CATEGORY_COLOR',
+            'CATEGORY',
+            'CATEGORY_NAME, CATEGORY_COLOR',
             'ACTIVE = 1',
-            'CATEGORY'
+            'CATEGORY_NAME'
         )
 
-        return results.map((result: any) => new CategorySummary(result.CATEGORY, result.CATEGORY_COLOR))
+        return results.map((result: any) => new CategorySummary(result.CATEGORY_NAME, result.CATEGORY_COLOR))
     }
 }
 
