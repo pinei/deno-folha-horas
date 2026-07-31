@@ -1,13 +1,16 @@
 <template>
-    <div :id="dropdownId" class="ui fluid selection dropdown" :class="{ inverted: themeStore.isDark }">
-        <input type="hidden" name="category">
-        <i class="dropdown icon"></i>
-        <div class="default text">Select Category</div>
-        <div class="menu">
-            <div class="item" v-for="category in props.categories"
-                :key="category" :data-value="category.name">
-                <i class="circle icon" :class="[ category.color ]"></i>{{ category.name }}</div>
+    <div :class="{ 'ui corner labeled input fluid': props.required }">
+        <div :id="dropdownId" class="ui fluid selection dropdown" :class="{ inverted: themeStore.isDark }">
+            <input type="hidden" name="category">
+            <i class="dropdown icon"></i>
+            <div class="default text">Select Category</div>
+            <div class="menu">
+                <div class="item" v-for="category in props.categories"
+                    :key="category" :data-value="category.name">
+                    <i class="circle icon" :class="[ category.color ]"></i>{{ category.name }}</div>
+            </div>
         </div>
+        <div v-if="props.required" class="ui corner label"><i class="asterisk icon"></i></div>
     </div>
 </template>
 
@@ -34,6 +37,10 @@ const props = defineProps({
         required: true
     },
     enabled: {
+        type: Boolean,
+        default: false
+    },
+    required: {
         type: Boolean,
         default: false
     }

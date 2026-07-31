@@ -53,11 +53,8 @@
 					</div>
 					<div class="eight wide field" :class="isTsValidCategory(editingTimesheet) || 'error'">
 						<label>Category</label>
-						<div class="ui corner labeled input">
-							<CategoryDropdown
-								v-model="editingTimesheet.category" :categories="categories" :enabled="isModalVisible"></CategoryDropdown>
-							<div class="ui corner label"><i class="asterisk icon"></i></div>
-						</div>
+						<CategoryDropdown
+							v-model="editingTimesheet.category" :categories="categories" :enabled="isModalVisible" required></CategoryDropdown>
 					</div>
 				</div>
 				<div class="field" :class="isTsValidContext(editingTimesheet) || 'error'">

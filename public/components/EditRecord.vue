@@ -32,11 +32,8 @@
 			</div>
 			<div class="eight wide field" :class="isValidCategory || 'error'">
 				<label>Category</label>
-				<div class="ui corner labeled input">
-					<CategoryDropdown
-						v-model="state.record.category" :categories="state.categories" :enabled="state.isModalVisible"></CategoryDropdown>
-					<div class="ui corner label"><i class="asterisk icon"></i></div>
-				</div>
+				<CategoryDropdown
+					v-model="state.record.category" :categories="state.categories" :enabled="state.isModalVisible" required></CategoryDropdown>
 			</div>
 		</div>
 		<div class="field" :class="isValidContext || 'error'">

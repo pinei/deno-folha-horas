@@ -220,11 +220,10 @@ const removeRecord = (record) => {
     state.selectedRecord = {};
 }
 
-const saveRecord = (record) => {
+const saveRecord = async (record) => {
     log(`Saving record: ${JSON.stringify(record)}`)
-    timesheetStore.mergeRecord(record);
+    await timesheetStore.mergeRecord(record);
     state.isEditRecordVisible = false;
-    state.selectedRecord = {};
 }
 
 const cloneRecord = (record) => {
