@@ -1,7 +1,7 @@
 <template>
 	<h1>Categories</h1>
 	<div class="categories-table-wrapper">
-		<table class="ui selectable compact celled table tabbed">
+		<table class="ui selectable compact celled table tabbed" :class="{ inverted: themeStore.isDark }">
 			<thead>
 				<tr class="tab-row">
 					<th colspan="2"></th>
@@ -60,6 +60,9 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
 import { useCategoryAdminStore } from '../stores/category-admin-store.mjs'
+import { useThemeStore } from '../stores/theme-store.mjs'
+
+const themeStore = useThemeStore()
 
 const emptyCategory = () => ({
 	id: null,

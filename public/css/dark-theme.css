@@ -6,6 +6,7 @@ body.dark {
     --dark-text-color: #ffffff;
     --dark-text-primary: rgba(255, 255, 255, 0.87);
     --dark-border-color: rgba(255, 255, 255, 0.15);
+    --table-border-color: var(--dark-border-color);
     background-color: var(--dark-page-background);
     color: var(--dark-text-color);
 }
@@ -78,40 +79,9 @@ body.dark .ui.checkbox input:focus~label {
     color: var(--dark-text-color) !important;
 }
 
-/* Tabbed tables */
-body.dark .ui.table.tabbed {
-    background-color: transparent !important;
-    color: var(--dark-text-primary) !important;
-}
-
-body.dark .ui.table.tabbed tr.tab-row>th {
-    color: rgba(255, 255, 255, 0.95) !important;
-}
-
-body.dark .ui.table.tabbed thead tr:not(.tab-row)>th {
-    background-color: #242526 !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    border-color: var(--dark-border-color) !important;
-}
-
-body.dark .ui.table.tabbed tbody>tr>td {
-    background-color: var(--dark-surface-background) !important;
-    color: var(--dark-text-primary) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-body.dark .ui.selectable.table.tabbed tbody>tr:hover>td {
+/* Make Fomantic table headers distinct from body cells on the dark page background. */
+body.dark .ui.table thead>tr>th {
     background-color: var(--dark-hover-background) !important;
-    color: var(--dark-text-color) !important;
-}
-
-body.dark .ui.table.tabbed tr.tab-row+tr>th:nth-child(-n+2),
-body.dark .ui.table.tabbed thead tr:not(.tab-row)>th:first-child,
-body.dark .ui.table.tabbed tbody tr>td:first-child,
-body.dark .ui.table.tabbed thead tr:not(.tab-row)>th:last-child,
-body.dark .ui.table.tabbed tbody tr>td:last-child,
-body.dark .ui.table.tabbed tbody tr:last-child>td {
-    border-color: var(--dark-border-color) !important;
 }
 
 /* Modals dimmer background */
