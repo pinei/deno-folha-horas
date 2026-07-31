@@ -14,7 +14,7 @@
         
         <div v-if="state.report.length > 0" >
             <div class="ui scrolling container">
-                <table class="ui first head foot stuck unstackable celled table">
+                <table class="ui first head foot stuck unstackable celled table" :class="{ inverted: themeStore.isDark }">
                     <thead>
                         <tr>
                             <th>Categoria</th>
@@ -79,6 +79,9 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
 import timesheetReportApi from '../services/timesheet-report-api.mjs';
+import { useThemeStore } from '../stores/theme-store.mjs';
+
+const themeStore = useThemeStore();
 
 const log = (message, object) => {
     if (object)
